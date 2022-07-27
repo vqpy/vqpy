@@ -17,7 +17,7 @@ class FrameStream:
         self.frame = None
         logger.info("Parameters of video is width={}, height={}, fps={}".format(self.frame_width, self.frame_height, self.fps))
     
-    @vqpy_logger
+    #@vqpy_logger
     def next(self):
         self.frame_id += 1
         ret_val, self.frame = self._cap.read()

@@ -18,7 +18,7 @@ class Vehicle(vqpy.VObjBase):
         self._list_lp = []
     @vqpy.property()
     def license_plate(self):
-        this_lp = vqpy.infer(self, 'license_plate', ['frame', 'tlbr'])
+        this_lp = self.infer('license_plate', {'license_plate': 'openalpr'})
         self._list_lp.append(this_lp)
         if len(self._list_lp) > 100:
             self._list_lp = self._list_lp[1:]

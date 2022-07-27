@@ -56,6 +56,7 @@ def launch(cls_name, cls_type, workers: List[QueryBase]):
         tracked_tracks, _ = byte_tracker.update(outputs)
         for worker in workers:
             res = worker.apply(tracked_tracks)
-            if res != []: print(res)
+            # TODO: add downstream functions for worker processing
+            # if res != []: print(res)
         if args.save_result:
             visual.vis(frame, tracked_tracks, yolox_predictor.cls_names)

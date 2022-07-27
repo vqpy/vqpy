@@ -6,14 +6,13 @@ from vqpy.funcutils import *
 
 _vqpy_basefuncs: Dict[str, List[str]] = {}
 _vqpy_libfuncs: Dict[str, Tuple[List[str], List[str], List[str], Callable]] = {}
-def vqpy_func_logger(input_fields, output_fields, stateful_input_fields, specifications = None):
+def vqpy_func_logger(input_fields, output_fields, past_fields, specifications = None):
     # generate a property from other properties
     # TODO: support specifications on classes of objects
     # TODO: support more accurate automatic selection of used functions
-    # TODO: merge input_fields and stateful_input_fields in this backend
     def decorator(func : Callable):
         global _vqpy_libfuncs, _vqpy_basefuncs
-        _vqpy_libfuncs[func.__name__] = (input_fields, output_fields, stateful_input_fields, func)
+        _vqpy_libfuncs[func.__name__] = (input_fields, output_fields, past_fields, func)
         for index, field in enumerate(output_fields):
             if field not in _vqpy_basefuncs:
                 _vqpy_basefuncs[field] = [func.__name__]
@@ -38,16 +37,25 @@ def bbox_velocity(obj):
     return [v]
 
 @vqpy_func_logger(['frame', 'tlbr'], ['license_plate'], [])
-def license_plate(obj, frame, tlbr):
+def license_plate_lprnet(obj, frame, tlbr):
     from vqpy.models.lprnet import GetLP
     if obj._track_length < 1: return [None]
     img = CropImage(frame, tlbr)
     return [GetLP(img)]
 
+@vqpy_func_logger(['frame', 'tlbr'], ['license_plate'], [])
+def license_plate_openalpr(obj, frame, tlbr):
+    from vqpy.models.openalpr import GetLP
+    if obj._track_length < 1: return [None]
+    img = CropImage(frame, tlbr)
+    return [GetLP(img)]
+
 @vqpy_logger
-def infer(obj, attr: str, existing_fields: List[str]):
-    if attr not in _vqpy_libfuncs:
+def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str] = [], specifications = None):
+    if attr not in _vqpy_basefuncs:
         return None
+    if specifications is None:
+        specifications = {}
     data = {}
     waitlist = [attr]
     calls = []
@@ -55,17 +63,27 @@ def infer(obj, attr: str, existing_fields: List[str]):
     q.put(attr)
     while not q.empty():
         attr = q.get()
-        best, bscore = None, -1e4
+        eval = None
+        if attr in specifications:
+            eval = lambda x: longest_prefix_in(specifications[attr], x)
+        INF = 1e4
+        best, bscore = None, -INF**2
         for name in _vqpy_basefuncs[attr]:
-            input_fields, output_fields, _, _ = _vqpy_libfuncs[name]
+            input_fields, output_fields, past_fields, _ = _vqpy_libfuncs[name]
             alive = True
+            for field in past_fields:
+                if field not in existing_pfields:
+                    alive = False
+                    break
+            if not alive:
+                continue
             for field in input_fields:
                 if field in waitlist:
                     alive = False
                     break
             if not alive:
-                break
-            score = 0
+                continue
+            score = 0 if eval is None else eval(name) * INF
             for field in input_fields:
                 if field not in existing_fields:
                     score -= 5
@@ -76,7 +94,6 @@ def infer(obj, attr: str, existing_fields: List[str]):
                 best = name
                 bscore = score
         if best is None:
-            # resolve attribute failed
             return None
         input_fields, output_fields, _, _ = _vqpy_libfuncs[best]
         for field in input_fields:

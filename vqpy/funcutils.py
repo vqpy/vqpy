@@ -12,8 +12,10 @@ def vqpy_logger(func: Callable):
             if len(ret) > 100: ret = ret[:100] + '...) '
             return ret
         # logger.info(f'CALL {func.__module__}::{func.__name__} with parameter:')
-        # logger.info(f'args={tostr(args)}, kwargs={tostr(kwargs)}')
-        return func(*args, **kwargs)
+        # logger.info(f'args={[tostr(x) for x in args]}, kwargs={tostr(kwargs)}')
+        rets = func(*args, **kwargs)
+        # logger.info(f'{rets}')
+        return rets
     return wrapper
 
 import numpy as np
@@ -40,3 +42,12 @@ def CropImage(img, tlbr, ext=0):
         maxy = int(min(maxy + h * ext / 2, img.shape[0]))
         return img[miny:maxy+1, minx:maxx+1, :]
     return None
+
+def longest_prefix_in(b, a):
+    # return the longest prefix of b that appears in a (for best match)
+    l, r = 0, len(b)
+    while l < r:
+        m = (l + r + 1) >> 1
+        if b[:m] in a: l = m
+        else: r = m - 1
+    return l
