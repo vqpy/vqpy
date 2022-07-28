@@ -17,20 +17,9 @@ class Vehicle(vqpy.VObjBase):
         super().__init__(ctx)
         self._list_lp = []
     @vqpy.property()
+    @vqpy.postproc({'majority': 100})
     def license_plate(self):
-        this_lp = self.infer('license_plate', {'license_plate': 'openalpr'})
-        self._list_lp.append(this_lp)
-        if len(self._list_lp) > 100:
-            self._list_lp = self._list_lp[1:]
-        local_map = {}
-        for it in self._list_lp:
-            if it in local_map: local_map[it] += 1
-            else: local_map[it] = 1
-        ret = (None, 0)
-        for it, v in local_map.items():
-            if it is not None and v > ret[1]:
-                ret = (it, v)
-        return ret[0]
+        return self.infer('license_plate', {'license_plate': 'openalpr'})
 
 class ListMovingVehicle(vqpy.QueryBase):
     def apply(self, tracks: List[vqpy.VObjBase]) -> List[Dict]:

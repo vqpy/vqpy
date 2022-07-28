@@ -11,8 +11,8 @@ from vqpy.basics import MultiTracker
 from vqpy.visualize import Visualizer
 from vqpy.objects import property, stateful
 from vqpy.functions import infer
-from vqpy.objects import VObjBase
-from vqpy.database import QueryBase, vobj_select, vobj_filter
+from vqpy.objects import VObjBase, postproc
+from vqpy.database import QueryBase, vobj_select, vobj_filter, vobj_argmin
 
 def make_parser():
     parser = argparse.ArgumentParser("VQPy Demo!")

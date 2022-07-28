@@ -67,6 +67,7 @@ class MultiTracker(object):
             if func in detections:
                 dets = detections[func]
             f_tracked, f_lost = tracker.update(dets)
+            self.stream._objdatas = f_tracked
             for item in f_tracked:
                 track_id = item['track_id']
                 if track_id not in self.vobj_pool:

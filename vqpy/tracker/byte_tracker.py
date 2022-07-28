@@ -286,7 +286,7 @@ def remove_duplicate_stracks(stracksa : List[ByteTracker.Data], stracksb : List[
     dupa, dupb = list(), list()
     for p, q in zip(*pairs):
         timep = stracksa[p].frame_id - stracksa[p].start_frame
-        timeq = stracksb[q].frame_id - stracksb[q]
+        timeq = stracksb[q].frame_id - stracksb[q].start_frame
         if timep > timeq:
             dupb.append(q)
         else:

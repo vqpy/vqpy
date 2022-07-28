@@ -14,4 +14,5 @@ def GetLP(image):
     if len(results) == 0: return None
     if results[0]['confidence'] < 75:
         return None
+    print(f'plate detected {results[0]["plate"]}')
     return results[0]['plate']

@@ -53,12 +53,32 @@ def stateful(length: int = 0):
         return wrapper
     return decorator
 
-def worker(cond: Dict):
-    """
-    Fetch the detection results to functional arguments.
-    cond: which results to fetch
-    """
-    # TODO: complete worker definition
+def postproc(params: Dict):
+    if 'majority' in params:
+        size = params['majority']
+        def decorator(func: Callable):
+            @functools.wraps(func)
+            def wrapper(self, *args, **kwargs):
+                name = '__postproc_majority_' + func.__name__
+                if not hasattr(self, name):
+                    setattr(self, name, [])
+                values = getattr(self, name)
+                values.append(func(self, *args, **kwargs))
+                if len(values) > size:
+                    values = values[1:]
+                local_map = {}
+                for it in values:
+                    if it in local_map: local_map[it] += 1
+                    else: local_map[it] = 1
+                ret = (None, 0)
+                for it, v in local_map.items():
+                    if it is not None and v > ret[1]:
+                        ret = (it, v)
+                return ret[0]
+            return wrapper
+        return decorator
+    else:
+        raise NotImplementedError
 
 class VObjBase(object):
     # When the vobject is active, keep it updated
