@@ -2,8 +2,6 @@ from loguru import logger
 import cv2
 import os
 
-from vqpy.funcutils import vqpy_logger
-
 class FrameStream:
     output_fields = ['frame', 'frame_id', 'frame_width', 'frame_height', 'fps']
     
@@ -18,7 +16,6 @@ class FrameStream:
         logger.info("Parameters of video is width={}, height={}, fps={}".format(self.frame_width, self.frame_height, self.fps))
         self._objdatas = None
     
-    #@vqpy_logger
     def next(self):
         self.frame_id += 1
         ret_val, self.frame = self._cap.read()

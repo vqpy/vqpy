@@ -10,7 +10,7 @@ sys.path.append("./models/lpdetect")
 sys.path.append("./models/lpdetect/LPRNet")
 sys.path.append("./models/lpdetect/MTCNN")
 
-from vqpy.funcutils import CropImage
+from vqpy.utils.images import CropImage
 import torch
 import numpy as np
 import cv2

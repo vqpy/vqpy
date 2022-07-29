@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import List, Tuple, Dict, Optional, Callable, Any
-from vqpy.funcutils import vqpy_logger
 from vqpy.video_loader import FrameStream
 from vqpy.functions import _vqpy_libfuncs, infer
 import functools
 
 def property():
     """
+    @property decorator should ALWAYS appear as the FIRST decorator.
     Ensures a method of an VObj is computed exactly once per frame.
     When having incoming updates, call all functions with @property decorators.
     TODO: add more features for @property
@@ -33,10 +33,10 @@ def property():
 
 def stateful(length: int = 0):
     """
+    @stateful decorator stores the return value into `__state_` field.
+    If a function is decorated with @stateful, it also should be decorated with @property.
     TODO: we can merge @property to @stateful.
-    ALL @stateful FUNCTIONS SHOULD BE @property FUNCTIONS.
-    Store historic values of a function into '__state_' field.
-    length:     the number of frames to reserve the value, by default store all values.
+    length: the number of frames to reserve the value, by default store all values.
     """
     def decorator(func : Callable):
         @functools.wraps(func)
@@ -54,6 +54,12 @@ def stateful(length: int = 0):
     return decorator
 
 def postproc(params: Dict):
+    """
+    Run a set of postprocessing functions for the function's result.
+    Input the parameters in a dictionary of form {process_name: setting}
+    Currently only `majority` is supported, it has a integer parameter N,
+      denoting that we return the majority vote of the result in last N frames.
+    """
     if 'majority' in params:
         size = params['majority']
         def decorator(func: Callable):
@@ -126,7 +132,6 @@ class VObjBase(object):
         elif idx < len(self._datas) and self._datas[idx] is not None and attr in self._datas[idx]:
             return self._datas[idx][attr]
         elif index == -1:
-            # For 
             if attr in self._ctx.output_fields:
                 return getattr(self._ctx, attr)
             elif hasattr(self, '__record_' + attr) and getattr(self, '__index_' + attr) == self._ctx.frame_id:
@@ -154,7 +159,6 @@ class VObjBase(object):
             else:
                 return None
     
-    @vqpy_logger
     def update(self, data: Optional[Dict]):
         # TODO: it is possible to not store all the items
         if data is not None:
@@ -166,9 +170,8 @@ class VObjBase(object):
         for method_name in self._registered_names:
             getattr(self, method_name)()
     
-    @vqpy_logger
     def infer(self, attr: str, specifications: Optional[Dict[str, str]] = None):
-        # wrapper for vqpy.infer
+        """A easy-to-use interface provided to user to use functions in built-in functions"""
         return infer(self, attr, self._get_fields(), self._get_pfields(), specifications)
 
 VObjGeneratorType = Callable[[FrameStream], VObjBase]

@@ -2,19 +2,6 @@
 import functools
 from typing import Callable, Dict, List, Optional, Tuple
 from vqpy.objects import VObjBase
-from vqpy.video_loader import FrameStream
-
-class QueryBase:
-    def attach(self, ctx: FrameStream):
-        # attach the working stream with the query object
-        self._ctx = ctx
-    
-    def apply(self, tracks: List[VObjBase]) -> List[Dict]:
-        """
-        Apply something required to the per-frame updated tracks.
-        tracks: the list of all VQPy objects appeared in this frame.
-        """
-        pass
 
 def _filter(x: VObjBase, cond: Dict[str, Callable]) -> Optional[VObjBase]:
     for item, func in cond.items():
@@ -24,11 +11,17 @@ def _filter(x: VObjBase, cond: Dict[str, Callable]) -> Optional[VObjBase]:
     return x
 
 def vobj_filter(tracks: List[VObjBase], cond: Dict[str, Callable]) -> List[VObjBase]:
-    # this function works like the WHERE clause in SQL
+    """works like WHERE clause in SQL
+    Select some fields of the list of vobjects
+    Result is returned as list of dictionary
+    """
     return list(filter(None, list(map(lambda x: _filter(x, cond), tracks))))
 
 def vobj_select(tracks: List[VObjBase], cond: Dict[str, Callable]) -> List[Dict]:
-    # this function works like the SELECT clause in SQL
+    """works like SELECT clause in SQL
+    Select some fields of the list of vobjects
+    Result is returned as list of dictionary
+    """
     return [{key: postproc(x.getv(key)) for key, postproc in cond.items()} for x in tracks]
 
 def vobj_argmin(tracks: List[VObjBase], func: Callable, args: List):

@@ -1,3 +1,5 @@
+# Based on demo implementation in Megvii YOLOX repo
+
 from typing import Dict, List
 
 import torch
@@ -5,7 +7,9 @@ import numpy as np
 from loguru import logger
 from vqpy.basics import PredictorBase
 from vqpy.utils import *
+import sys
 
+sys.path.append("./models/yolo")
 
 class YOLOXPredictor(PredictorBase):
     

@@ -19,6 +19,7 @@ class ByteTracker(object):
         def __init__(self, data: Dict): 
             """Create an instance of ByteTracker Data field"""
             self.track_id = self.next_id()
+            # It is possible to remove duplicated (track_id)s for the same tracks
             self.data = data
             self._tlbr = np.asarray(data["tlbr"], dtype=np.float)
             self.score = data["score"]

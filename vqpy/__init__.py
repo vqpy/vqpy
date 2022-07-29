@@ -7,12 +7,13 @@ from loguru import logger
 from vqpy.video_loader import FrameStream
 from vqpy.predictor import YOLOXPredictor
 from vqpy.tracker import ByteTracker
-from vqpy.basics import MultiTracker
+from vqpy.basics import MultiTracker, QueryBase
 from vqpy.visualize import Visualizer
 from vqpy.objects import property, stateful
 from vqpy.functions import infer
 from vqpy.objects import VObjBase, postproc
-from vqpy.database import QueryBase, vobj_select, vobj_filter, vobj_argmin
+from vqpy.database import vobj_select, vobj_filter, vobj_argmin, access_data
+from vqpy.utils import COCO_CLASSES
 
 def make_parser():
     parser = argparse.ArgumentParser("VQPy Demo!")
@@ -49,14 +50,17 @@ def launch(cls_name, cls_type, workers: List[QueryBase]):
     yolox_predictor = YOLOXPredictor(device="gpu", fp16=True)
     # Bytetracker setup
     byte_tracker = MultiTracker(ByteTracker, stream, cls_name, cls_type)
+    # worker setup
+    for worker in workers: worker.attach(stream)
     
     for frame_id in tqdm(range(1, stream.n_frames + 1)):
         frame = stream.next()
         outputs = yolox_predictor.inference(frame)
         tracked_tracks, _ = byte_tracker.update(outputs)
         for worker in workers:
-            res = worker.apply(tracked_tracks)
-            # TODO: add downstream functions for worker processing
-            # if res != []: print(res)
+            worker.apply(tracked_tracks)
         if args.save_result:
             visual.vis(frame, tracked_tracks, yolox_predictor.cls_names)
+
+    for worker in workers:
+        worker.finalize()

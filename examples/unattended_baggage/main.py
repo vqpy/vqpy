@@ -1,31 +1,37 @@
+from __future__ import annotations
+import sys
+
+sys.path.append(".")
+sys.path.append("./models/yolo")
+sys.path.append("./vqpy_demo")
+
 from typing import List
 import vqpy
-from __future__ import annotations
 import numpy as np
 
 from vqpy.utils import COCO_SUPERCLASSES
 
 def distance(person : Person, accessory : Accessory):
-    d = person.getv("coordinate", -1) - accessory.getv("coordinate", -1)
+    d = person.getv("coordinate") - accessory.getv("coordinate")
     return float(np.sqrt(sum(d * d)))
-
-# TODO: add required input_fields and output_fields
 
 class Person(vqpy.VObjBase):
     pass
 
 class Accessory(vqpy.VObjBase):
+    required_fields = [""]
     threshold = 10
     OwnDist = 5
     @vqpy.property()
     @vqpy.stateful(2)
-    @vqpy.worker(({"type": Person, "is_activated": True}))
-    def owner(self, person : List[vqpy.VObjBase]):
+    @vqpy.access_data(({"__class__": lambda x: x == Person}))
+    def owner(self, person : List[Person]):
+        # TODO: Should we allow the accessory maintains a historic version of value?
         last_owner = self.getv("owner", -2)
         if last_owner is not None:
-            p = vqpy.vobj_filter(person, {"track_id": lambda x: x == last_owner})
+            p: List[Person] = vqpy.vobj_filter(person, {"track_id": lambda x: x == last_owner})
             if len(p) == 1 and distance(p[0], self) < Accessory.OwnDist:
-                return p[0]
+                return p[0].getv("track_id")
         p: Person = vqpy.vobj_argmin(person, distance, (None, self))
         if p is not None and distance(p, self) < Accessory.OwnDist:
             return p
@@ -42,9 +48,8 @@ class Accessory(vqpy.VObjBase):
 
 class TriggerAlarm(vqpy.QueryBase):
     def apply(self, tracks : List[vqpy.VObjBase]):
-        objs: List[Accessory] = vqpy.vobj_select(tracks, {"__class__": lambda x: x == Accessory, "abandoned": lambda x: x})
-        return objs.getv("image")
+        return vqpy.vobj_select(vqpy.vobj_filter(tracks, {"__class__": lambda x: x == Accessory, "abandoned": lambda x: x}), "image")
 
-vqpy.launch(cls_type = COCO_SUPERCLASSES,
-            cls_dict = {"person": Person, "accessory": Accessory},
+vqpy.launch(cls_name = COCO_SUPERCLASSES,
+            cls_type = {"person": Person, "accessory": Accessory},
             workers = [TriggerAlarm()])
