@@ -1,9 +1,11 @@
 import sys
+
 sys.path.append(".")            # enable us to import vqpy module
 
-from typing import Dict, List
+from typing import List
 
 import vqpy
+
 
 class Vehicle(vqpy.VObjBase):
     required_fields = ['class_id', 'tlbr']
@@ -18,7 +20,7 @@ class ListMovingVehicle(vqpy.QueryBase):
         self.n_movings = 0
         self.set_movings = {}
     
-    def apply(self, tracks: List[vqpy.VObjBase]) -> None:
+    def apply(self, tracks: List[vqpy.VObjBase]) -> List[vqpy.VObjBase]:
         movings = vqpy.vobj_select(
                     vqpy.vobj_filter(tracks,
                     {'__class__': lambda x: x == Vehicle,
@@ -33,10 +35,14 @@ class ListMovingVehicle(vqpy.QueryBase):
             self.set_movings[moving['track_id']] = moving['license_plate']
     
     def finalize(self) -> None:
-        print('Average moving vehicle count = {%.3f}' % self.n_movings / self.n_frames)
+        print('Average moving vehicle count = {%.3f}' % (self.n_movings / self.n_frames))
         print('All moving vehicle count = {%d}' % len(self.set_movings.items()))
-        # print(self.set_movings)
+        for item in self.set_movings.items(): print(item)
+
+worker = ListMovingVehicle()
 
 vqpy.launch(cls_name=vqpy.COCO_CLASSES,
             cls_type={"car": Vehicle, "truck": Vehicle},
-            workers=[ListMovingVehicle()])
+            workers=[worker])
+
+worker.finalize()

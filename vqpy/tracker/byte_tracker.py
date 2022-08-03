@@ -3,13 +3,15 @@ from __future__ import annotations
 from typing import Dict, List, Tuple
 
 import numpy as np
-from vqpy.video_loader import FrameStream
+from vqpy.base.ground_tracker import GroundTrackerBase
+from vqpy.utils.video import FrameStream
 
 from . import matching
 from .base_track import BaseTrack, TrackState
 from .kalman_filter import KalmanFilter
 
-class ByteTracker(object):
+
+class ByteTracker(GroundTrackerBase):
     shared_kalman = KalmanFilter()
     
     input_fields = ["tlbr", "score"]

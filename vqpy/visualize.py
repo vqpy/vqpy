@@ -4,8 +4,8 @@ import numpy as np
 import time, os
 from loguru import logger
 
-from vqpy.objects import VObjBase
-from vqpy.video_loader import FrameStream
+from vqpy.impl.vobj_base import VObjBase
+from vqpy.utils.video import FrameStream
 
 class Visualizer:
     input_fields = ["tlbr", "class_id", "track_id" "score", "bbox_velocity", "license_plate"]

@@ -11,6 +11,14 @@ def tlbr_to_xyah(tlbr):
     return ret
 
 def CropImage(img, tlbr, ext=0):
+    """Crop part of the image
+    Args:
+        img (np.ndarray): the image file
+        tlbr (np.ndarray): the bounding box of the image
+        ext (float, optional): how much we extend the bounding box. Defaults to 0.
+    Returns:
+        Optional[np.ndarray]: the cropped image.
+    """
     _, _, w, h = tlbr_to_xyah(tlbr)
     if tlbr[0] >= -w * 0.2 and tlbr[1] >= -h * 0.2 and \
        tlbr[2] <= img.shape[1] + w * 0.2 and tlbr[3] <= img.shape[0] + h * 0.2:

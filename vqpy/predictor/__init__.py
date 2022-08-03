@@ -1,1 +1,0 @@
-from .yolox_predictor import *

@@ -2,34 +2,34 @@
 
 from typing import Dict, List
 
-import torch
 import numpy as np
+import torch
 from loguru import logger
-from vqpy.basics import PredictorBase
-from vqpy.utils import *
-import sys
+from vqpy.base.detector import DetectorBase
+from vqpy.utils.classes import COCO_CLASSES
 
-sys.path.append("./models/yolo")
 
-class YOLOXPredictor(PredictorBase):
-    
-    from models.yolo.yolox.data.data_augment import ValTransform
-    from models.yolo.yolox.exp.build import get_exp
-    from models.yolo.yolox.utils import postprocess
-    from models.yolo.yolox.utils.model_utils import get_model_info
+class YOLOXDetector(DetectorBase):
     
     cls_names = COCO_CLASSES
     output_fields = ["tlbr", "score", "class_id"]
     
     def __init__(self, device="cpu", fp16=False):
+        import sys
+        sys.path.append("./models/yolo")
         
-        exp = YOLOXPredictor.get_exp(None, "yolox_x")
+        from models.yolo.yolox.data.data_augment import ValTransform
+        from models.yolo.yolox.exp.build import get_exp
+        from models.yolo.yolox.utils import postprocess
+        from models.yolo.yolox.utils.model_utils import get_model_info
+        
+        exp = get_exp(None, "yolox_x")
         exp.test_conf = 0.3
         exp.nmsthre = 0.3
         exp.test_size = (640, 640)
         
         model = exp.get_model()
-        logger.info("Model Summary: {}".format(YOLOXPredictor.get_model_info(model, exp.test_size)))
+        logger.info("Model Summary: {}".format(get_model_info(model, exp.test_size)))
         if device == 'gpu':
             model.cuda()
             if fp16:
@@ -48,7 +48,8 @@ class YOLOXPredictor(PredictorBase):
         self.test_size = exp.test_size
         self.device = device
         self.fp16 = fp16
-        self.preproc = YOLOXPredictor.ValTransform(legacy=False)
+        self.preproc = ValTransform(legacy=False)
+        self.postproc = postprocess
 
     def inference(self, img) -> List[Dict]:
         ratio = min(self.test_size[0] / img.shape[0], self.test_size[1] / img.shape[1])
@@ -63,7 +64,7 @@ class YOLOXPredictor(PredictorBase):
 
         with torch.no_grad():
             outputs = self.model(img)
-            outputs = YOLOXPredictor.postprocess(
+            outputs = self.postproc(
                 outputs, self.num_classes, self.confthre,
                 self.nmsthre, class_agnostic=True
             )

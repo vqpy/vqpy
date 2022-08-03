@@ -1,19 +1,23 @@
 import argparse
 import os
 from typing import List
-from tqdm import tqdm
-from loguru import logger
 
-from vqpy.video_loader import FrameStream
-from vqpy.predictor import YOLOXPredictor
-from vqpy.tracker import ByteTracker
-from vqpy.basics import MultiTracker, QueryBase
+from loguru import logger
+from tqdm import tqdm
+
+from vqpy.base.query import QueryBase
+from vqpy.detector import setup_detector
+from vqpy.feat.database import vobj_argmin, vobj_filter, vobj_select
+from vqpy.feat.feat import access_data, postproc, property, stateful
+from vqpy.function import infer
+from vqpy.impl.multiclass_tracker import \
+    MultiTracker as default_surface_tracker
+from vqpy.impl.vobj_base import VObjBase
+from vqpy.tracker import setup_ground_tracker
+from vqpy.utils.classes import COCO_CLASSES
+from vqpy.utils.video import FrameStream
 from vqpy.visualize import Visualizer
-from vqpy.objects import property, stateful
-from vqpy.functions import infer
-from vqpy.objects import VObjBase, postproc
-from vqpy.database import vobj_select, vobj_filter, vobj_argmin, access_data
-from vqpy.utils import COCO_CLASSES
+
 
 def make_parser():
     parser = argparse.ArgumentParser("VQPy Demo!")
@@ -46,21 +50,16 @@ def launch(cls_name, cls_type, workers: List[QueryBase]):
     if args.save_result:
         visual = Visualizer(args, stream)
     
-    # YOLOX model setup
-    yolox_predictor = YOLOXPredictor(device="gpu", fp16=True)
-    # Bytetracker setup
-    byte_tracker = MultiTracker(ByteTracker, stream, cls_name, cls_type)
+    detector = setup_detector(device="gpu", fp16=True)
+    tracker = default_surface_tracker(setup_ground_tracker, stream, cls_name, cls_type)
     # worker setup
     for worker in workers: worker.attach(stream)
     
     for frame_id in tqdm(range(1, stream.n_frames + 1)):
         frame = stream.next()
-        outputs = yolox_predictor.inference(frame)
-        tracked_tracks, _ = byte_tracker.update(outputs)
+        outputs = detector.inference(frame)
+        tracked_tracks, _ = tracker.update(outputs)
         for worker in workers:
             worker.apply(tracked_tracks)
         if args.save_result:
-            visual.vis(frame, tracked_tracks, yolox_predictor.cls_names)
-
-    for worker in workers:
-        worker.finalize()
+            visual.vis(frame, tracked_tracks, detector.cls_names)

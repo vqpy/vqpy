@@ -1,6 +1,7 @@
-from loguru import logger
 import cv2
-import os
+from loguru import logger
+
+# TODO: support different types of video streams
 
 class FrameStream:
     output_fields = ['frame', 'frame_id', 'frame_width', 'frame_height', 'fps']

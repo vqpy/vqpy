@@ -1,69 +1,19 @@
-import functools
-from math import sqrt
+"""
+This folder (function/) contains the VQPy lib functions.
+The (expected) only visible interface of this folder is `infer`.
+"""
+
 from queue import Queue
-from typing import Any, Dict, Callable, List, Tuple
-from vqpy.utils.images import CropImage
-from vqpy.utils.strings import longest_prefix_in
+from typing import Any, Dict, List
 
-_vqpy_basefuncs: Dict[str, List[str]] = {}
-_vqpy_libfuncs: Dict[str, Tuple[List[str], List[str], List[str], Callable]] = {}
-def vqpy_func_logger(input_fields, output_fields, past_fields, specifications = None, required_length = -1):
-    """Add function to log
-    Args:
-        input_fields: required fields in this frame.
-        output_fields: provided fields.
-        past_fields: required fields in past frames.
-        specifications: preference of the function (TODO).
-        required_length: the minimum track length for function to be useful.
-    """
-    # TODO: support specifications on classes of objects
-    # TODO: support more accurate automatic selection of used functions
-    def decorator(func : Callable):
-        @functools.wraps(func)
-        def wrapper(obj, *args, **kwargs):
-            if obj._track_length < required_length and required_length >= 0:
-                return [None]
-            return func(obj, *args, **kwargs)
-        global _vqpy_libfuncs, _vqpy_basefuncs
-        _vqpy_libfuncs[func.__name__] = (input_fields, output_fields, past_fields, wrapper)
-        for index, field in enumerate(output_fields):
-            if field not in _vqpy_basefuncs:
-                _vqpy_basefuncs[field] = [func.__name__]
-            else:
-                _vqpy_basefuncs[field].append(func.__name__)
-        return wrapper
-    return decorator
+from vqpy.utils.strings import longest_prefix_in as _default_metric
 
-@vqpy_func_logger(['tlbr'], ['bbox_velocity'], ['tlbr'], required_length=2)
-def bbox_velocity(obj, tlbr):
-    tlbr_c, tlbr_p = tlbr, obj.getv('tlbr', -2)
-    center_c = (tlbr_c[:2] + tlbr_c[2:]) / 2
-    center_p = (tlbr_p[:2] + tlbr_p[2:]) / 2
-    tlbr_avg = (tlbr_c + tlbr_p) / 2
-    scale = (tlbr_avg[3] - tlbr_avg[1]) / 1.5
-    dcenter = (center_c - center_p) / scale * obj._ctx.fps
-    v = sqrt(sum(dcenter * dcenter))
-    return [v]
+from .functions import *
+from .logger import _vqpy_basefuncs, _vqpy_libfuncs
 
-@vqpy_func_logger(['frame', 'tlbr'], ['image'], [], required_length=1)
-def image_boundarycrop(obj, frame, tlbr):
-    return [CropImage(frame, tlbr)]
+# TODO: formally define the format of `specifications`, supporting more accurate
+# automatic selection, applicable condition for functions, etc.
 
-@vqpy_func_logger(['image'], ['license_plate'], [], required_length=1)
-def license_plate_lprnet(obj, image):
-    from vqpy.models.lprnet import GetLP
-    return [GetLP(image)]
-
-@vqpy_func_logger(['image'], ['license_plate'], [], required_length=1)
-def license_plate_openalpr(obj, image):
-    from vqpy.models.openalpr import GetLP
-    return [GetLP(image)]
-
-@vqpy_func_logger(['tlbr'], ['coordinate'], [], required_length=1)
-def coordinate_center(obj, tlbr):
-    return (tlbr[:2] + tlbr[2:]) / 2
-
-# @vqpy_logger
 def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str] = [], specifications = None):
     """Infer a undefined attribute based on provided fields and logged functions
     Args:
@@ -90,7 +40,7 @@ def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str
         attr = q.get()
         eval = None
         if attr in specifications:
-            eval = lambda x: longest_prefix_in(specifications[attr], x)
+            eval = lambda x: _default_metric(specifications[attr], x)
         INF = 1e4
         best, bscore = None, -INF**2
         for name in _vqpy_basefuncs[attr]:
