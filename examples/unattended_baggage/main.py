@@ -1,3 +1,4 @@
+"""
 from __future__ import annotations
 import sys
 
@@ -48,8 +49,10 @@ class Accessory(vqpy.VObjBase):
 
 class TriggerAlarm(vqpy.QueryBase):
     def apply(self, tracks : List[vqpy.VObjBase]):
-        return vqpy.vobj_select(vqpy.vobj_filter(tracks, {"__class__": lambda x: x == Accessory, "abandoned": lambda x: x}), "image")
+        return vqpy.vobj_select(vqpy.vobj_filter(tracks,
+                 {"__class__": lambda x: x == Accessory, "abandoned": lambda x: x}), "image")
 
 vqpy.launch(cls_name = COCO_SUPERCLASSES,
             cls_type = {"person": Person, "accessory": Accessory},
             workers = [TriggerAlarm()])
+"""

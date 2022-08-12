@@ -1,19 +1,24 @@
+"""Interfaces that requires 
+"""
+
 from typing import Dict, List, Optional
 
 from ..utils.video import FrameStream
 
 
 class VObjBaseInterface(object):
-    # When the vobject is active, keep it updated
-    
+    """The interface of VObject Base Class.
+    The tracker is responsible to keep the objects updated when the track is active.
+    """
+
     def __init__(self, ctx: FrameStream):
         self._ctx = ctx
         self._start_idx = ctx.frame_id
         self._track_length = 0                          # Number of frames consecutively appears
-        self._datas: List[Optional[Dict]] = []          # Historic object data. TODO: reduce the memory cost of _datas
+        self._datas: List[Optional[Dict]] = []          # Historic object data. TODO: shrink memory
         self._registered_names: List[str] = []          # List of @property instances
         raise NotImplementedError
-    
+
     def getv(self, attr: str, index: int = -1, specifications: Optional[Dict[str, str]] = None):
         """
         attr: attribute name.
@@ -22,7 +27,7 @@ class VObjBaseInterface(object):
         Return: the value when applicable, and None otherwise.
         """
         raise NotImplementedError
-    
+
     def update(self, data: Optional[Dict]):
         """Called once per frame by the tracker providing the object data"""
         if data is not None:
@@ -32,7 +37,7 @@ class VObjBaseInterface(object):
             self._datas.append(None)
             self._track_length = 0
         raise NotImplementedError
-    
+
     def infer(self, attr: str, specifications: Optional[Dict[str, str]] = None):
         """A easy-to-use interface provided to user to use functions in built-in functions"""
         raise NotImplementedError

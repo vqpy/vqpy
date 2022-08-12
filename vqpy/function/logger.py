@@ -1,3 +1,5 @@
+"""The logger of VQPy libfunctions"""
+
 import functools
 from typing import Any, Callable, Dict, List, Tuple
 
@@ -18,9 +20,8 @@ def vqpy_func_logger(input_fields, output_fields, past_fields, specifications = 
             if obj._track_length < required_length and required_length >= 0:
                 return [None]
             return func(obj, *args, **kwargs)
-        global _vqpy_libfuncs, _vqpy_basefuncs
         _vqpy_libfuncs[func.__name__] = (input_fields, output_fields, past_fields, wrapper)
-        for index, field in enumerate(output_fields):
+        for field in output_fields:
             if field not in _vqpy_basefuncs:
                 _vqpy_basefuncs[field] = [func.__name__]
             else:

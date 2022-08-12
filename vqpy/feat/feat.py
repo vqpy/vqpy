@@ -1,3 +1,5 @@
+"""The features for easy coding in VQPy"""
+
 import functools
 from typing import Any, Callable, Dict, List
 
@@ -9,6 +11,7 @@ def property():
     Ensures a method of an VObj is computed exactly once per frame.
     When having incoming updates, call all functions with @property decorators.
     TODO: add more features for @property
+    NOTE: This is never called directly hence overriding is not a problem.
     """
     def decorator(func : Callable):
         @functools.wraps(func)

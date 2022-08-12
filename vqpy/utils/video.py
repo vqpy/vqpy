@@ -5,7 +5,7 @@ from loguru import logger
 
 class FrameStream:
     output_fields = ['frame', 'frame_id', 'frame_width', 'frame_height', 'fps']
-    
+
     def __init__(self, path):
         self._cap = cv2.VideoCapture(path)
         self.frame_width = self._cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float
@@ -16,7 +16,7 @@ class FrameStream:
         self.frame = None
         logger.info("Parameters of video is width={}, height={}, fps={}".format(self.frame_width, self.frame_height, self.fps))
         self._objdatas = None
-    
+
     def next(self):
         self.frame_id += 1
         ret_val, self.frame = self._cap.read()

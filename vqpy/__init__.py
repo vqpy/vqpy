@@ -1,22 +1,24 @@
 import argparse
-import os, time, json
+import json
+import os
+import time
 from typing import List
 
 from loguru import logger
 from tqdm import tqdm
 
 from .base.query import QueryBase
-from .detector import setup_detector
 from .database import VObjConstraint
+from .detector import setup_detector
 from .feat.feat import postproc, property, stateful
 from .function import infer
 from .function.logger import vqpy_func_logger
-from .impl.multiclass_tracker import \
-    MultiTracker as default_surface_tracker
+from .impl.multiclass_tracker import MultiTracker as default_surface_tracker
 from .impl.vobj_base import VObjBase
 from .tracker import setup_ground_tracker
 from .utils.classes import COCO_CLASSES
 from .utils.video import FrameStream
+
 
 def make_parser():
     parser = argparse.ArgumentParser("VQPy Demo!")
@@ -32,14 +34,10 @@ def make_parser():
 def launch(cls_name, cls_type, workers: List[QueryBase]):
     args = make_parser().parse_args()
     logger.info("Args: {}".format(args))
-    
     stream = FrameStream(args.path)
-    
     detector = setup_detector(device="gpu", fp16=True)
     tracker = default_surface_tracker(setup_ground_tracker, stream, cls_name, cls_type)
-    
     for worker in workers: worker._begin_query()
-    
     for frame_id in tqdm(range(1, stream.n_frames + 1)):
         frame = stream.next()
         outputs = detector.inference(frame)

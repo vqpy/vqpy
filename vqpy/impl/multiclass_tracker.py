@@ -1,3 +1,7 @@
+"""MultiTracker (a surface tracker) implementation
+this tracker separate tracker at each level by their classes, and tracks individually
+"""
+
 from typing import Callable, Dict, List, Mapping, Tuple
 from ..base.ground_tracker import GroundTrackerBase
 from ..base.surface_tracker import SurfaceTrackerBase
@@ -8,8 +12,9 @@ from ..utils.video import FrameStream
 TrackerGeneratorType = Callable[[FrameStream], GroundTrackerBase]
 
 class MultiTracker(SurfaceTrackerBase):
+    """MultiTracker class, separate object by classes and tracks indivdually"""
     input_fields = ["class_id"]
-    
+
     def __init__(self,
                  tracker: TrackerGeneratorType,
                  ctx: FrameStream,
@@ -21,12 +26,16 @@ class MultiTracker(SurfaceTrackerBase):
         self.cls_type = cls_type
         self.tracker_dict: Dict[VObjGeneratorType, GroundTrackerBase] = {}
         self.vobj_pool: Dict[int, VObjBase] = {}
-    
+
     def update(self, output: List[Dict]) -> Tuple[List[VObjBase], List[VObjBase]]:
+        """Use ground level tracker and initialized parameters to generate VObj dictionary
+        returns: the current tracked VObj instances and the current lost VObj instances
+        TODO: complete the __init__ docstring
+        """
         detections: Dict[VObjGeneratorType, List[Dict]] = {}
         tracked: List[VObjBase] = []
         lost: List[VObjBase] = []
-        
+
         for obj in output:
             name = self.cls_name[obj['class_id']]
             if name not in self.cls_type:
@@ -35,11 +44,11 @@ class MultiTracker(SurfaceTrackerBase):
             if func not in detections:
                 detections[func] = []
             detections[func].append(obj)
-    
+
         for func, dets in detections.items():
             if func not in self.tracker_dict:
                 self.tracker_dict[func] = self.tracker(self.ctx)
-    
+
         for func, tracker in self.tracker_dict.items():
             # logger.info(f"Multitracking type {func}")
             dets = []
@@ -58,6 +67,5 @@ class MultiTracker(SurfaceTrackerBase):
                 self.vobj_pool[track_id].update(None)
                 lost.append(self.vobj_pool[track_id])
             # logger.info(f"tracking done")
-        
-        return tracked, lost
 
+        return tracked, lost

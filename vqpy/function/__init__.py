@@ -22,7 +22,8 @@ def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str
         existing_fields (List[str]): existing fields in this frame.
         existing_pfields (List[str], optional): existing fields in past frames. Defaults to [].
         specifications (Any, optional): hints for the infer. Defaults to None.
-        Currently, we accept a set of strings as hints, and choose the functions having the longest prefix of the provided hints.
+        Currently, we accept a set of strings as hints, and choose the functions having the longest
+        prefix of the provided hints.
 
     Returns:
         The inferred attribute value.
@@ -86,5 +87,5 @@ def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str
         outputs = func(*args)
         for i, value in enumerate(outputs):
             data[output_fields[i]] = value
-    
+
     return data[waitlist[0]]

@@ -1,3 +1,5 @@
+"""LPRNet Model"""
+
 # Provided interface:
 # GetLP: infer the license plate from the image of a car
 
@@ -21,15 +23,15 @@ pnet, onet, lprnet, stnet, mini_lp = None, None, None, None, None
 
 def network_setup():
     import sys
-    
+
     sys.path.append("./models/lpdetect")
     sys.path.append("./models/lpdetect/LPRNet")
     sys.path.append("./models/lpdetect/MTCNN")
-    
+
     from models.lpdetect.LPRNet.model.LPRNET import LPRNet, CHARS
     from models.lpdetect.LPRNet.model.STN import STNet
     from models.lpdetect.MTCNN.MTCNN import PNet, ONet
-    
+
     global pnet, onet, lprnet, stnet, mini_lp
     pnet = PNet().to(device)
     pnet.load_state_dict(torch.load('models/lpdetect/MTCNN/weights/pnet_Weights', map_location=lambda storage,loc:storage))
@@ -48,21 +50,23 @@ def network_setup():
 
 
 def GetLP(image):
-    
     from models.lpdetect.LPRNet.LPRNet_Test import decode as lprnet_decode
     from models.lpdetect.MTCNN.MTCNN import detect_pnet, detect_onet
-    
-    from vqpy.utils.images import CropImage
-    
-    if device is None: network_setup()
-    if image is None: return None
+
+    from vqpy.utils.images import crop_image
+
+    if device is None:
+        network_setup()
+    if image is None:
+        return None
     bboxes = detect_pnet(pnet, image, mini_lp, device)
     bboxes = detect_onet(onet, image, bboxes, device)
-    if len(bboxes) == 0: return None
+    if len(bboxes) == 0:
+        return None
     bboxes = bboxes[np.argsort(-bboxes[:, 4])]
     for i in range(len(bboxes)):
         bbox = bboxes[i, :4]
-        img_box = CropImage(image, bbox)
+        img_box = crop_image(image, bbox)
         if img_box is None:
             continue
         im = cv2.resize(img_box, (94, 24), interpolation=cv2.INTER_CUBIC)
@@ -76,5 +80,5 @@ def GetLP(image):
         if len(labels) < 7:
             continue
         return labels
-    
+
     return None

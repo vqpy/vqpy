@@ -10,7 +10,7 @@ def tlbr_to_xyah(tlbr):
     ret[2] /= ret[3]
     return ret
 
-def CropImage(img, tlbr, ext=0):
+def crop_image(img, tlbr, ext=0):
     """Crop part of the image
     Args:
         img (np.ndarray): the image file
