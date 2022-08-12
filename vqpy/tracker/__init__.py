@@ -2,7 +2,7 @@
 This folder (tracker/) contains the VQPy UNDERLYING tracker interfaces.
 All visible instances in this folder inherits (base/ground_tracker.py).
 """
-from vqpy.utils.video import FrameStream
+from ..utils.video import FrameStream
 
 from .byte_tracker import ByteTracker
 

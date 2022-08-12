@@ -1,9 +1,7 @@
 import functools
 from typing import Any, Callable, Dict, List
 
-from vqpy.base.interface import VObjBaseInterface
-from vqpy.feat.database import vobj_filter
-
+from ..base.interface import VObjBaseInterface
 
 def property():
     """
@@ -87,6 +85,10 @@ def postproc(params: Dict):
     else:
         raise NotImplementedError
 
+"""
+This feature is to support the computation of cross-object property.
+Now we do not support it. If this type of property is required, please compute it using the database.
+
 # TODO: make it more clear and locate in the right place
 def access_data(cond: Dict[str, Callable]):
     def decorator(func: Callable):
@@ -95,3 +97,4 @@ def access_data(cond: Dict[str, Callable]):
             return func(self, vobj_filter(self._ctx._objdatas, cond))
         return wrapper
     return decorator
+"""

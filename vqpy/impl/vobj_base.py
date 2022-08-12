@@ -1,8 +1,8 @@
 from typing import Callable, Dict, List, Optional
 
-from vqpy.base.interface import VObjBaseInterface
-from vqpy.function import infer
-from vqpy.utils.video import FrameStream
+from ..base.interface import VObjBaseInterface
+from ..function import infer
+from ..utils.video import FrameStream
 
 
 class VObjBase(VObjBaseInterface):

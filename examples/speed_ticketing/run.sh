@@ -1,1 +1,1 @@
-python3 examples/speed_ticketing/main.py -expn ticketing --path videos/demo.mp4
+python3 examples/speed_ticketing/main.py -expn ticketing --path videos/demo.mp4 --save_result

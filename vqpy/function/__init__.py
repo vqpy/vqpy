@@ -6,7 +6,7 @@ The (expected) only visible interface of this folder is `infer`.
 from queue import Queue
 from typing import Any, Dict, List
 
-from vqpy.utils.strings import longest_prefix_in as _default_metric
+from ..utils.strings import longest_prefix_in as _default_metric
 
 from .functions import *
 from .logger import _vqpy_basefuncs, _vqpy_libfuncs

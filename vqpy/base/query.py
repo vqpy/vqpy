@@ -1,16 +1,31 @@
 from typing import List
-
-from vqpy.utils.video import FrameStream
-from vqpy.impl.vobj_base import VObjBase
+from ..base.interface import VObjBaseInterface
+from ..database import VObjConstraint
 
 class QueryBase:
-    def attach(self, ctx: FrameStream):
-        """attach the working stream with the query object, will be called at the beginning of tracking"""
-        self._ctx = ctx
+    def _begin_query(self):
+        self._query_data = []
+        general_setting = self.setting()
+        cls = self.__class__.__bases__[0]
+        while cls != QueryBase:
+            general_setting = general_setting + cls.setting()
+            cls = cls.__bases__[0]
+        self._setting = general_setting
     
-    def apply(self, tracks: List[VObjBase]) -> List[VObjBase]:
+    def _update_query(self, frame_id: int, vobjs: List[VObjBaseInterface]):
+        self._query_data.append({"frame_id": frame_id, "data": self._setting.apply(vobjs)})
+    
+    def _end_query(self):
+        """Returns the query database of the final data"""
+        return self._query_data
+
+    def _get_setting(self):
+        return self._setting
+    
+    @staticmethod
+    def setting() -> VObjConstraint:
         """
-        Apply something required to the per-frame updated tracks.
-        tracks: the list of all VQPy objects appeared in this frame.
+        The setting for the applied filter/selects on the per-frame updated tracks.
+        return: a VObjConstraint instance containing the required settings.
         """
-        pass
+        return VObjConstraint()

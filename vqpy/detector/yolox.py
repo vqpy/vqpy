@@ -5,8 +5,8 @@ from typing import Dict, List
 import numpy as np
 import torch
 from loguru import logger
-from vqpy.base.detector import DetectorBase
-from vqpy.utils.classes import COCO_CLASSES
+from ..base.detector import DetectorBase
+from ..utils.classes import COCO_CLASSES
 
 
 class YOLOXDetector(DetectorBase):

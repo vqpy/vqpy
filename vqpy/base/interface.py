@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional
 
-from vqpy.utils.video import FrameStream
+from ..utils.video import FrameStream
 
 
 class VObjBaseInterface(object):

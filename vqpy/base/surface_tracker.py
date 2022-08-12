@@ -1,5 +1,5 @@
 from typing import Dict, List, Tuple
-from vqpy.base.interface import VObjBaseInterface
+from ..base.interface import VObjBaseInterface
 
 class SurfaceTrackerBase(object):
     """The surface level tracker base class.

@@ -1,9 +1,9 @@
 from typing import Callable, Dict, List, Mapping, Tuple
-from vqpy.base.ground_tracker import GroundTrackerBase
-from vqpy.base.surface_tracker import SurfaceTrackerBase
+from ..base.ground_tracker import GroundTrackerBase
+from ..base.surface_tracker import SurfaceTrackerBase
 
-from vqpy.impl.vobj_base import VObjBase, VObjGeneratorType
-from vqpy.utils.video import FrameStream
+from ..impl.vobj_base import VObjBase, VObjGeneratorType
+from ..utils.video import FrameStream
 
 TrackerGeneratorType = Callable[[FrameStream], GroundTrackerBase]
 
