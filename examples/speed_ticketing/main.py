@@ -1,6 +1,5 @@
-"""
-This is a demo VQPy implementation listing and storing all red moving vehicles to a json file.
-"""
+"""This is a demo VQPy implementation listing and storing all red moving
+vehicles to a json file."""
 
 from typing import Optional
 
@@ -12,6 +11,7 @@ import vqpy
 class Vehicle(vqpy.VObjBase):
     """The class of vehicles"""
     required_fields = ['class_id', 'tlbr']
+    
     @vqpy.property()
     @vqpy.postproc({'majority': 100})
     def license_plate(self):
@@ -69,6 +69,7 @@ class ListRedMovingVehicle(ListMovingVehicle):
         filter_cons = {'dominant_color': is_red}
         return vqpy.VObjConstraint(filter_cons=filter_cons,
                                    filename="redmoving")
+
 
 vqpy.launch(cls_name=vqpy.COCO_CLASSES,
             cls_type={"car": Vehicle, "truck": Vehicle},
