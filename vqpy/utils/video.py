@@ -3,6 +3,7 @@ from loguru import logger
 
 # TODO: support different types of video streams
 
+
 class FrameStream:
     output_fields = ['frame', 'frame_id', 'frame_width', 'frame_height', 'fps']
 
@@ -14,7 +15,8 @@ class FrameStream:
         self.n_frames = int(self._cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.frame_id = -1
         self.frame = None
-        logger.info("Parameters of video is width={}, height={}, fps={}".format(self.frame_width, self.frame_height, self.fps))
+        logger.info(f"Parameters of video is width={self.frame_width}, \
+                      height={self.frame_height}, fps={self.fps}")
         self._objdatas = None
 
     def next(self):

@@ -4,6 +4,7 @@ class TrackState(object):
     Lost = 2
     Removed = 3
 
+
 class BaseTrack(object):
     _count = 0
 
@@ -11,7 +12,7 @@ class BaseTrack(object):
     is_activated = False
     state = TrackState.New
     score = 0
-    
+
     start_frame = 0
     frame_id = 0
 

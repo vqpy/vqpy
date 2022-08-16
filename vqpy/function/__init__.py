@@ -8,22 +8,29 @@ from typing import Any, Dict, List
 
 from ..utils.strings import longest_prefix_in as _default_metric
 
-from .functions import *
+# import the library to include default builtin functions
+from .functions import *  # noqa: F401,F403
 from .logger import _vqpy_basefuncs, _vqpy_libfuncs
 
-# TODO: formally define the format of `specifications`, supporting more accurate
-# automatic selection, applicable condition for functions, etc.
+# TODO: formally define the format of `specifications`, supporting more
+# accurate automatic selection, applicable condition for functions, etc.
 
-def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str] = [], specifications = None):
-    """Infer a undefined attribute based on provided fields and logged functions
+
+def infer(obj,
+          attr: str,
+          existing_fields: List[str],
+          existing_pfields: List[str] = [],
+          specifications=None):
+    """Infer a undefined attribute with provided fields and logged functions
     Args:
         obj (VObjBase): the vobject itself.
         attr (str): the attribute name to infer.
         existing_fields (List[str]): existing fields in this frame.
-        existing_pfields (List[str], optional): existing fields in past frames. Defaults to [].
+        existing_pfields (List[str], optional):
+            existing fields in past frames. Defaults to [].
         specifications (Any, optional): hints for the infer. Defaults to None.
-        Currently, we accept a set of strings as hints, and choose the functions having the longest
-        prefix of the provided hints.
+        Currently, we accept a set of strings as hints, and choose the function
+        having the longest prefix of the provided hints.
 
     Returns:
         The inferred attribute value.
@@ -39,9 +46,13 @@ def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str
     q.put(attr)
     while not q.empty():
         attr = q.get()
-        eval = None
-        if attr in specifications:
-            eval = lambda x: _default_metric(specifications[attr], x)
+
+        def evaluate(x):
+            if attr in specifications:
+                return _default_metric(specifications[attr], x)
+            else:
+                return 0
+
         INF = 1e4
         best, bscore = None, -INF**2
         for name in _vqpy_basefuncs[attr]:
@@ -59,7 +70,7 @@ def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str
                     break
             if not alive:
                 continue
-            score = 0 if eval is None else eval(name) * INF
+            score = evaluate(name) * INF
             for field in input_fields:
                 if field not in existing_fields:
                     score -= 5
@@ -82,7 +93,8 @@ def infer(obj, attr: str, existing_fields: List[str], existing_pfields: List[str
     for name in calls:
         input_fields, output_fields, _, func = _vqpy_libfuncs[name]
         # print(input_fields)
-        args = [obj] + [obj.getv(x) if x in existing_fields else data[x] for x in input_fields]
+        args = [obj] + [obj.getv(x) if x in existing_fields else
+                        data[x] for x in input_fields]
         # this is the required args format
         outputs = func(*args)
         for i, value in enumerate(outputs):

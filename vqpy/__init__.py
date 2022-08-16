@@ -8,15 +8,15 @@ from loguru import logger
 from tqdm import tqdm
 
 from .base.query import QueryBase
-from .database import VObjConstraint
+from .database import VObjConstraint  # noqa: F401
 from .detector import setup_detector
-from .feat.feat import postproc, property, stateful
-from .function import infer
-from .function.logger import vqpy_func_logger
-from .impl.multiclass_tracker import MultiTracker as default_surface_tracker
-from .impl.vobj_base import VObjBase
+from .feat.feat import property, stateful, postproc  # noqa: F401
+from .function import infer  # noqa: F401
+from .function.logger import vqpy_func_logger  # noqa: F401
+from .impl.multiclass_tracker import MultiTracker as _dtracker
+from .impl.vobj_base import VObjBase  # noqa: F401
 from .tracker import setup_ground_tracker
-from .utils.classes import COCO_CLASSES
+from .utils.classes import COCO_CLASSES  # noqa: F401
 from .utils.video import FrameStream
 
 
@@ -31,26 +31,30 @@ def make_parser():
     )
     return parser
 
+
 def launch(cls_name, cls_type, workers: List[QueryBase]):
     args = make_parser().parse_args()
     logger.info("Args: {}".format(args))
     stream = FrameStream(args.path)
     detector = setup_detector(device="gpu", fp16=True)
-    tracker = default_surface_tracker(setup_ground_tracker, stream, cls_name, cls_type)
-    for worker in workers: worker._begin_query()
+    tracker = _dtracker(setup_ground_tracker, stream, cls_name, cls_type)
+    for worker in workers:
+        worker._begin_query()
     for frame_id in tqdm(range(1, stream.n_frames + 1)):
         frame = stream.next()
         outputs = detector.inference(frame)
         tracked_tracks, _ = tracker.update(outputs)
         for worker in workers:
             worker._update_query(frame_id, tracked_tracks)
-    
+
     if args.save_result:
+        folder_name = os.path.join("./vqpy_outputs", args.experiment_name)
+        os.makedirs(folder_name, exist_ok=True)
+        current_time = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
+        save_folder = os.path.join(folder_name, current_time)
+        os.makedirs(save_folder, exist_ok=True)
         for worker in workers:
-            folder_name = os.path.join("./vqpy_outputs", args.experiment_name)
-            os.makedirs(folder_name, exist_ok=True)
-            save_folder = os.path.join(folder_name, time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime()))
-            os.makedirs(save_folder, exist_ok=True)
-            save_path = os.path.join(save_folder, worker._get_setting().filename + '.json')
+            filename = worker._get_setting().filename + '.json'
+            save_path = os.path.join(save_folder, filename)
             with open(save_path, 'w') as f:
                 json.dump(worker._end_query(), f)

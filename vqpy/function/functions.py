@@ -2,6 +2,7 @@
 
 from .logger import vqpy_func_logger
 
+
 @vqpy_func_logger(['tlbr'], ['bbox_velocity'], ['tlbr'], required_length=2)
 def bbox_velocity(obj, tlbr):
     """compute the bounding box velocity using the center
@@ -17,11 +18,13 @@ def bbox_velocity(obj, tlbr):
     v = sqrt(sum(dcenter * dcenter))
     return [v]
 
+
 @vqpy_func_logger(['frame', 'tlbr'], ['image'], [], required_length=1)
 def image_boundarycrop(obj, frame, tlbr):
     """crop the image of object from bounding box"""
     from vqpy.utils.images import crop_image
     return [crop_image(frame, tlbr)]
+
 
 @vqpy_func_logger(['image'], ['license_plate'], [], required_length=1)
 def license_plate_lprnet(obj, image):
@@ -29,11 +32,13 @@ def license_plate_lprnet(obj, image):
     from vqpy.models.lprnet import GetLP
     return [GetLP(image)]
 
+
 @vqpy_func_logger(['image'], ['license_plate'], [], required_length=1)
 def license_plate_openalpr(obj, image):
     """recognize license plate using OpenAlpr"""
     from vqpy.models.openalpr import GetLP
     return [GetLP(image)]
+
 
 @vqpy_func_logger(['tlbr'], ['coordinate'], [], required_length=1)
 def coordinate_center(obj, tlbr):

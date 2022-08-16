@@ -1,5 +1,4 @@
-"""Interfaces that requires 
-"""
+"""Interfaces that requires implementations in impl/"""
 
 from typing import Dict, List, Optional
 
@@ -8,18 +7,24 @@ from ..utils.video import FrameStream
 
 class VObjBaseInterface(object):
     """The interface of VObject Base Class.
-    The tracker is responsible to keep the objects updated when the track is active.
+    The tracker is responsible to keep objects updated when the track is active
     """
 
     def __init__(self, ctx: FrameStream):
         self._ctx = ctx
         self._start_idx = ctx.frame_id
-        self._track_length = 0                          # Number of frames consecutively appears
-        self._datas: List[Optional[Dict]] = []          # Historic object data. TODO: shrink memory
-        self._registered_names: List[str] = []          # List of @property instances
+        # Number of frames consecutively appears
+        self._track_length = 0
+        # Historic object data. TODO: shrink memory
+        self._datas: List[Optional[Dict]] = []
+        # List of @property instances
+        self._registered_names: List[str] = []
         raise NotImplementedError
 
-    def getv(self, attr: str, index: int = -1, specifications: Optional[Dict[str, str]] = None):
+    def getv(self,
+             attr: str,
+             index: int = -1,
+             specifications: Optional[Dict[str, str]] = None):
         """
         attr: attribute name.
         index: FRAMEID - Current FRAMEID - 1.
@@ -38,6 +43,8 @@ class VObjBaseInterface(object):
             self._track_length = 0
         raise NotImplementedError
 
-    def infer(self, attr: str, specifications: Optional[Dict[str, str]] = None):
-        """A easy-to-use interface provided to user to use functions in built-in functions"""
+    def infer(self,
+              attr: str,
+              specifications: Optional[Dict[str, str]] = None):
+        """A easy-to-use interface provided for usage of built-in functions"""
         raise NotImplementedError

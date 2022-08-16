@@ -1,9 +1,10 @@
 """The features for easy coding in VQPy"""
 
 import functools
-from typing import Any, Callable, Dict, List
+from typing import Callable, Dict, List
 
 from ..base.interface import VObjBaseInterface
+
 
 def property():
     """
@@ -13,7 +14,7 @@ def property():
     TODO: add more features for @property
     NOTE: This is never called directly hence overriding is not a problem.
     """
-    def decorator(func : Callable):
+    def decorator(func: Callable):
         @functools.wraps(func)
         def wrapper(self: VObjBaseInterface, *args, **kwargs):
             if len(self._datas) > 0:
@@ -33,14 +34,15 @@ def property():
         return wrapper
     return decorator
 
+
 def stateful(length: int = 0):
     """
     @stateful decorator stores the return value into `__state_` field.
-    If a function is decorated with @stateful, it also should be decorated with @property.
-    TODO: we can merge @property to @stateful.
-    length: the number of frames to reserve the value, by default store all values.
+    A function decorated withthis also should be decorated with @property.
+    TODO: we can merge @property and @stateful.
+    length: number of frames to reserve the value, by default store all values.
     """
-    def decorator(func : Callable):
+    def decorator(func: Callable):
         @functools.wraps(func)
         def wrapper(self: VObjBaseInterface, *args, **kwargs):
             attr = '__state_' + func.__name__
@@ -55,6 +57,7 @@ def stateful(length: int = 0):
         return wrapper
     return decorator
 
+
 def postproc(params: Dict):
     """
     Run a set of postprocessing functions for the function's result.
@@ -64,6 +67,7 @@ def postproc(params: Dict):
     """
     if 'majority' in params:
         size = params['majority']
+
         def decorator(func: Callable):
             @functools.wraps(func)
             def wrapper(self: VObjBaseInterface, *args, **kwargs):
@@ -76,8 +80,10 @@ def postproc(params: Dict):
                     values = values[1:]
                 local_map = {}
                 for it in values:
-                    if it in local_map: local_map[it] += 1
-                    else: local_map[it] = 1
+                    if it in local_map:
+                        local_map[it] += 1
+                    else:
+                        local_map[it] = 1
                 ret = (None, 0)
                 for it, v in local_map.items():
                     if it is not None and v > ret[1]:
@@ -88,9 +94,11 @@ def postproc(params: Dict):
     else:
         raise NotImplementedError
 
+
 """
 This feature is to support the computation of cross-object property.
-Now we do not support it. If this type of property is required, please compute it using the database.
+Now we do not support it. If this type of property is required, please
+compute it using the database.
 
 # TODO: make it more clear and locate in the right place
 def access_data(cond: Dict[str, Callable]):

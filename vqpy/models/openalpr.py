@@ -2,12 +2,15 @@
 
 alpr = None
 
+
 def GetLP(image):
     global alpr
     if alpr is None:
         import sys
         from openalpr import Alpr
-        alpr = Alpr("us", "/usr/share/openalpr/config/openalpr.defaults.conf", "/usr/share/openalpr/runtime_data")
+        alpr = Alpr("us",
+                    "/usr/share/openalpr/config/openalpr.defaults.conf",
+                    "/usr/share/openalpr/runtime_data")
         if not alpr.is_loaded():
             print('Error loading OpenALPR')
             sys.exit(1)

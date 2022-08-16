@@ -1,5 +1,5 @@
 """MultiTracker (a surface tracker) implementation
-this tracker separate tracker at each level by their classes, and tracks individually
+this tracker separate objects by their classes, and tracks individually
 """
 
 from typing import Callable, Dict, List, Mapping, Tuple
@@ -11,6 +11,7 @@ from ..utils.video import FrameStream
 
 TrackerGeneratorType = Callable[[FrameStream], GroundTrackerBase]
 
+
 class MultiTracker(SurfaceTrackerBase):
     """MultiTracker class, separate object by classes and tracks indivdually"""
     input_fields = ["class_id"]
@@ -20,6 +21,7 @@ class MultiTracker(SurfaceTrackerBase):
                  ctx: FrameStream,
                  cls_name: Mapping[int, str],
                  cls_type: Mapping[str, VObjGeneratorType]):
+        """TODO: complete the __init__ docstring"""
         self.ctx = ctx
         self.tracker = tracker
         self.cls_name = cls_name
@@ -27,11 +29,10 @@ class MultiTracker(SurfaceTrackerBase):
         self.tracker_dict: Dict[VObjGeneratorType, GroundTrackerBase] = {}
         self.vobj_pool: Dict[int, VObjBase] = {}
 
-    def update(self, output: List[Dict]) -> Tuple[List[VObjBase], List[VObjBase]]:
-        """Use ground level tracker and initialized parameters to generate VObj dictionary
-        returns: the current tracked VObj instances and the current lost VObj instances
-        TODO: complete the __init__ docstring
-        """
+    def update(self, output: List[Dict]
+               ) -> Tuple[List[VObjBase], List[VObjBase]]:
+        """Generate the video objects using ground tracker and detection result
+        returns: the current tracked/lost VObj instances"""
         detections: Dict[VObjGeneratorType, List[Dict]] = {}
         tracked: List[VObjBase] = []
         lost: List[VObjBase] = []

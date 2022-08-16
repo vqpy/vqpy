@@ -65,8 +65,8 @@ class KalmanFilter(object):
         -------
         (ndarray, ndarray)
             Returns the mean vector (8 dimensional) and covariance matrix (8x8
-            dimensional) of the new track. Unobserved velocities are initialized
-            to 0 mean.
+            dimensional) of the new track. Unobserved velocities are
+            initialized to 0 mean.
 
         """
         mean_pos = measurement
@@ -116,7 +116,7 @@ class KalmanFilter(object):
             self._std_weight_velocity * mean[3]]
         motion_cov = np.diag(np.square(np.r_[std_pos, std_vel]))
 
-        #mean = np.dot(self._motion_mat, mean)
+        # mean = np.dot(self._motion_mat, mean)
         mean = np.dot(mean, self._motion_mat.T)
         covariance = np.linalg.multi_dot((
             self._motion_mat, covariance, self._motion_mat.T)) + motion_cov
@@ -157,11 +157,11 @@ class KalmanFilter(object):
         Parameters
         ----------
         mean : ndarray
-            The Nx8 dimensional mean matrix of the object states at the previous
-            time step.
-        covariance : ndarray
-            The Nx8x8 dimensional covariance matrics of the object states at the
+            The Nx8 dimensional mean matrix of the object states at the
             previous time step.
+        covariance : ndarray
+            The Nx8x8 dimensional covariance matrics of the object states at
+            the previous time step.
         Returns
         -------
         (ndarray, ndarray)

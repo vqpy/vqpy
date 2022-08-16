@@ -43,7 +43,8 @@ class YOLOXDetector(DetectorBase):
         model.eval()
 
         logger.info("loading checkpoint")
-        ckpt = torch.load("models/yolo/pretrained/yolox_x.pth", map_location="cpu")
+        ckpt = torch.load("models/yolo/pretrained/yolox_x.pth",
+                          map_location="cpu")
         model.load_state_dict(ckpt["model"])
         logger.info("loaded checkpoint done.")
 
@@ -58,7 +59,8 @@ class YOLOXDetector(DetectorBase):
         self.postproc = postprocess
 
     def inference(self, img) -> List[Dict]:
-        ratio = min(self.test_size[0] / img.shape[0], self.test_size[1] / img.shape[1])
+        ratio = min(self.test_size[0] / img.shape[0],
+                    self.test_size[1] / img.shape[1])
 
         img, _ = self.preproc(img, None, self.test_size)
         img = torch.from_numpy(img).unsqueeze(0)

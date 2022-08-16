@@ -9,10 +9,10 @@ import cv2
 
 device = torch.device("cuda")
 
-CHARS_ASCII = ['BJ-', 'SH-', 'TJ-', 'CQ-', 'HE-', 'SX-', 'IM-', 'LN-', 'JL-', 'HL-',
-               'JS-', 'ZJ-', 'AH-', 'FJ-', 'JX-', 'SD-', 'HA-', 'HB-', 'HN-', 'GZ-',
-               'GX-', 'HI-', 'SC-', 'GZ-', 'YN-', 'XZ-', 'SX-', 'GS-', 'QH-', 'NX-',
-               'XJ-',
+CHARS_ASCII = ['BJ-', 'SH-', 'TJ-', 'CQ-', 'HE-', 'SX-', 'IM-', 'LN-', 'JL-',
+               'HL-', 'JS-', 'ZJ-', 'AH-', 'FJ-', 'JX-', 'SD-', 'HA-', 'HB-',
+               'HN-', 'GZ-', 'GX-', 'HI-', 'SC-', 'GZ-', 'YN-', 'XZ-', 'SX-',
+               'GS-', 'QH-', 'NX-', 'XJ-',
                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K',
                'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
@@ -20,6 +20,7 @@ CHARS_ASCII = ['BJ-', 'SH-', 'TJ-', 'CQ-', 'HE-', 'SX-', 'IM-', 'LN-', 'JL-', 'H
                ]
 
 pnet, onet, lprnet, stnet, mini_lp = None, None, None, None, None
+
 
 def network_setup():
     import sys
@@ -34,19 +35,29 @@ def network_setup():
 
     global pnet, onet, lprnet, stnet, mini_lp
     pnet = PNet().to(device)
-    pnet.load_state_dict(torch.load('models/lpdetect/MTCNN/weights/pnet_Weights', map_location=lambda storage,loc:storage))
+    pnet.load_state_dict(
+        torch.load('models/lpdetect/MTCNN/weights/pnet_Weights',
+                   map_location=lambda storage, loc: storage)
+        )
     pnet.eval()
     onet = ONet().to(device)
-    onet.load_state_dict(torch.load('models/lpdetect/MTCNN/weights/onet_Weights', map_location=lambda storage,loc:storage))
+    onet.load_state_dict(
+        torch.load('models/lpdetect/MTCNN/weights/onet_Weights',
+                   map_location=lambda storage, loc: storage)
+        )
     onet.eval()
-    lprnet = LPRNet(class_num = len(CHARS), dropout_rate = 0).to(device)
-    lprnet.load_state_dict(torch.load('models/lpdetect/LPRNet/weights/Final_LPRNet_model.pth', map_location=lambda storage,loc:storage))
+    lprnet = LPRNet(class_num=len(CHARS), dropout_rate=0).to(device)
+    lprnet.load_state_dict(
+        torch.load('models/lpdetect/LPRNet/weights/Final_LPRNet_model.pth',
+                   map_location=lambda storage, loc: storage)
+        )
     lprnet.eval()
     stnet = STNet().to(device)
-    stnet.load_state_dict(torch.load('models/lpdetect/LPRNet/weights/Final_STN_model.pth', map_location=lambda storage,loc:storage))
+    stnet.load_state_dict(
+        torch.load('models/lpdetect/LPRNet/weights/Final_STN_model.pth',
+                   map_location=lambda storage, loc: storage))
     stnet.eval()
-    mini_lp = (50, 15) # smallest lp size
-
+    mini_lp = (50, 15)  # smallest lp size
 
 
 def GetLP(image):
@@ -71,10 +82,11 @@ def GetLP(image):
             continue
         im = cv2.resize(img_box, (94, 24), interpolation=cv2.INTER_CUBIC)
         im = (np.transpose(np.float32(im), (2, 0, 1)) - 127.5)*0.0078125
-        data = torch.from_numpy(im).float().unsqueeze(0).to(device)  # torch.Size([1, 3, 24, 94]) 
+        # data.size is torch.Size([1, 3, 24, 94])
+        data = torch.from_numpy(im).float().unsqueeze(0).to(device)
         transfer = stnet(data)
         preds = lprnet(transfer)
-        preds = preds.cpu().detach().numpy()  # (1, 68, 18)    
+        preds = preds.cpu().detach().numpy()  # (1, 68, 18)
         labels, _ = lprnet_decode(preds, CHARS_ASCII)
         labels = labels[0]
         if len(labels) < 7:

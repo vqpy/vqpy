@@ -13,8 +13,8 @@ class SurfaceTrackerBase(object):
 
     input_fields = []       # the required data fields for this tracker
 
-    def update(self, data: List[Dict]) -> Tuple[List[VObjBaseInterface], List[VObjBaseInterface]]:
-        """Use ground level tracker and initialized parameters to generate VObj dictionary
-        returns: the current tracked VObj instances and the current lost VObj instances
-        """
+    def update(self, data: List[Dict]
+               ) -> Tuple[List[VObjBaseInterface], List[VObjBaseInterface]]:
+        """Generate the video objects using ground tracker and detection result
+        returns: the current tracked/lost VObj instances"""
         raise NotImplementedError

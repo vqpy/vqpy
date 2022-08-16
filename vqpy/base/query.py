@@ -4,6 +4,7 @@ from typing import List
 from ..base.interface import VObjBaseInterface
 from ..database import VObjConstraint
 
+
 class QueryBase(object):
     """the base class of all applied queries"""
     def _begin_query(self):
@@ -16,8 +17,11 @@ class QueryBase(object):
             cls = cls.__bases__[0]
         self._setting = general_setting
 
-    def _update_query(self, frame_id: int, vobjs: List[VObjBaseInterface]):
-        self._query_data.append({"frame_id": frame_id, "data": self._setting.apply(vobjs)})
+    def _update_query(self,
+                      frame_id: int,
+                      vobjs: List[VObjBaseInterface]):
+        self._query_data.append({"frame_id": frame_id,
+                                 "data": self._setting.apply(vobjs)})
 
     def _end_query(self):
         """Returns the query database of the final data"""
@@ -29,7 +33,7 @@ class QueryBase(object):
     @staticmethod
     def setting() -> VObjConstraint:
         """
-        The setting for the applied filter/selects on the per-frame updated tracks.
+        The database operation setting applied on the per-frame updated tracks.
         return: a VObjConstraint instance containing the required settings.
         """
         return VObjConstraint()
