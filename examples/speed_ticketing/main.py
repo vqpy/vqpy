@@ -11,7 +11,7 @@ import vqpy
 class Vehicle(vqpy.VObjBase):
     """The class of vehicles"""
     required_fields = ['class_id', 'tlbr']
-    
+
     @vqpy.property()
     @vqpy.postproc({'majority': 100})
     def license_plate(self):
