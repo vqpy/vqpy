@@ -1,11 +1,9 @@
 """This is a demo VQPy implementation listing and storing all red moving
 vehicles to a json file."""
 
-from typing import Optional
-
 import numpy as np
-
 import vqpy
+from getcolor import get_image_color  # noqa: F401
 
 
 class Vehicle(vqpy.VObjBase):
@@ -32,42 +30,22 @@ class ListMovingVehicle(vqpy.QueryBase):
                                    filename='moving')
 
 
-# add general built-in function to library
-@vqpy.vqpy_func_logger(['image'], ['dominant_color'], [], required_length=1)
-def extract_color(obj, image: Optional[np.ndarray]):
-    """scratchy implementation obtaining the dominant color from an image"""
-    if image is None:
-        return [None]
-    datas = {}
-    nrows, ncols, _ = image.shape
-    for row in range(nrows):
-        for col in range(ncols):
-            v = np.round(image[row, col] * 255.0) / 64   # 4x4x4 color grid
-            v = tuple(int(x) for x in v)
-            if v not in datas:
-                datas[v] = 1
-            else:
-                datas[v] += 1
-    color, best = None, 0
-    for new_color, value in datas.items():
-        if value > best:
-            color = np.array(new_color) * 64 / 255.0
-            best = value
-    return [color]
-
-
 class ListRedMovingVehicle(ListMovingVehicle):
     """The class obtaining all red moving vehicles"""
     @staticmethod
     def setting() -> vqpy.VObjConstraint:
+        import webcolors
 
-        def is_red(color: np.ndarray):
-            color = color / np.linalg.norm(color)
-            ratio = np.dot(color, np.asarray([1, 0, 0]))
-            return ratio > 0.5
+        def rgb_is_red(color):
+            color = np.asarray(color)
+            return color[0] ** 2 > sum(color * color) * 0.7
 
-        filter_cons = {'dominant_color': is_red}
-        return vqpy.VObjConstraint(filter_cons=filter_cons,
+        select_cons = {'track_id': None,
+                       'license_plate': None,
+                       'major_color_rgb': webcolors.rgb_to_name}
+        filter_cons = {'major_color_rgb': rgb_is_red}
+        return vqpy.VObjConstraint(select_cons=select_cons,
+                                   filter_cons=filter_cons,
                                    filename="redmoving")
 
 
