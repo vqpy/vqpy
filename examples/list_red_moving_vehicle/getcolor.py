@@ -29,12 +29,13 @@ def get_image_color(obj, image: Optional[np.ndarray]) -> str:
 
     if image is None:
         return [None]
-    ratio = max(32 / image.shape[0], 32 / image.shape[1])
+
+    maximum_width = 24
+    ratio = max(maximum_width / image.shape[0], maximum_width / image.shape[1])
     if ratio < 1:
         size = (int(image.shape[0] * ratio + 0.5),
                 int(image.shape[1] * ratio + 0.5))
         image = cv2.resize(image, size, interpolation=cv2.INTER_LINEAR)
-    # print(f'Image shape = {image.shape}')
     detector = BindedColorDetect(image)
     result = detector.get_color_count()
     bestrgb, bestp = None, 0
@@ -44,7 +45,4 @@ def get_image_color(obj, image: Optional[np.ndarray]) -> str:
             percent /= 5
         if percent > bestp:
             bestrgb, bestp = rgb, percent
-    # if 'red' in bestcolor:
-    # print(result)
-    # print(bestrgb, bestp)
     return [bestrgb]

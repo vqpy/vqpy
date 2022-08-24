@@ -1,9 +1,21 @@
 """This is a demo VQPy implementation listing and storing all red moving
 vehicles to a json file."""
 
+import argparse
 import numpy as np
 import vqpy
 from getcolor import get_image_color  # noqa: F401
+
+
+def make_parser():
+    parser = argparse.ArgumentParser('VQPy Demo!')
+    parser.add_argument('--path', help='path to video')
+    parser.add_argument(
+        "--save_folder",
+        default=None,
+        help="the folder to save the final result",
+    )
+    return parser
 
 
 class Vehicle(vqpy.VObjBase):
@@ -49,6 +61,10 @@ class ListRedMovingVehicle(ListMovingVehicle):
                                    filename="redmoving")
 
 
-vqpy.launch(cls_name=vqpy.COCO_CLASSES,
-            cls_type={"car": Vehicle, "truck": Vehicle},
-            workers=[ListRedMovingVehicle()])
+if __name__ == '__main__':
+    args = make_parser().parse_args()
+    vqpy.launch(cls_name=vqpy.COCO_CLASSES,
+                cls_type={"car": Vehicle, "truck": Vehicle},
+                tasks=[ListRedMovingVehicle()],
+                video_path=args.path,
+                save_folder=args.save_folder)

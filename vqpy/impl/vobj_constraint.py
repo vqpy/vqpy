@@ -1,0 +1,71 @@
+from __future__ import annotations
+
+from typing import Callable, Dict, List, Optional
+from ..base.interface import VObjBaseInterface, VObjConstraintInterface
+
+
+class VObjConstraint(VObjConstraintInterface):
+    """The constraint on VObj instances, helpful when applying queries"""
+
+    def __init__(self,
+                 filter_cons: Dict[str, Optional[Callable]] = {},
+                 select_cons: Dict[str, Optional[Callable]] = {},
+                 filename: str = "data"):
+        """Initialize a VObj constraint instances
+
+        filter_cons (Dict[str, Optional[Callable]], optional):
+            the filter constraints, an item pair (key, cond) denotes the
+        property 'key' of the VObj instance should satisfies cond(key) is
+        True. When cond is None, the instance should satisfies key is True.
+        Defaults to {}.
+
+        select_cons (Dict[str, Optional[Callable]], optional):
+            the select constraints, an item pair (key, proc) denotes select
+        property 'key' of the VObj instance and then apply 'proc' on it. When
+        cond is None, we do the identity transformation. Defaults to {}.
+
+        filename (str, optional): the saved json name. Defaults to "data".
+        """
+        self.filter_cons = {key: (lambda x: x is True) if func is None
+                            else func for (key, func) in filter_cons.items()}
+        self.select_cons = {key: (lambda x: x) if func is None
+                            else func for (key, func) in select_cons.items()}
+        self.filename = filename
+
+    def __add__(self, other: VObjConstraint) -> VObjConstraint:
+        """merge constraints in the form subclass + superclass"""
+        filter_cons = self.filter_cons
+        ret = VObjConstraint(filter_cons, self.select_cons, self.filename)
+        for key, cond in other.filter_cons.items():
+            if key in ret.filter_cons:
+                filter_cons[key] = lambda x: filter_cons[key](x) and cond(x)
+            else:
+                filter_cons[key] = cond
+        return ret
+
+    def filter(self, objs: List[VObjBaseInterface]) -> List[VObjBaseInterface]:
+        """filter the list of vobjects from the constraint"""
+        ret: List[VObjBaseInterface] = []
+        for obj in objs:
+            ok = True
+            for item, func in self.filter_cons.items():
+                it = obj.getv(item)
+                if it is None or not func(it):
+                    ok = False
+                    break
+            if ok:
+                ret.append(obj)
+        return ret
+
+    def select(self, objs: List[VObjBaseInterface]) -> List[Dict]:
+        """select the required informations from the constraints"""
+        return [{key: postproc(x.getv(key))
+                 for key, postproc in self.select_cons.items()}
+                for x in objs]
+
+    def apply(self, vobjs: List[VObjBaseInterface]) -> List[Dict]:
+        """apply the constraint on a list of VObj instances"""
+        # TODO: optimize the procedure
+        filtered = self.filter(vobjs)
+        selected = self.select(filtered)
+        return selected
