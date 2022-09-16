@@ -8,7 +8,7 @@ from ..base.interface import VObjBaseInterface, VObjConstraintInterface
 
 class QueryBase(object):
     """the base class of all applied queries"""
-    def get_base_setting(self) -> VObjBaseInterface:
+    def get_base_setting(self) -> VObjConstraintInterface:
         """Get the setting of this class"""
         ret = self.setting()
         cls: QueryBase = self.__class__.__bases__[0]

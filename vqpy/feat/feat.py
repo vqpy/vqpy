@@ -48,11 +48,12 @@ def stateful(length: int = 0):
             attr = '__state_' + func.__name__
             if not hasattr(self, attr):
                 setattr(self, attr, [])
-            values: List = getattr(self, attr)
             new_value = func(self, *args, **kwargs)
+            values: List = getattr(self, attr)
             if length > 0 and len(values) == length:
                 values = values[1:]
             values.append(new_value)
+            setattr(self, attr, values)
             return values[-1]
         return wrapper
     return decorator
