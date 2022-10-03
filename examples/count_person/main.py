@@ -1,6 +1,3 @@
-"""This is a demo VQPy implementation listing and storing all red moving
-vehicles to a json file."""
-
 import argparse
 import numpy as np
 import vqpy
