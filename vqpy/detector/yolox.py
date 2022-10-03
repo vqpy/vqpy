@@ -10,6 +10,7 @@ import torch
 from loguru import logger
 from ..base.detector import DetectorBase
 from ..utils.classes import COCO_CLASSES
+from .logger import register
 
 
 class YOLOXDetector(DetectorBase):
@@ -18,7 +19,7 @@ class YOLOXDetector(DetectorBase):
     cls_names = COCO_CLASSES
     output_fields = ["tlbr", "score", "class_id"]
 
-    def __init__(self, device="cpu", fp16=False):
+    def __init__(self, device="gpu", fp16=True):
         # TODO: start a new process handling this
 
         import sys
@@ -90,3 +91,6 @@ class YOLOXDetector(DetectorBase):
                          "score": score.item(),
                          "class_id": int(class_id.item())})
         return rets
+
+
+register(YOLOXDetector)

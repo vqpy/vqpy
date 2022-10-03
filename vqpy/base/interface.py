@@ -1,5 +1,6 @@
 """Interfaces that requires implementations in impl/"""
 
+from __future__ import annotations
 from typing import Dict, List, Optional
 
 from ..utils.video import FrameStream
@@ -47,4 +48,19 @@ class VObjBaseInterface(object):
               attr: str,
               specifications: Optional[Dict[str, str]] = None):
         """A easy-to-use interface provided for usage of built-in functions"""
+        raise NotImplementedError
+
+
+class VObjConstraintInterface(object):
+    """The interface of VObjConstraint class"""
+    def __add__(self, other: VObjConstraintInterface):
+        """merge constraints in the form subclass + superclass"""
+        raise NotImplementedError
+
+    def filter(self, objs: List[VObjBaseInterface]) -> List[VObjBaseInterface]:
+        """filter the list of vobjects from the constraint"""
+        raise NotImplementedError
+
+    def apply(self, vobjs: List[VObjBaseInterface]) -> List[Dict]:
+        """apply the constraint on a list of VObj instances"""
         raise NotImplementedError
