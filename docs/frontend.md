@@ -1,4 +1,4 @@
-# v0.1.0 Frontend Document
+# Frontend Document
 
 This document will go through how to implement a task and how to use the features with VQPy frontend.
 
