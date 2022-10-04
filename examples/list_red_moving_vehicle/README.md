@@ -1,5 +1,5 @@
 # List Red Moving Vehicles example
-This example demonstrates how to use VQPy to generate a query that returns all the plate numbers of red moving vehicles.
+This example demonstrates how to use VQPy to generate a query that returns the plate numbers of all red moving vehicles.
 
 ## Environment preparation
 You can follow the instructions [here](../../README.md) to prepare your environment for VQPy.
