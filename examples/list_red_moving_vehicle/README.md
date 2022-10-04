@@ -6,7 +6,7 @@ You can follow the instructions [here](../../README.md) to prepare your environm
 
 Besides, please use below command to install dependencies for this example.
 ```
-pip install webcolors, ColorDetect, opencv-python
+pip install webcolors ColorDetect opencv-python
 ```
 
 ## Download Dataset
