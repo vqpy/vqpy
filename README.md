@@ -1,6 +1,6 @@
 # VQPy : An object-oriented Video Query Language
 
-VQPy is an object-oriented language for modern video analytics. With VQPy, user can express their video queries in a composable and reusable manner with Python. 
+VQPy is an object-oriented language for modern video analytics. With VQPy, users can express their video queries in a composable and reusable manner with Python. 
 
 VQPy is still under active development. VQPy compiler, which generates a query plan with optimized performance for users' video analytics applications, is working in progress. With VQPy compiler, users can simply focus on the declaration of video queries for their own applications, and multiple optimizations defined in the compiler will be transparently applied to the user’s video analytics pipeline.
 
