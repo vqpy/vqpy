@@ -2,6 +2,8 @@ import argparse
 import numpy as np
 import vqpy
 from vqpy.function.logger import vqpy_func_logger
+from yolox_detector import YOLOXDetector
+from vqpy.detector.logger import register
 
 
 def make_parser():
@@ -12,6 +14,10 @@ def make_parser():
         default=None,
         help="the folder to save the final result",
     )
+    parser.add_argument(
+        "-y",
+        "--yolox_model_path",
+        help="path to yolox pretrained model")
     return parser
 
 
@@ -64,8 +70,10 @@ class ListPersonOnCrosswalk(vqpy.QueryBase):
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
+    register(YOLOXDetector)
     vqpy.launch(cls_name=vqpy.COCO_CLASSES,
                 cls_type={"person": Pedestrian},
                 tasks=[ListPersonOnCrosswalk()],
                 video_path=args.path,
-                save_folder=args.save_folder)
+                save_folder=args.save_folder,
+                detector_model_path=args.yolox_model_path)

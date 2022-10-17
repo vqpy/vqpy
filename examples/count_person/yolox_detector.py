@@ -8,9 +8,13 @@ from typing import Dict, List
 import numpy as np
 import torch
 from loguru import logger
-from ..base.detector import DetectorBase
-from ..utils.classes import COCO_CLASSES
-from .logger import register
+from vqpy.base.detector import DetectorBase
+from vqpy.utils.classes import COCO_CLASSES
+
+from yolox.data.data_augment import ValTransform
+from yolox.exp.build import get_exp
+from yolox.utils import postprocess
+from yolox.utils.model_utils import get_model_info
 
 
 class YOLOXDetector(DetectorBase):
@@ -19,24 +23,16 @@ class YOLOXDetector(DetectorBase):
     cls_names = COCO_CLASSES
     output_fields = ["tlbr", "score", "class_id"]
 
-    def __init__(self, device="gpu", fp16=True):
+    def __init__(self, model_path, device="gpu", fp16=True):
         # TODO: start a new process handling this
-
-        import sys
-        sys.path.append("./models/yolo")
-
-        from models.yolo.yolox.data.data_augment import ValTransform
-        from models.yolo.yolox.exp.build import get_exp
-        from models.yolo.yolox.utils import postprocess
-        from models.yolo.yolox.utils.model_utils import get_model_info
-
         exp = get_exp(None, "yolox_x")
         exp.test_conf = 0.3
         exp.nmsthre = 0.3
         exp.test_size = (640, 640)
 
         model = exp.get_model()
-        logger.info(f"Model Summary: {get_model_info(model, exp.test_size)}")
+        model_info = get_model_info(model, exp.test_size)
+        logger.info(f"Model Summary: {model_info}")
         if device == 'gpu':
             model.cuda()
             if fp16:
@@ -44,8 +40,7 @@ class YOLOXDetector(DetectorBase):
         model.eval()
 
         logger.info("loading checkpoint")
-        ckpt = torch.load("models/yolo/pretrained/yolox_x.pth",
-                          map_location="cpu")
+        ckpt = torch.load(model_path, map_location="cpu")
         model.load_state_dict(ckpt["model"])
         logger.info("loaded checkpoint done.")
 
@@ -91,6 +86,3 @@ class YOLOXDetector(DetectorBase):
                          "score": score.item(),
                          "class_id": int(class_id.item())})
         return rets
-
-
-register(YOLOXDetector)
