@@ -26,7 +26,9 @@ def launch(cls_name,
            video_path: str,
            save_folder: str = None,
            save_freq: int = 10,
-           detector_model_path: str = None):
+           detector_model_dir: str = None,
+           detector_name: str = None,
+           ):
     """Launch the VQPy tasks with specific setting.
     Args:
         cls_name: the detector classification result classes.
@@ -35,12 +37,15 @@ def launch(cls_name,
         video_path (str): the path of the queried video.
         save_folder: the folder to save final result.
         save_freq: the frequency of save when processing.
-        detector_model_path: the pretrained detector path.
+        detector_model_dir: the directory for all pretrained detectors.
+        detector_name: the specific detector name you desire to use.
     """
     logger.info(f"VQPy Launch I/O Setting: \
                   video_path={video_path}, save_folder={save_folder}")
     stream = FrameStream(video_path)
-    detector = setup_detector(cls_name, detector_model_path)
+    detector = setup_detector(cls_name,
+                              detector_model_dir=detector_model_dir,
+                              detector_name=detector_name)
     # Now tracking is always performed by track each class separately
     tracker = MultiTracker(setup_ground_tracker, stream, cls_name, cls_type)
     for task in tasks:

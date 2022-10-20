@@ -20,4 +20,4 @@ TO BE ADDED.
 You can simply use `bash run.sh` to run the example. Below are some arguments in `run.sh` you may want to change.
 * `--path`: your own video dataset path.
 * `--save_folder`: the folder that you preferred to save the query result.
-* `-y`: your pretrained yolox model path.
+* `-d`: your directory for all pretrained models.

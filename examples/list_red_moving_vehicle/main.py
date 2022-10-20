@@ -18,9 +18,9 @@ def make_parser():
         help="the folder to save the final result",
     )
     parser.add_argument(
-        "-y",
-        "--yolox_model_path",
-        help="path to yolox pretrained model")
+        "-d",
+        "--pretrained_model_dir",
+        help="Directory to pretrained models")
     return parser
 
 
@@ -69,10 +69,11 @@ class ListRedMovingVehicle(ListMovingVehicle):
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
-    register(YOLOXDetector)
+    register("yolox", YOLOXDetector, "yolox_x.pth")
     vqpy.launch(cls_name=vqpy.COCO_CLASSES,
                 cls_type={"car": Vehicle, "truck": Vehicle},
                 tasks=[ListRedMovingVehicle()],
                 video_path=args.path,
                 save_folder=args.save_folder,
-                detector_model_path=args.yolox_model_path)
+                detector_name="yolox",
+                detector_model_dir=args.pretrained_model_dir)
