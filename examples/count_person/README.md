@@ -17,7 +17,7 @@ wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yo
 TO BE ADDED.
 
 ## Run Example
-You can simply use `bash run.sh` to run the example. Below are some arguments in `run.sh` you may want to change.
+You can simply use `python main.py` to run the example. Below are the arguments you need to specify.
 * `--path`: your own video dataset path.
 * `--save_folder`: the folder that you preferred to save the query result.
 * `-d`: your directory for all pretrained models.

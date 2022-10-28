@@ -3,13 +3,17 @@ This folder (detector/) contains the VQPy detector interfaces.
 All visible instances in this folder inherits (base/detector.py).
 """
 
+from vqpy.detector.yolov4 import *   # noqa: F401,F403
+from vqpy.detector.faster_rcnn import *   # noqa: F401,F403
+
 from .logger import vqpy_detectors
 from ..base.detector import DetectorBase
 import os
+from loguru import logger
 
 
 def setup_detector(cls_names,
-                   detector_model_dir: str = None,
+                   model_dir: str = None,
                    detector_name: str = None,
                    ) -> DetectorBase:
     """setup a detector for video analytics
@@ -29,5 +33,6 @@ def setup_detector(cls_names,
             if cls_names == detector_type.cls_names:
                 print(f"Detector {detector_name} has been selected!")
                 break
-    detector_model_path = os.path.join(detector_model_dir, model_filename)
-    return detector_type(model_path=detector_model_path)
+    logger.info(f"Detector {detector_name} is chosen!")
+    detector_model_path = os.path.join(model_dir, model_filename)
+    return detector_name, detector_type(model_path=detector_model_path)
