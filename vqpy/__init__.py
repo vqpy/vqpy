@@ -15,6 +15,7 @@ from .function.logger import vqpy_func_logger  # noqa: F401
 from .impl.multiclass_tracker import MultiTracker
 from .impl.vobj_base import VObjBase
 from .impl.vobj_constraint import VObjConstraint  # noqa: F401
+from .base.interface import OutputConfig  # noqa: F401
 from .tracker import setup_ground_tracker
 from .utils.classes import COCO_CLASSES  # noqa: F401
 from .utils.video import FrameStream
@@ -42,6 +43,7 @@ def launch(cls_name,
     """
     logger.info(f"VQPy Launch I/O Setting: \
                   video_path={video_path}, save_folder={save_folder}")
+    video_name = os.path.basename(video_path).split(".")[0]
     stream = FrameStream(video_path)
     detector_name, detector = setup_detector(cls_name,
                                              model_dir=detector_model_dir,
@@ -64,7 +66,7 @@ def launch(cls_name,
                 os.makedirs(save_folder, exist_ok=True)
             for task in tasks:
                 task_name = task.get_setting().filename
-                filename = task_name + '_' + detector_name + '.json'
+                filename = f"{video_name}_{task_name}_{detector_name}.json"
                 save_path = os.path.join(save_folder, filename)
                 with open(save_path, 'w') as f:
                     json.dump(task.vqpy_getdata(), f)

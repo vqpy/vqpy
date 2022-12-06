@@ -5,6 +5,8 @@ from typing import Dict, List, Optional
 
 from ..utils.video import FrameStream
 
+from dataclasses import dataclass
+
 
 class VObjBaseInterface(object):
     """The interface of VObject Base Class.
@@ -64,3 +66,14 @@ class VObjConstraintInterface(object):
     def apply(self, vobjs: List[VObjBaseInterface]) -> List[Dict]:
         """apply the constraint on a list of VObj instances"""
         raise NotImplementedError
+
+
+@dataclass
+class OutputConfig:
+    """
+    The config for Query output.
+    :param output_frame_vobj_num: Default as False. whether to add the number
+        of the filtered vobjs as an output for each frame. If true, we will
+        generate a "vobj_num" field in the frame output.
+    """
+    output_frame_vobj_num: bool = False

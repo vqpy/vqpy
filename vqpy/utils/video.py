@@ -23,7 +23,8 @@ class FrameStream:
         self.frame_id += 1
         ret_val, self.frame = self._cap.read()
         if not ret_val:
-            logger.info("Failed to load frame stream")
+            logger.info(f"Failed to load frame stream with id of "
+                        f"{self.frame_id}")
             raise IOError
         ch = cv2.waitKey(1)
         if ch == 27 or ch == ord("q") or ch == ord('Q'):
