@@ -11,6 +11,7 @@ from ..base.interface import (
 
 
 OUTPUT_FRAME_VOBJ_NUM_NAME = "vobj_num"
+OUTPUT_TOTAL_VOBJ_NUM_NAME = "total_vobj_num"
 
 
 class QueryBase(object):
@@ -29,11 +30,25 @@ class QueryBase(object):
         self._query_data = []
         self._setting = self.get_base_setting()
         self._output_configs = self.set_output_configs()
+        self._total_ids = set()
 
     def vqpy_update(self,
                     frame_id: int,
                     vobjs: List[VObjBaseInterface]):
-        data = self._setting.apply(vobjs)
+        data, filtered_ids = self._setting.apply(vobjs)
+
+        # total vobj num is always the first element of output
+        if self._output_configs.output_total_vobj_num:
+            self._total_ids.update(filtered_ids)
+            total_vobj_num_data = {
+                OUTPUT_TOTAL_VOBJ_NUM_NAME: len(self._total_ids)
+            }
+            if frame_id == 1:
+                self._query_data = [total_vobj_num_data]
+            else:
+                assert OUTPUT_TOTAL_VOBJ_NUM_NAME in self._query_data[0]
+                self._query_data[0].update(total_vobj_num_data)
+
         frame_vobj_num = len(data)
         frame_query_data = dict()
         if self._output_configs.output_frame_vobj_num:

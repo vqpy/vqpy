@@ -68,4 +68,5 @@ class VObjConstraint(VObjConstraintInterface):
         # TODO: optimize the procedure
         filtered = self.filter(vobjs)
         selected = self.select(filtered)
-        return selected
+        filtered_ids = [obj.getv("track_id") for obj in filtered]
+        return selected, filtered_ids

@@ -23,11 +23,14 @@ class Person(vqpy.VObjBase):
     pass
 
 
-class PersonOnCrosswalk(vqpy.QueryBase):
+class CountPersonOnCrosswalk(vqpy.QueryBase):
 
     @staticmethod
     def set_output_configs() -> vqpy.OutputConfig:
-        return vqpy.OutputConfig(output_frame_vobj_num=True)
+        return vqpy.OutputConfig(
+            # output_frame_vobj_num=True,
+            output_total_vobj_num=True
+            )
 
     @staticmethod
     def setting() -> vqpy.VObjConstraint:
@@ -66,7 +69,7 @@ if __name__ == '__main__':
     register("yolox", YOLOXDetector, "yolox_x.pth")
     vqpy.launch(cls_name=vqpy.COCO_CLASSES,
                 cls_type={"person": Person},
-                tasks=[PersonOnCrosswalk()],
+                tasks=[CountPersonOnCrosswalk()],
                 video_path=args.path,
                 save_folder=args.save_folder,
                 detector_name="yolox",
