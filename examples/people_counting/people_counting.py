@@ -40,15 +40,9 @@ class CountPersonOnCrosswalk(vqpy.QueryBase):
                               (1839, 492), (1893, 547)]
         CROSSWALK_REGIONS = [CROSSWALK_REGION_1, CROSSWALK_REGION_2]
 
-        def get_bottom_central_point(tlbr):
-            x = (tlbr[0] + tlbr[2]) / 2
-            y = tlbr[3]
-            return (x, y)
-
-        def on_crosswalk(tlbr):
+        def on_crosswalk(bottom_center):
             from shapely.geometry import Point, Polygon
-            bottom_central_point = get_bottom_central_point(tlbr)
-            point = Point(bottom_central_point)
+            point = Point(bottom_center)
             for region in CROSSWALK_REGIONS:
                 poly = Polygon(region)
                 if point.within(poly):
@@ -56,7 +50,7 @@ class CountPersonOnCrosswalk(vqpy.QueryBase):
             return False
 
         filter_cons = {"__class__": lambda x: x == Person,
-                       "tlbr": on_crosswalk}
+                       "bottom_center": on_crosswalk}
         select_cons = {"track_id": None,
                        }
         return vqpy.VObjConstraint(filter_cons=filter_cons,
