@@ -19,6 +19,7 @@ from .base.interface import OutputConfig  # noqa: F401
 from .tracker import setup_ground_tracker
 from .utils.classes import COCO_CLASSES  # noqa: F401
 from .utils.video import FrameStream
+from . import utils  # noqa: F401
 
 
 def launch(cls_name,
