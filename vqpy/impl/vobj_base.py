@@ -43,8 +43,8 @@ class VObjBase(VObjBaseInterface):
         """
         NOTE: Note the order in the following checking.
         Infer an attribute of the object from:
-        (1) _datas (2) __state_ (3) _ctx.output_fields (4) __record_
-        (5) _registered_names (6) vqpy.infer
+        (1) __static (2) _datas (3) __state_ (4) _ctx.output_fields
+        (5) __record_ (6) _registered_names (7) vqpy.infer
 
         attr: attribute name.
         index: FRAMEID - Current FRAMEID - 1.
@@ -54,8 +54,13 @@ class VObjBase(VObjBaseInterface):
         return: the value when applicable, and None otherwise.
 
         For paramterized getv, write UDFs to compute the required properties.
-        """
 
+        __static_ can be used to store properties that are not time-related.
+        e.g. color of object, aggregated properties
+        """
+        # patchwork to support __static_
+        if hasattr(self, '__static_' + attr):
+            return getattr(self, '__static_' + attr)
         idx = self._ctx.frame_id + index + 1 - self._start_idx
         if idx < 0 or idx > len(self._datas):
             return None

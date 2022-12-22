@@ -43,7 +43,7 @@ def license_plate_openalpr(obj, image):
 @vqpy_func_logger(['tlbr'], ['coordinate'], [], required_length=1)
 def coordinate_center(obj, tlbr):
     """compute the center of the bounding box"""
-    return (tlbr[:2] + tlbr[2:]) / 2
+    return [(tlbr[:2] + tlbr[2:]) / 2]
 
 
 @vqpy_func_logger(['tlbr'], ['bottom_center'], [], required_length=1)
