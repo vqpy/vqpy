@@ -15,6 +15,7 @@ from .function.logger import vqpy_func_logger  # noqa: F401
 from .impl.multiclass_tracker import MultiTracker
 from .impl.vobj_base import VObjBase
 from .impl.vobj_constraint import VObjConstraint  # noqa: F401
+from .impl.frame import Frame
 from .base.interface import OutputConfig  # noqa: F401
 from .tracker import setup_ground_tracker
 from .utils.classes import COCO_CLASSES  # noqa: F401
@@ -50,15 +51,16 @@ def launch(cls_name,
                                              model_dir=detector_model_dir,
                                              detector_name=detector_name)
     # Now tracking is always performed by track each class separately
-    tracker = MultiTracker(setup_ground_tracker, stream, cls_name, cls_type)
+    frame = Frame(stream)
+    tracker = MultiTracker(setup_ground_tracker, cls_name, cls_type)
     for task in tasks:
         task.vqpy_init()
 
     tag = stream.n_frames
     for frame_id in tqdm(range(1, stream.n_frames + 1)):
-        frame = stream.next()
-        outputs = detector.inference(frame)
-        tracked_tracks, _ = tracker.update(outputs)
+        frame_image = stream.next()
+        outputs = detector.inference(frame_image)
+        tracked_tracks, _, frame = tracker.update(outputs, frame)
         for task in tasks:
             task.vqpy_update(frame_id, tracked_tracks)
 
@@ -72,3 +74,4 @@ def launch(cls_name,
                 with open(save_path, 'w') as f:
                     json.dump(task.vqpy_getdata(), f)
             tag += stream.n_frames
+    logger.info("Done!")

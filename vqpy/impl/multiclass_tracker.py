@@ -8,6 +8,7 @@ from ..base.surface_tracker import SurfaceTrackerBase
 
 from ..impl.vobj_base import VObjBase, VObjGeneratorType
 from ..utils.video import FrameStream
+from ..impl.frame import Frame
 
 TrackerGeneratorType = Callable[[FrameStream], GroundTrackerBase]
 
@@ -18,24 +19,27 @@ class MultiTracker(SurfaceTrackerBase):
 
     def __init__(self,
                  tracker: TrackerGeneratorType,
-                 ctx: FrameStream,
                  cls_name: Mapping[int, str],
                  cls_type: Mapping[str, VObjGeneratorType]):
         """TODO: complete the __init__ docstring"""
-        self.ctx = ctx
         self.tracker = tracker
         self.cls_name = cls_name
         self.cls_type = cls_type
         self.tracker_dict: Dict[VObjGeneratorType, GroundTrackerBase] = {}
         self.vobj_pool: Dict[int, VObjBase] = {}
 
-    def update(self, output: List[Dict]
-               ) -> Tuple[List[VObjBase], List[VObjBase]]:
+    def update(self, output: List[Dict], last_frame: Frame
+               ) -> Tuple[List[VObjBase], List[VObjBase], Frame]:
         """Generate the video objects using ground tracker and detection result
         returns: the current tracked/lost VObj instances"""
         detections: Dict[VObjGeneratorType, List[Dict]] = {}
         tracked: List[VObjBase] = []
         lost: List[VObjBase] = []
+
+        last_frame_vobjs = last_frame.vobjs
+        ctx = last_frame.ctx
+        frame = Frame(ctx)
+        frame.set_vobjs(last_frame_vobjs)
 
         for obj in output:
             name = self.cls_name[obj['class_id']]
@@ -48,7 +52,7 @@ class MultiTracker(SurfaceTrackerBase):
 
         for func, dets in detections.items():
             if func not in self.tracker_dict:
-                self.tracker_dict[func] = self.tracker(self.ctx)
+                self.tracker_dict[func] = self.tracker(ctx)
 
         for func, tracker in self.tracker_dict.items():
             # logger.info(f"Multitracking type {func}")
@@ -56,17 +60,14 @@ class MultiTracker(SurfaceTrackerBase):
             if func in detections:
                 dets = detections[func]
             f_tracked, f_lost = tracker.update(dets)
-            self.ctx._objdatas = f_tracked
+            ctx._objdatas = f_tracked
             for item in f_tracked:
                 track_id = item['track_id']
-                if track_id not in self.vobj_pool:
-                    self.vobj_pool[track_id] = func(self.ctx)
-                self.vobj_pool[track_id].update(item)
-                tracked.append(self.vobj_pool[track_id])
+                frame.update_vobjs(func, track_id, item)
+            tracked = frame.get_tracked_vobjs(func)
             for item in f_lost:
                 track_id = item['track_id']
-                self.vobj_pool[track_id].update(None)
-                lost.append(self.vobj_pool[track_id])
+                frame.update_vobjs(func, track_id, None)
+            lost = frame.get_lost_vobjs(func)
             # logger.info(f"tracking done")
-
-        return tracked, lost
+        return tracked, lost, frame
