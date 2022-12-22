@@ -6,7 +6,8 @@ from typing import Callable, Dict, List, Mapping, Tuple
 from ..base.ground_tracker import GroundTrackerBase
 from ..base.surface_tracker import SurfaceTrackerBase
 
-from ..impl.vobj_base import VObjBase, VObjGeneratorType
+from ..base.interface import VObjGeneratorType
+from ..impl.vobj_base import VObjBase
 from ..utils.video import FrameStream
 from ..impl.frame import Frame
 

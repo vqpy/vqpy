@@ -1,10 +1,10 @@
 """VObjBase implementation"""
 
-from typing import Callable, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from ..base.interface import VObjBaseInterface
 from ..function import infer
-from ..utils.video import FrameStream
+from ..impl.frame import Frame
 
 
 class VObjBase(VObjBaseInterface):
@@ -12,9 +12,10 @@ class VObjBase(VObjBaseInterface):
     The tracker is responsible to keep objects updated when the track is active
     """
 
-    def __init__(self, ctx: FrameStream):
-        self._ctx = ctx
-        self._start_idx = ctx.frame_id
+    def __init__(self, frame: Frame):
+        self._frame = frame
+        self._ctx = frame.ctx
+        self._start_idx = frame.ctx.frame_id
         self._track_length = 0
         self._datas: List[Optional[Dict]] = []
         self._registered_names: List[str] = []
@@ -114,6 +115,3 @@ class VObjBase(VObjBaseInterface):
         """A easy-to-use interface provided for usage of built-in functions"""
         return infer(self, attr, self._get_fields(), self._get_pfields(),
                      specifications)
-
-
-VObjGeneratorType = Callable[[FrameStream], VObjBase]

@@ -110,3 +110,43 @@ def access_data(cond: Dict[str, Callable]):
         return wrapper
     return decorator
 """
+
+
+# for declaring data dependencies and retrieving data from other vobjs
+# currently don't register dependencies since execution sequence is fixed
+# cross_vobj_property only needs to provide the required list of properties
+# of vobjs
+def cross_vobj_property(
+        vobj_type=None, vobj_num="ALL", vobj_input_fields=None
+        ):
+    """Decorator for cross-object property computation.
+
+    Wrapper for cross-object property computation. Retrieves list of properties
+    of VObjs of specified type and passes them to the function, as
+    `List[property1], List[property2], ...`.
+
+    Attributes:
+    vobj_type: VObjGeneratorType
+        type of VObj to retrieve
+    vobj_num: int
+        number of VObjs to retrieve
+    vobj_input_fields: List[str]
+        list of names of properties to retrieve from VObjs
+    """
+    # vobj_num defaults to "ALL" for now
+    # other possible options could be user-specified number
+    def wrap(func: Callable):
+        @functools.wraps(func)
+        def wrapped_func(self: VObjBaseInterface, *args, **kwargs):
+            # somehow find all vobjs of specified type and their properties
+            # pass the properties to func and return value
+            vobjs = self._frame.get_tracked_vobjs(vobj_type)
+            arg = tuple()
+            for input_field in vobj_input_fields:
+                properties = []
+                for vobj in vobjs:
+                    properties.append(vobj.getv(input_field))
+                arg = arg + (properties,)
+            return func(self, *arg)
+        return wrapped_func
+    return wrap
