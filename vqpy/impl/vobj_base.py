@@ -98,6 +98,12 @@ class VObjBase(VObjBaseInterface):
             else:
                 return None
 
+        if hasattr(self, '__record_' + attr) and \
+                not hasattr(self, '__state_' + attr):
+            raise ValueError(f"We don't support retrieve historical data from \
+                non-stateful properties. \
+                Please add @stateful() decorator to property {attr}.")
+
     def update(self, data: Optional[Dict]):
         """Update data this frame to object"""
         if data is not None:
