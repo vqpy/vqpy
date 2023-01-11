@@ -32,30 +32,28 @@ class Person(vqpy.VObjBase):
 
 
 class Baggage(vqpy.VObjBase):
-    @vqpy.property()
+    @vqpy.stateful()
     @vqpy.cross_vobj_property(
         vobj_type=Person, vobj_num="ALL",
         vobj_input_fields=("track_id", "tlbr")
     )
     # function decorator responsible for retrieving list of properties
     # Person_id and Person_tlbr given as a list of track_id's and tlbr's
-    def owner(self, person_ids, person_tlbrs):
+    def owner(self, person_ids_tlbrs):
         # if previous owner within distance, return previous owner track id
         # else: find the nearest person within distance, return the track id
         # else: return None
         baggage_tlbr = self.getv('tlbr')
         prev_owner = self.getv('owner', -2)
         owner_id = None
-
-        # return previous owner, if baggage is not present in current frame
-        # return None is previous owner is not present in current frame
-        if baggage_tlbr is None:
-            return prev_owner if prev_owner in person_ids else None
+        # with new implementation of @cross_vobj_property and VObj.update, only
+        # tracked VObjs will go into the filter and compute property "owner"
+        # Thus no need to handle situation of baggage_tlbr being None
 
         # set threshold to baggage's width
         threshold = (baggage_tlbr[3] - baggage_tlbr[1])
         min_dist = threshold + 1
-        for person_id, person_tlbr in zip(person_ids, person_tlbrs):
+        for person_id, person_tlbr in person_ids_tlbrs:
             dist = distance(baggage_tlbr, person_tlbr)
             if person_id == prev_owner and dist <= threshold:
                 # return previous owner if still around

@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from typing import List
 from ..base.interface import (
-    VObjBaseInterface,
     VObjConstraintInterface,
-    OutputConfig
+    OutputConfig,
+    FrameInterface
 )
 
 
@@ -32,10 +31,9 @@ class QueryBase(object):
         self._output_configs = self.set_output_configs()
         self._total_ids = set()
 
-    def vqpy_update(self,
-                    frame_id: int,
-                    vobjs: List[VObjBaseInterface]):
-        data, filtered_ids = self._setting.apply(vobjs)
+    def vqpy_update(self, frame: FrameInterface):
+        frame_id: int = frame.ctx.frame_id
+        data, filtered_ids = self._setting.apply(frame)
 
         # total vobj num is always the first element of output
         if self._output_configs.output_total_vobj_num:

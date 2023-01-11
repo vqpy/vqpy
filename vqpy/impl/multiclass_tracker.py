@@ -2,7 +2,7 @@
 this tracker separate objects by their classes, and tracks individually
 """
 
-from typing import Callable, Dict, List, Mapping, Tuple
+from typing import Callable, Dict, List, Mapping
 from ..base.ground_tracker import GroundTrackerBase
 from ..base.surface_tracker import SurfaceTrackerBase
 
@@ -29,13 +29,10 @@ class MultiTracker(SurfaceTrackerBase):
         self.tracker_dict: Dict[VObjGeneratorType, GroundTrackerBase] = {}
         self.vobj_pool: Dict[int, VObjBase] = {}
 
-    def update(self, output: List[Dict], last_frame: Frame
-               ) -> Tuple[List[VObjBase], List[VObjBase], Frame]:
+    def update(self, output: List[Dict], last_frame: Frame) -> Frame:
         """Generate the video objects using ground tracker and detection result
         returns: the current tracked/lost VObj instances"""
         detections: Dict[VObjGeneratorType, List[Dict]] = {}
-        tracked: List[VObjBase] = []
-        lost: List[VObjBase] = []
 
         last_frame_vobjs = last_frame.vobjs
         ctx = last_frame.ctx
@@ -65,10 +62,8 @@ class MultiTracker(SurfaceTrackerBase):
             for item in f_tracked:
                 track_id = item['track_id']
                 frame.update_vobjs(func, track_id, item)
-            tracked = frame.get_tracked_vobjs(func)
             for item in f_lost:
                 track_id = item['track_id']
                 frame.update_vobjs(func, track_id, None)
-            lost = frame.get_lost_vobjs(func)
             # logger.info(f"tracking done")
-        return tracked, lost, frame
+        return frame

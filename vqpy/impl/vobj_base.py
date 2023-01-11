@@ -1,10 +1,10 @@
 """VObjBase implementation"""
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 from ..base.interface import VObjBaseInterface
 from ..function import infer
-from ..impl.frame import Frame
+from ..utils.video import FrameStream
 
 
 class VObjBase(VObjBaseInterface):
@@ -12,13 +12,13 @@ class VObjBase(VObjBaseInterface):
     The tracker is responsible to keep objects updated when the track is active
     """
 
-    def __init__(self, frame: Frame):
-        self._frame = frame
-        self._ctx = frame.ctx
-        self._start_idx = frame.ctx.frame_id
+    def __init__(self, ctx: FrameStream):
+        self._ctx = ctx
+        self._start_idx = ctx.frame_id
         self._track_length = 0
         self._datas: List[Optional[Dict]] = []
-        self._registered_names: List[str] = []
+        self._registered_names: Set[str] = set()
+        self._registered_cross_vobj_names: Dict[str, ] = {}
         self._working_infers: List[str] = []
         # NOTE: now @property instances are stored in the order of __dir__()
         for instance_name in self.__dir__():
@@ -31,7 +31,7 @@ class VObjBase(VObjBaseInterface):
 
     def _get_fields(self):
         return list(self._datas[0].keys()) + \
-            self._registered_names + self._ctx.output_fields
+            list(self._registered_names) + self._ctx.output_fields
 
     def _get_pfields(self):
         return list(self._datas[0].keys()) + [x for x in self._registered_names
@@ -76,7 +76,7 @@ class VObjBase(VObjBaseInterface):
                   getattr(self, '__index_' + attr) == self._ctx.frame_id):
                 return getattr(self, '__record_' + attr)
             elif attr in self._registered_names:
-                return getattr(self, attr)()
+                return getattr(self, attr)()    # TODO: test if used at all
             else:
                 assert len(self._datas) > 0
                 self._working_infers.append(attr)
@@ -107,6 +107,7 @@ class VObjBase(VObjBaseInterface):
             self._datas.append(None)
             self._track_length = 0
         for method_name in self._registered_names:
+            # properties updated here
             getattr(self, method_name)()
 
     def infer(self,

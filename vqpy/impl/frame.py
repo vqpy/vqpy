@@ -25,13 +25,8 @@ class Frame:
                      ):
         # create new vobj if doesn't exist
         if track_id not in self.vobjs[vobj_type]:
-            # each vobj has reference to Frame
-            # temporary, should be querying on Frame
-            new_vobj = vobj_type(self)
+            new_vobj = vobj_type(self.ctx)
             self.vobjs[vobj_type][track_id] = new_vobj
-        else:
-            # update _frame if vobj already exists
-            self.vobjs[vobj_type][track_id]._frame = self
         # update vobj
         vobj = self.vobjs[vobj_type][track_id]
         vobj.update(data)

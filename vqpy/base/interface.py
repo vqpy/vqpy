@@ -1,7 +1,7 @@
 """Interfaces that requires implementations in impl/"""
 
 from __future__ import annotations
-from typing import Dict, List, Optional, Callable
+from typing import Dict, List, Optional, Callable, Set
 
 from ..utils.video import FrameStream
 
@@ -13,16 +13,16 @@ class VObjBaseInterface(object):
     The tracker is responsible to keep objects updated when the track is active
     """
 
-    def __init__(self, frame: FrameInterface):
-        self._frame = frame
-        self._ctx = frame.ctx
-        self._start_idx = frame.ctx.frame_id
+    def __init__(self, ctx: FrameStream):
+        self._ctx = ctx
+        self._start_idx = ctx.frame_id
         # Number of frames consecutively appears
         self._track_length = 0
         # Historic object data. TODO: shrink memory
         self._datas: List[Optional[Dict]] = []
         # List of @property instances
-        self._registered_names: List[str] = []
+        self._registered_names: Set[str] = set()
+        self._registered_cross_vobj_names: Set[str] = set()
         raise NotImplementedError
 
     def getv(self,
@@ -60,12 +60,24 @@ class VObjConstraintInterface(object):
         """merge constraints in the form subclass + superclass"""
         raise NotImplementedError
 
-    def filter(self, objs: List[VObjBaseInterface]) -> List[VObjBaseInterface]:
+    def filter(self, frame: FrameInterface) -> List[VObjBaseInterface]:
         """filter the list of vobjects from the constraint"""
         raise NotImplementedError
 
-    def apply(self, vobjs: List[VObjBaseInterface]) -> List[Dict]:
+    def select(self, objs: List[VObjBaseInterface], frame: FrameInterface) \
+            -> VObjBaseInterface:
+        """select one vobject from the constraint"""
+        raise NotImplementedError
+
+    def apply(self, frame: FrameInterface) -> List[Dict]:
         """apply the constraint on a list of VObj instances"""
+        raise NotImplementedError
+
+    def _compute_cross_vobj_property(
+        self, frame: FrameInterface, vobjs: VObjBaseInterface, conditions
+    ) -> None:
+        """Compute cross_vobj_property's used in the conditions for the given
+        VObjs"""
         raise NotImplementedError
 
 

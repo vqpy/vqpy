@@ -1,7 +1,7 @@
 """The features for easy coding in VQPy"""
 
 import functools
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 from ..base.interface import VObjBaseInterface
 
@@ -29,7 +29,7 @@ def property():
                     return value
             elif func.__name__ not in self._registered_names:
                 # initialization
-                self._registered_names.append(func.__name__)
+                self._registered_names.add(func.__name__)
                 return None
         return wrapper
     return decorator
@@ -121,9 +121,17 @@ def cross_vobj_property(
         ):
     """Decorator for cross-object property computation.
 
-    Wrapper for cross-object property computation. Retrieves list of properties
-    of VObjs of specified type and passes them to the function, as
-    `List[property1], List[property2], ...`.
+    Wrapper for cross-object property computation.
+
+    The property function being decorated should accept two arguments:
+    `self` and `cross_vobj_arg` (positional).
+    During execution, VQPy will pass `cross_vobj_arg`, a list of properties of
+    VObjs of specified type, to the property function being decorated.
+
+    `cross_vobj_arg` has structure:
+    `List[Tuple(property1, property2, ...) for vobj1, Tuple for vobj2, ...]`,
+    where property1, property2 are values of property names listed in
+    `vobj_input_fields`, in order; vobj1, vobj2 are VObjs of type `vobj_type`.
 
     Attributes:
     vobj_type: VObjGeneratorType
@@ -137,16 +145,28 @@ def cross_vobj_property(
     # other possible options could be user-specified number
     def wrap(func: Callable):
         @functools.wraps(func)
-        def wrapped_func(self: VObjBaseInterface, *args, **kwargs):
-            # somehow find all vobjs of specified type and their properties
-            # pass the properties to func and return value
-            vobjs = self._frame.get_tracked_vobjs(vobj_type)
-            arg = tuple()
-            for input_field in vobj_input_fields:
-                properties = []
-                for vobj in vobjs:
-                    properties.append(vobj.getv(input_field))
-                arg = arg + (properties,)
-            return func(self, *arg)
+        def wrapped_func(
+            self: VObjBaseInterface,
+            cross_vobj_arg: Optional[List] = None
+        ):
+            # parameter cross_vobj_arg has default value None to maintain
+            # the "same" interface with @property upon being called directly
+            # this compatibility is used in VObjBase.__init__ at instance()
+            if len(self._datas) > 0:
+                vidx = '__record_' + func.__name__
+                aidx = '__index_' + func.__name__
+                if getattr(self, aidx, None) == self._ctx.frame_id:
+                    return getattr(self, vidx)
+                else:
+                    value = func(self, cross_vobj_arg)
+                    setattr(self, vidx, value)
+                    setattr(self, aidx, self._ctx.frame_id)
+                    return value
+            elif func.__name__ not in self._registered_cross_vobj_names:
+                # initialization
+                # register function name, required VObj type and fields
+                self._registered_cross_vobj_names[func.__name__] = \
+                    (vobj_type, vobj_input_fields)
+                return None
         return wrapped_func
     return wrap
