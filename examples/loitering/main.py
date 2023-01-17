@@ -1,7 +1,5 @@
 import argparse
 import vqpy
-from vqpy.detector.logger import register
-from yolox_detector import YOLOXDetector
 
 
 def make_parser():
@@ -51,13 +49,11 @@ class People_loitering_query(vqpy.QueryBase):
 
 if __name__ == "__main__":
     args = make_parser().parse_args()
-    register("yolox", YOLOXDetector, "yolox_x.pth")
     vqpy.launch(
         cls_name=vqpy.COCO_CLASSES,
         cls_type={"person": Person},
         tasks=[People_loitering_query()],
         video_path=args.path,
         save_folder=args.save_folder,
-        detector_name="yolox",
         detector_model_dir=args.pretrained_model_dir,
     )

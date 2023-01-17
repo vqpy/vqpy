@@ -30,7 +30,7 @@ def launch(cls_name,
            save_folder: str = None,
            save_freq: int = 10,
            detector_model_dir: str = None,
-           detector_name: str = None,
+           detector_name: str = "yolox",
            ):
     """Launch the VQPy tasks with specific setting.
     Args:

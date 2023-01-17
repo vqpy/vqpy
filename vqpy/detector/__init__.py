@@ -5,6 +5,7 @@ All visible instances in this folder inherits (base/detector.py).
 
 from vqpy.detector.yolov4 import *   # noqa: F401,F403
 from vqpy.detector.faster_rcnn import *   # noqa: F401,F403
+from vqpy.detector.yolox import *   # noqa: F401,F403
 
 from .logger import vqpy_detectors
 from ..base.detector import DetectorBase

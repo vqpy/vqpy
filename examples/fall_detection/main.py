@@ -1,7 +1,5 @@
 import sys
 import vqpy
-from yolox_detector import YOLOXDetector
-from vqpy.detector.logger import register
 
 import torch
 import numpy as np
@@ -81,11 +79,9 @@ class FallDetection(vqpy.QueryBase):
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
-    register("yolox", YOLOXDetector, "yolox_x.pth")
     vqpy.launch(cls_name=vqpy.COCO_CLASSES,
                 cls_type={"person": Person},
                 tasks=[FallDetection()],
                 video_path=args.path,
                 save_folder=args.save_folder,
-                detector_name="yolox",
                 detector_model_dir=args.pretrained_model_dir)

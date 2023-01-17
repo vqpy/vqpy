@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-brightgreen.svg)](https://github.com/uclasystem/VQPy/blob/main/LICENSE)
 
-VQPy is an object-oriented language for modern video analytics. With VQPy, users can express their video queries in a composable and reusable manner with Python. 
+VQPy is an object-oriented language for modern video analytics. With VQPy, users can express their video queries in a composable and reusable manner with Python.
 
 VQPy is still under active development. VQPy compiler, which generates a query plan with optimized performance for users' video analytics applications, is working in progress. With VQPy compiler, users can simply focus on the declaration of video queries for their own applications, and multiple optimizations defined in the compiler will be transparently applied to the user’s video analytics pipeline.
 
@@ -10,9 +10,27 @@ VQPy is still under active development. VQPy compiler, which generates a query p
 
 We have not supported installing VQPy automatically yet. You can follow the steps below to install VQPy manually.
 
+It is recommended to use Python 3.8 to avoid any compatibility issues with YOLOX.
+
 #### Step 1: install VQPy dependences
 ```
 pip3 install lap cython_bbox shapely
+```
+
+VQPy uses [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) as the default built-in object detection model.
+
+We need to install it from source. YOLOX requires PyTorch (version>=1.7) for pre-compiling ops, so please install it first.
+
+```
+git clone https://github.com/Megvii-BaseDetection/YOLOX.git
+cd YOLOX
+pip3 install -v -e .
+```
+
+The pretrained YOLOX model can be downloaded from [here](https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth).
+
+```
+wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth
 ```
 
 #### Step 2: install VQPy from source
