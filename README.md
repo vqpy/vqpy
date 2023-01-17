@@ -6,6 +6,31 @@ VQPy is an object-oriented language for modern video analytics. With VQPy, users
 
 VQPy is still under active development. VQPy compiler, which generates a query plan with optimized performance for users' video analytics applications, is working in progress. With VQPy compiler, users can simply focus on the declaration of video queries for their own applications, and multiple optimizations defined in the compiler will be transparently applied to the user’s video analytics pipeline.
 
+## Installation
+
+We have not supported installing VQPy automatically yet. You can follow the steps below to install VQPy manually.
+
+#### Step 1: install VQPy dependences
+```
+pip3 install lap cython_bbox shapely
+```
+
+#### Step 2: install VQPy from source
+
+First, clone vqpy repository from GitHub.
+```
+git clone https://github.com/uclasystem/VQPy.git
+```
+
+Next, add vqpy to your `$PYTHONPATH`. For example, if your local VQPy repository is `$HOME/sources/VQPy`, then you can add your path to VQPy repository to `$PYTHONPATH` with
+```
+export $PYTHONPATH=$PYTHONPATH:$HOME/sources/VQPy
+```
+You can test the installation with
+```
+import vqpy
+```
+
 ## Getting Started
 
 ### Basic usage
