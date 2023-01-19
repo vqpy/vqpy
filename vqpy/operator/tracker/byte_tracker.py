@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 from vqpy.operator.tracker.base import GroundTrackerBase
-from ..utils.video import FrameStream
+from vqpy.utils.video import FrameStream
 
 from . import matching
 from .base_track import BaseTrack, TrackState
