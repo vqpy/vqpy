@@ -1,4 +1,4 @@
-from vqpy.operator.detector.utils import onnx_inference
+from vqpy.operator.detector.models.onnx import onnx_inference
 from vqpy.operator.detector.base import DetectorBase
 from vqpy.utils.classes import COCO_CLASSES
 import numpy as np
