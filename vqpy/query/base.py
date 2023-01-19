@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from ..query.output_config import OutputConfig
-from ..impl.frame import FrameInterface
-from ..impl.vobj_constraint import VObjConstraintInterface
+from vqpy.query.output_config import OutputConfig
+from vqpy.impl.frame import FrameInterface
+from vqpy.impl.vobj_constraint import VObjConstraintInterface
 
 OUTPUT_FRAME_VOBJ_NUM_NAME = "vobj_num"
 OUTPUT_TOTAL_VOBJ_NUM_NAME = "total_vobj_num"

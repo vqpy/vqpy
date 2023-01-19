@@ -6,7 +6,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from vqpy.operator.detector.base import DetectorBase  # noqa: F401
-from .base.query import QueryBase
+from vqpy.query.base import QueryBase
 from vqpy.operator.tracker.base import GroundTrackerBase  # noqa: F401
 from vqpy.operator.detector import setup_detector
 from vqpy.obj.vobj.wrappers import property, stateful, postproc, cross_vobj_property  # noqa: F401,E501
