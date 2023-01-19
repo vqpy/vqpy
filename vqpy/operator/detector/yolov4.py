@@ -1,11 +1,11 @@
-from vqpy.detector.utils import onnx_inference
+from vqpy.operator.detector.utils import onnx_inference
 from vqpy.base.detector import DetectorBase
 from vqpy.utils.classes import COCO_CLASSES
 import numpy as np
 from typing import Dict, List
 import cv2
 from scipy import special
-from vqpy.detector.logger import register
+from vqpy.operator.detector.logger import register
 
 
 MODEL_INPUT_SIZE = (416, 416)

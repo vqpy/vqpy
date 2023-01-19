@@ -3,12 +3,12 @@ This folder (detector/) contains the VQPy detector interfaces.
 All visible instances in this folder inherits (base/detector.py).
 """
 
-from vqpy.detector.yolov4 import *   # noqa: F401,F403
-from vqpy.detector.faster_rcnn import *   # noqa: F401,F403
-from vqpy.detector.yolox import *   # noqa: F401,F403
+from vqpy.operator.detector.yolov4 import *   # noqa: F401,F403
+from vqpy.operator.detector.faster_rcnn import *   # noqa: F401,F403
+from vqpy.operator.detector.yolox import *   # noqa: F401,F403
 
 from .logger import vqpy_detectors
-from ..base.detector import DetectorBase
+from vqpy.base.detector import DetectorBase
 import os
 from loguru import logger
 

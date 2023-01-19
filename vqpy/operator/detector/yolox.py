@@ -10,7 +10,7 @@ import torch
 from loguru import logger
 from vqpy.base.detector import DetectorBase
 from vqpy.utils.classes import COCO_CLASSES
-from vqpy.detector.logger import register
+from vqpy.operator.detector.logger import register
 
 from yolox.data.data_augment import ValTransform
 from yolox.exp.build import get_exp
