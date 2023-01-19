@@ -29,14 +29,14 @@ def image_boundarycrop(obj, frame, tlbr):
 @vqpy_func_logger(['image'], ['license_plate'], [], required_length=1)
 def license_plate_lprnet(obj, image):
     """recognize license plate using LPRNet"""
-    from vqpy.models.lprnet import GetLP
+    from vqpy.property_lib.vehicle.models.lprnet import GetLP
     return [GetLP(image)]
 
 
 @vqpy_func_logger(['image'], ['license_plate'], [], required_length=1)
 def license_plate_openalpr(obj, image):
     """recognize license plate using OpenAlpr"""
-    from vqpy.models.openalpr import GetLP
+    from vqpy.property_lib.vehicle.models.openalpr import GetLP
     return [GetLP(image)]
 
 
