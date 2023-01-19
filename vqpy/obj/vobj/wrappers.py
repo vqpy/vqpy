@@ -3,7 +3,7 @@
 import functools
 from typing import Callable, Dict, List, Optional
 
-from ..base.interface import VObjBaseInterface
+from vqpy.base.interface import VObjBaseInterface
 
 
 def property():
