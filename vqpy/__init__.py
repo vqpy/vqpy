@@ -5,7 +5,7 @@ from typing import List, Dict
 from loguru import logger
 from tqdm import tqdm
 
-from .base.detector import DetectorBase  # noqa: F401
+from vqpy.operator.detector.base import DetectorBase  # noqa: F401
 from .base.query import QueryBase
 from .base.ground_tracker import GroundTrackerBase  # noqa: F401
 from vqpy.operator.detector import setup_detector

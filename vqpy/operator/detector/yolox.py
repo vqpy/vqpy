@@ -8,7 +8,7 @@ from typing import Dict, List
 import numpy as np
 import torch
 from loguru import logger
-from vqpy.base.detector import DetectorBase
+from vqpy.operator.detector.base import DetectorBase
 from vqpy.utils.classes import COCO_CLASSES
 from vqpy.operator.detector.logger import register
 

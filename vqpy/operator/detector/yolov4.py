@@ -1,5 +1,5 @@
 from vqpy.operator.detector.utils import onnx_inference
-from vqpy.base.detector import DetectorBase
+from vqpy.operator.detector.base import DetectorBase
 from vqpy.utils.classes import COCO_CLASSES
 import numpy as np
 from typing import Dict, List
