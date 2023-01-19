@@ -1,7 +1,7 @@
 """The ground-level tracker base class"""
 
 from typing import Dict, List, Tuple
-from ..utils.video import FrameStream
+from vqpy.utils.video import FrameStream
 
 
 class GroundTrackerBase(object):

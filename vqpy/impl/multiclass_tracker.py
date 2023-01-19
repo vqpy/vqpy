@@ -3,7 +3,7 @@ this tracker separate objects by their classes, and tracks individually
 """
 
 from typing import Callable, Dict, List, Mapping
-from ..base.ground_tracker import GroundTrackerBase
+from vqpy.operator.tracker.base import GroundTrackerBase
 from ..base.surface_tracker import SurfaceTrackerBase
 
 from ..base.interface import VObjGeneratorType

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Dict, List, Tuple
 
 import numpy as np
-from ..base.ground_tracker import GroundTrackerBase
+from vqpy.operator.tracker.base import GroundTrackerBase
 from ..utils.video import FrameStream
 
 from . import matching
