@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import List, Dict
+
 from vqpy.query.output_config import OutputConfig
 from vqpy.impl.frame import FrameInterface
 from vqpy.impl.vobj_constraint import VObjConstraintInterface
@@ -77,3 +79,17 @@ class QueryBase(object):
     @staticmethod
     def set_output_configs() -> OutputConfig:
         return OutputConfig()
+
+
+class SurfaceTrackerBase(object):
+    """The surface level tracker base class.
+    Objects of this class integrate detections results and associate the
+    results with necessary data fields.
+    """
+
+    input_fields = []       # the required data fields for this tracker
+
+    def update(self, data: List[Dict]) -> FrameInterface:
+        """Generate the video objects using ground tracker and detection result
+        returns: the current tracked/lost VObj instances"""
+        raise NotImplementedError
