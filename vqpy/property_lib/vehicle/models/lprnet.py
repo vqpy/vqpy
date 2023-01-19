@@ -25,46 +25,49 @@ pnet, onet, lprnet, stnet, mini_lp = None, None, None, None, None
 def network_setup():
     import sys
 
-    sys.path.append("./models/lpdetect")
-    sys.path.append("./models/lpdetect/LPRNet")
-    sys.path.append("./models/lpdetect/MTCNN")
+    sys.path.append("./lpdetect")
+    sys.path.append("./lpdetect/LPRNet")
+    sys.path.append("./lpdetect/MTCNN")
 
-    from models.lpdetect.LPRNet.model.LPRNET import LPRNet, CHARS
-    from models.lpdetect.LPRNet.model.STN import STNet
-    from models.lpdetect.MTCNN.MTCNN import PNet, ONet
+    from lpdetect.LPRNet.model.LPRNET import LPRNet, CHARS
+    from lpdetect.LPRNet.model.STN import STNet
+    from lpdetect.MTCNN.MTCNN import PNet, ONet
 
     global pnet, onet, lprnet, stnet, mini_lp
     pnet = PNet().to(device)
     pnet.load_state_dict(
-        torch.load('models/lpdetect/MTCNN/weights/pnet_Weights',
+        torch.load('lpdetect/MTCNN/weights/pnet_Weights',
                    map_location=lambda storage, loc: storage)
         )
     pnet.eval()
     onet = ONet().to(device)
     onet.load_state_dict(
-        torch.load('models/lpdetect/MTCNN/weights/onet_Weights',
+        torch.load('lpdetect/MTCNN/weights/onet_Weights',
                    map_location=lambda storage, loc: storage)
         )
     onet.eval()
     lprnet = LPRNet(class_num=len(CHARS), dropout_rate=0).to(device)
     lprnet.load_state_dict(
-        torch.load('models/lpdetect/LPRNet/weights/Final_LPRNet_model.pth',
+        torch.load('lpdetect/LPRNet/weights/Final_LPRNet_model.pth',
                    map_location=lambda storage, loc: storage)
         )
     lprnet.eval()
     stnet = STNet().to(device)
     stnet.load_state_dict(
-        torch.load('models/lpdetect/LPRNet/weights/Final_STN_model.pth',
+        torch.load('lpdetect/LPRNet/weights/Final_STN_model.pth',
                    map_location=lambda storage, loc: storage))
     stnet.eval()
     mini_lp = (50, 15)  # smallest lp size
 
 
 def GetLP(image):
-    from models.lpdetect.LPRNet.LPRNet_Test import decode as lprnet_decode
-    from models.lpdetect.MTCNN.MTCNN import detect_pnet, detect_onet
+    try:
+        from lpdetect.LPRNet.LPRNet_Test import decode as lprnet_decode
+        from lpdetect.MTCNN.MTCNN import detect_pnet, detect_onet
+    except ImportError:
+        raise ImportError("Please run VQPY/download_models.sh before using built-in vehicle properties.")
 
-    from vqpy.utils.images import crop_image
+    from vqpy.utils import crop_image
 
     if device is None:
         network_setup()
