@@ -5,7 +5,7 @@ from typing import Dict, List
 from vqpy.obj import VObjGeneratorType
 from vqpy.obj.vobj.base import VObjBaseInterface
 from collections import defaultdict
-from vqpy.utils.video import FrameStream
+from vqpy.operator.video_reader import FrameStream
 
 
 class Frame:

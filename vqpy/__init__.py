@@ -18,8 +18,8 @@ from vqpy.query.vobj_constraint import VObjConstraint  # noqa: F401
 from vqpy.obj.frame import Frame
 from .query.output_config import OutputConfig
 from vqpy.operator.tracker import setup_ground_tracker
-from .utils.classes import COCO_CLASSES  # noqa: F401
-from .utils.video import FrameStream
+from vqpy.class_names.coco import COCO_CLASSES  # noqa: F401
+from vqpy.operator.video_reader import FrameStream
 from . import utils  # noqa: F401
 
 

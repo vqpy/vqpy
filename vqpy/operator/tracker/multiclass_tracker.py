@@ -8,7 +8,7 @@ from vqpy.query.base import SurfaceTrackerBase
 
 from vqpy.obj import VObjGeneratorType
 from vqpy.obj.vobj.base import VObjBase
-from vqpy.utils.video import FrameStream
+from vqpy.operator.video_reader import FrameStream
 from vqpy.obj.frame import Frame
 
 TrackerGeneratorType = Callable[[FrameStream], GroundTrackerBase]

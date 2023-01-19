@@ -1,5 +1,5 @@
 from vqpy.operator.detector.base import DetectorBase
-from vqpy.utils.classes import COCO_CLASSES
+from vqpy.class_names.coco import COCO_CLASSES
 import numpy as np
 from typing import Dict, List
 import cv2

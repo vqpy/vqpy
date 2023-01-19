@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Set
 
-from vqpy import FrameStream, infer
-from vqpy.utils.video import FrameStream
+from vqpy import infer
+from vqpy.operator.video_reader import FrameStream
 
 
 class VObjBaseInterface(object):

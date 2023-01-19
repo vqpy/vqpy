@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from loguru import logger
 from vqpy.operator.detector.base import DetectorBase
-from vqpy.utils.classes import COCO_CLASSES
+from vqpy.class_names.coco import COCO_CLASSES
 from vqpy.operator.detector import register
 
 from yolox.data.data_augment import ValTransform

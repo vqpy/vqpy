@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Callable, Dict, List, Optional
 from vqpy.obj.frame import FrameInterface
 from vqpy.obj.vobj.base import VObjBaseInterface
-from vqpy.utils.filters import continuing
+from vqpy.query.continuing import continuing
 
 
 class VObjConstraintInterface(object):
