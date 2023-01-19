@@ -2,7 +2,7 @@
 
 from typing import Dict, List
 
-from ..base.interface import FrameInterface
+from ..impl.frame import FrameInterface
 
 
 class SurfaceTrackerBase(object):

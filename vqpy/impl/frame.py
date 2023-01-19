@@ -1,5 +1,10 @@
+from __future__ import annotations
+
 from typing import Dict, List
-from ..base.interface import VObjGeneratorType, VObjBaseInterface
+
+from .. import FrameStream
+from ..obj import VObjGeneratorType
+from .vobj_base import VObjBaseInterface
 from collections import defaultdict
 from ..utils.video import FrameStream
 
@@ -54,3 +59,28 @@ class Frame:
         id_vobjs = self.vobjs[vobj_type]
         lost_vobjs = [id_vobjs[id] for id in ids]
         return lost_vobjs
+
+
+class FrameInterface(object):
+    def __init__(self, ctx: FrameStream):
+        raise NotImplementedError
+
+    def set_vobjs(self, vobjs: List[VObjBaseInterface]) -> None:
+        raise NotImplementedError
+
+    def update_vobjs(self,
+                     vobj_type: VObjGeneratorType,
+                     track_id: int,
+                     data: Dict,
+                     ) -> None:
+        raise NotImplementedError
+
+    def get_tracked_vobjs(self,
+                          vobj_type: VObjGeneratorType,
+                          ) -> List[VObjBaseInterface]:
+        raise NotImplementedError
+
+    def get_lost_vobjs(self,
+                       vobj_type: VObjGeneratorType,
+                       ) -> List[VObjBaseInterface]:
+        raise NotImplementedError

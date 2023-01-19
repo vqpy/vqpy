@@ -1,5 +1,6 @@
 import argparse
 import vqpy
+import vqpy.query.output_config
 
 
 def make_parser():
@@ -82,8 +83,8 @@ class Person(vqpy.VObjBase):
 class CountPersonOnCrosswalk(vqpy.QueryBase):
 
     @staticmethod
-    def set_output_configs() -> vqpy.OutputConfig:
-        return vqpy.OutputConfig(
+    def set_output_configs() -> vqpy.query.output_config.OutputConfig:
+        return vqpy.query.output_config.OutputConfig(
             # output_frame_vobj_num=True,
             output_total_vobj_num=True
             )
@@ -110,8 +111,8 @@ class CountPersonOnCrosswalk(vqpy.QueryBase):
 class CountPersonHeadLeft(CountPersonOnCrosswalk):
 
     @staticmethod
-    def set_output_configs() -> vqpy.OutputConfig:
-        return vqpy.OutputConfig(
+    def set_output_configs() -> vqpy.query.output_config.OutputConfig:
+        return vqpy.query.output_config.OutputConfig(
             # output_frame_vobj_num=True,
             output_total_vobj_num=True
             )
@@ -131,8 +132,8 @@ class CountPersonHeadLeft(CountPersonOnCrosswalk):
 class CountPersonHeadRight(CountPersonOnCrosswalk):
 
     @staticmethod
-    def set_output_configs() -> vqpy.OutputConfig:
-        return vqpy.OutputConfig(
+    def set_output_configs() -> vqpy.query.output_config.OutputConfig:
+        return vqpy.query.output_config.OutputConfig(
             # output_frame_vobj_num=True,
             output_total_vobj_num=True
             )

@@ -6,7 +6,7 @@ from typing import Callable, Dict, List, Mapping
 from vqpy.operator.tracker.base import GroundTrackerBase
 from ..base.surface_tracker import SurfaceTrackerBase
 
-from ..base.interface import VObjGeneratorType
+from ..obj import VObjGeneratorType
 from ..impl.vobj_base import VObjBase
 from ..utils.video import FrameStream
 from ..impl.frame import Frame

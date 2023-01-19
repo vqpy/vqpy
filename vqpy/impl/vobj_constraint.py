@@ -1,9 +1,36 @@
 from __future__ import annotations
 
 from typing import Callable, Dict, List, Optional
-from ..base.interface import \
-    VObjBaseInterface, VObjConstraintInterface, FrameInterface
+from .frame import FrameInterface
+from .vobj_base import VObjBaseInterface
 from ..utils.filters import continuing
+
+
+class VObjConstraintInterface(object):
+    """The interface of VObjConstraint class"""
+    def __add__(self, other: VObjConstraintInterface):
+        """merge constraints in the form subclass + superclass"""
+        raise NotImplementedError
+
+    def filter(self, frame: FrameInterface) -> List[VObjBaseInterface]:
+        """filter the list of vobjects from the constraint"""
+        raise NotImplementedError
+
+    def select(self, objs: List[VObjBaseInterface], frame: FrameInterface) \
+            -> VObjBaseInterface:
+        """select one vobject from the constraint"""
+        raise NotImplementedError
+
+    def apply(self, frame: FrameInterface) -> List[Dict]:
+        """apply the constraint on a list of VObj instances"""
+        raise NotImplementedError
+
+    def _compute_cross_vobj_property(
+        self, frame: FrameInterface, vobjs: VObjBaseInterface, conditions
+    ) -> None:
+        """Compute cross_vobj_property's used in the conditions for the given
+        VObjs"""
+        raise NotImplementedError
 
 
 class VObjConstraint(VObjConstraintInterface):

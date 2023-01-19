@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-from ..base.interface import (
-    VObjConstraintInterface,
-    OutputConfig,
-    FrameInterface
-)
-
+from ..query.output_config import OutputConfig
+from ..impl.frame import FrameInterface
+from ..impl.vobj_constraint import VObjConstraintInterface
 
 OUTPUT_FRAME_VOBJ_NUM_NAME = "vobj_num"
 OUTPUT_TOTAL_VOBJ_NUM_NAME = "total_vobj_num"
