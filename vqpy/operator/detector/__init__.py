@@ -3,14 +3,23 @@ This folder (detector/) contains the VQPy detector interfaces.
 All visible instances in this folder inherits (base.py).
 """
 
-from vqpy.operator.detector.yolov4 import *   # noqa: F401,F403
-from vqpy.operator.detector.faster_rcnn import *   # noqa: F401,F403
-from vqpy.operator.detector.yolox import *   # noqa: F401,F403
-
-from .logger import vqpy_detectors
+from vqpy.operator.detector.models.onnx.yolov4 import *   # noqa: F401,F403
+from vqpy.operator.detector.models.onnx.faster_rcnn import *   # noqa: F401,F403
+from vqpy.operator.detector.models.torch.yolox import *   # noqa: F401,F403
 from vqpy.operator.detector.base import DetectorBase
 import os
 from loguru import logger
+
+
+vqpy_detectors = {}
+
+
+def register(detector_name, detector_type, model_filename):
+    detector_name_lower = detector_name.lower()
+    if detector_name_lower in vqpy_detectors:
+        raise ValueError(f"Detector name {detector_name} is already in VQPy."
+                         f"Please change another name to register.")
+    vqpy_detectors[detector_name_lower] = (detector_type, model_filename)
 
 
 def setup_detector(cls_names,

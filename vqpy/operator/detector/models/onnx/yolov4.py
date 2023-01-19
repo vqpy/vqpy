@@ -5,8 +5,7 @@ import numpy as np
 from typing import Dict, List
 import cv2
 from scipy import special
-from vqpy.operator.detector.logger import register
-
+from vqpy.operator.detector import register
 
 MODEL_INPUT_SIZE = (416, 416)
 STRIDES = [8, 16, 32]
