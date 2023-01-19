@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import List, Dict
 
 from vqpy.query.output_config import OutputConfig
-from vqpy.impl.frame import FrameInterface
-from vqpy.impl.vobj_constraint import VObjConstraintInterface
+from vqpy.obj.frame import FrameInterface
+from vqpy.query.vobj_constraint import VObjConstraintInterface
 
 OUTPUT_FRAME_VOBJ_NUM_NAME = "vobj_num"
 OUTPUT_TOTAL_VOBJ_NUM_NAME = "total_vobj_num"

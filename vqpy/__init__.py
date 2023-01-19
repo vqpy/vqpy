@@ -12,10 +12,10 @@ from vqpy.operator.detector import setup_detector
 from vqpy.obj.vobj.wrappers import property, stateful, postproc, cross_vobj_property  # noqa: F401,E501
 from .obj.vobj.infer import infer
 from vqpy.property_lib.wrappers import vqpy_func_logger  # noqa: F401
-from .impl.multiclass_tracker import MultiTracker
-from .impl.vobj_base import VObjBase
-from .impl.vobj_constraint import VObjConstraint  # noqa: F401
-from .impl.frame import Frame
+from vqpy.operator.tracker.multiclass_tracker import MultiTracker
+from vqpy.obj.vobj.base import VObjBase
+from vqpy.query.vobj_constraint import VObjConstraint  # noqa: F401
+from vqpy.obj.frame import Frame
 from .query.output_config import OutputConfig
 from .tracker import setup_ground_tracker
 from .utils.classes import COCO_CLASSES  # noqa: F401

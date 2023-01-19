@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from .. import FrameStream
-from ..obj import VObjGeneratorType
-from .vobj_base import VObjBaseInterface
+from vqpy.obj import VObjGeneratorType
+from vqpy.obj.vobj.base import VObjBaseInterface
 from collections import defaultdict
-from ..utils.video import FrameStream
+from vqpy.utils.video import FrameStream
 
 
 class Frame:

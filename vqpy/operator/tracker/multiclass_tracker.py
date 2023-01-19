@@ -4,12 +4,12 @@ this tracker separate objects by their classes, and tracks individually
 
 from typing import Callable, Dict, List, Mapping
 from vqpy.operator.tracker.base import GroundTrackerBase
-from ..query.base import SurfaceTrackerBase
+from vqpy.query.base import SurfaceTrackerBase
 
-from ..obj import VObjGeneratorType
-from ..impl.vobj_base import VObjBase
-from ..utils.video import FrameStream
-from ..impl.frame import Frame
+from vqpy.obj import VObjGeneratorType
+from vqpy.obj.vobj.base import VObjBase
+from vqpy.utils.video import FrameStream
+from vqpy.obj.frame import Frame
 
 TrackerGeneratorType = Callable[[FrameStream], GroundTrackerBase]
 
