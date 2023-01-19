@@ -3,8 +3,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Set
 
-from .. import FrameStream
-from ..function import infer
+from .. import FrameStream, infer
 from ..utils.video import FrameStream
 
 

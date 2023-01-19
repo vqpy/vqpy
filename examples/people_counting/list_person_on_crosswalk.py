@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 import vqpy
-from vqpy.function.logger import vqpy_func_logger
+from vqpy.property_lib.wrappers import vqpy_func_logger
 
 
 def make_parser():

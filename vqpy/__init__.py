@@ -10,8 +10,8 @@ from vqpy.query.base import QueryBase
 from vqpy.operator.tracker.base import GroundTrackerBase  # noqa: F401
 from vqpy.operator.detector import setup_detector
 from vqpy.obj.vobj.wrappers import property, stateful, postproc, cross_vobj_property  # noqa: F401,E501
-from .function import infer  # noqa: F401
-from .function.logger import vqpy_func_logger  # noqa: F401
+from .obj.vobj.infer import infer
+from vqpy.property_lib.wrappers import vqpy_func_logger  # noqa: F401
 from .impl.multiclass_tracker import MultiTracker
 from .impl.vobj_base import VObjBase
 from .impl.vobj_constraint import VObjConstraint  # noqa: F401
