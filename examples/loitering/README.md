@@ -19,7 +19,6 @@ python VQPy/examples/loitering/main.py
 
 - `--path`: path of video;
 - `--save_folder`: the folder to save query result;
-- `-d`: directory containing pre-trained models (only model for YOLOX is used).
 
 ### Run in Jupyter notebook
 

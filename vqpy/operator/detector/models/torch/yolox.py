@@ -10,7 +10,6 @@ import torch
 from loguru import logger
 from vqpy.operator.detector.base import DetectorBase
 from vqpy.class_names.coco import COCO_CLASSES
-from vqpy.operator.detector import register
 
 from yolox.data.data_augment import ValTransform
 from yolox.exp.build import get_exp
@@ -89,4 +88,3 @@ class YOLOXDetector(DetectorBase):
         return rets
 
 
-register("yolox", YOLOXDetector, "yolox_x.pth")

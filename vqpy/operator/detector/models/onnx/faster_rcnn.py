@@ -4,7 +4,6 @@ from vqpy.class_names.coco import COCO_CLASSES
 import numpy as np
 from typing import Dict, List
 import cv2
-from vqpy.operator.detector import register
 
 
 class FasterRCNNDdetector(DetectorBase):
@@ -61,6 +60,3 @@ def postprocess(detections, image_size):
                      "score": score.item(),
                      "class_id": class_id - 1})
     return rets
-
-
-register("faster_rcnn", FasterRCNNDdetector, "FasterRCNN-10.onnx")

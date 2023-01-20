@@ -29,7 +29,6 @@ def launch(cls_name,
            video_path: str,
            save_folder: str = None,
            save_freq: int = 10,
-           detector_model_dir: str = None,
            detector_name: str = "yolox",
            ):
     """Launch the VQPy tasks with specific setting.
@@ -48,7 +47,6 @@ def launch(cls_name,
     video_name = os.path.basename(video_path).split(".")[0]
     stream = FrameStream(video_path)
     detector_name, detector = setup_detector(cls_name,
-                                             model_dir=detector_model_dir,
                                              detector_name=detector_name)
     # Now tracking is always performed by track each class separately
     frame = Frame(stream)

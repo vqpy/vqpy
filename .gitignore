@@ -165,4 +165,6 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/python
 
 # VQPy downloaded models
-vqpy/property_lib/vehicle/models/lpdetect
+lpdetect/
+weights/
+YOLOX/

@@ -11,10 +11,6 @@ def make_parser():
         default=None,
         help="the folder to save the final result",
     )
-    parser.add_argument(
-        "-d",
-        "--pretrained_model_dir",
-        help="Directory to pretrained models")
     return parser
 
 
@@ -157,4 +153,4 @@ if __name__ == '__main__':
                 tasks=[CountPersonHeadLeft(), CountPersonHeadRight()],
                 video_path=args.path,
                 save_folder=args.save_folder,
-                detector_model_dir=args.pretrained_model_dir)
+                )
