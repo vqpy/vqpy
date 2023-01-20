@@ -4,7 +4,7 @@ import numpy as np
 from typing import Dict, List
 import cv2
 from scipy import special
-from vqpy.operator.detector import register, onnx_inference
+from vqpy.operator.detector.models.onnx import onnx_inference
 
 MODEL_INPUT_SIZE = (416, 416)
 STRIDES = [8, 16, 32]
@@ -191,6 +191,3 @@ def postprocess(detections, image_size):
                      "score": bbox[4],
                      "class_id": int(bbox[5])})
     return rets
-
-
-register("yolov4", Yolov4Detector, "yolov4.onnx")

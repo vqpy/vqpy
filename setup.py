@@ -20,5 +20,5 @@ setuptools.setup(
     package_dir={"vqpy": "vqpy"},
     packages=['vqpy'],
     python_requires=">=3.7",
-    install_requires=["loguru", "tqdm", "onnxruntime", "shapely"],
+    install_requires=["loguru", "tqdm", "onnxruntime", "shapely", "scipy"],
 )

@@ -1,7 +1,7 @@
 from queue import Queue
 from typing import List, Dict, Any
 
-from vqpy.function import _vqpy_basefuncs, _vqpy_libfuncs
+from vqpy.property_lib.wrappers import _vqpy_basefuncs, _vqpy_libfuncs
 
 
 def infer(obj,

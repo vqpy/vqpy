@@ -10,7 +10,8 @@ from vqpy.operator.detector.base import DetectorBase
 import os
 from loguru import logger
 
-DEFAULT_DETECTOR_WEIGHTS_DIR = "weights/"
+dir_path = os.path.dirname(os.path.realpath(__file__))
+DEFAULT_DETECTOR_WEIGHTS_DIR = os.path.join(dir_path, "weights/")
 vqpy_detectors = {}
 
 
@@ -19,8 +20,6 @@ def register(detector_name, detector_type, model_weights_path):
     if detector_name_lower in vqpy_detectors:
         raise ValueError(f"Detector name {detector_name} is already in VQPy."
                          f"Please change another name to register.")
-    if not os.path.exists(model_weights_path):
-        raise ValueError(f"Cannot find weights path {model_weights_path}")
     vqpy_detectors[detector_name_lower] = (detector_type, model_weights_path)
 
 
@@ -53,4 +52,6 @@ def setup_detector(cls_names,
                 print(f"Detector {detector_name} has been selected!")
                 break
     logger.info(f"Detector {detector_name} is chosen!")
+    if not os.path.exists(model_weights_path):
+        raise ValueError(f"Cannot find weights path {model_weights_path}")
     return detector_name, detector_type(model_path=model_weights_path)

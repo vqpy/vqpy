@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from vqpy.obj import VObjGeneratorType
-from vqpy.obj.vobj.base import VObjBaseInterface
+from vqpy.obj.vobj.base import VObjBaseInterface, VObjGeneratorType
 from collections import defaultdict
 from vqpy.operator.video_reader import FrameStream
 

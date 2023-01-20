@@ -1,9 +1,9 @@
 """VObjBase implementation"""
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Callable
 
-from vqpy import infer
+from vqpy.obj.vobj.infer import infer
 from vqpy.operator.video_reader import FrameStream
 
 
@@ -168,3 +168,6 @@ class VObjBase(VObjBaseInterface):
         """A easy-to-use interface provided for usage of built-in functions"""
         return infer(self, attr, self._get_fields(), self._get_pfields(),
                      specifications)
+
+
+VObjGeneratorType = Callable[[FrameStream], VObjBase]
