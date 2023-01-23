@@ -65,7 +65,8 @@ def GetLP(image):
         from lpdetect.LPRNet.LPRNet_Test import decode as lprnet_decode
         from lpdetect.MTCNN.MTCNN import detect_pnet, detect_onet
     except ImportError:
-        raise ImportError("Please run VQPY/download_models.sh before using built-in vehicle properties.")
+        raise ImportError("Please run VQPY/download_models.sh before using \
+         built-in vehicle properties.")
 
     from vqpy.utils import crop_image
 

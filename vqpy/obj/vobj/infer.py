@@ -1,7 +1,22 @@
 from queue import Queue
 from typing import List, Dict, Any
 
+# import the library to include default builtin functions
+from vqpy.property_lib import *  # noqa: F401,F403
 from vqpy.property_lib.wrappers import _vqpy_basefuncs, _vqpy_libfuncs
+
+
+def longest_prefix_in(b: str, a: str):
+    """Return the length of the longest prefix of b that appears in a"""
+    # return the longest prefix of b that appears in a (for best match)
+    left, right = 0, len(b)
+    while left < right:
+        mid = (left + right + 1) >> 1
+        if b[:mid] in a:
+            left = mid
+        else:
+            right = mid - 1
+    return left
 
 
 def infer(obj,
@@ -37,7 +52,7 @@ def infer(obj,
 
         def evaluate(x):
             if attr in specifications:
-                return _default_metric(specifications[attr], x)
+                return longest_prefix_in(specifications[attr], x)
             else:
                 return 0
 
@@ -89,16 +104,3 @@ def infer(obj,
             data[output_fields[i]] = value
 
     return data[waitlist[0]]
-
-
-def longest_prefix_in(b: str, a: str):
-    """Return the length of the longest prefix of b that appears in a"""
-    # return the longest prefix of b that appears in a (for best match)
-    left, right = 0, len(b)
-    while left < right:
-        mid = (left + right + 1) >> 1
-        if b[:mid] in a:
-            left = mid
-        else:
-            right = mid - 1
-    return left

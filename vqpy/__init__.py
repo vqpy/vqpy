@@ -10,13 +10,11 @@ from vqpy.query.base import QueryBase
 from vqpy.operator.tracker.base import GroundTrackerBase  # noqa: F401
 from vqpy.operator.detector import setup_detector
 from vqpy.obj.vobj.wrappers import property, stateful, postproc, cross_vobj_property  # noqa: F401,E501
-from .obj.vobj.infer import infer
 from vqpy.property_lib.wrappers import vqpy_func_logger  # noqa: F401
 from vqpy.operator.tracker.multiclass_tracker import MultiTracker
 from vqpy.obj.vobj.base import VObjBase
 from vqpy.query.vobj_constraint import VObjConstraint  # noqa: F401
 from vqpy.obj.frame import Frame
-from .query.output_config import OutputConfig
 from vqpy.operator.tracker import setup_ground_tracker
 from vqpy.class_names.coco import COCO_CLASSES  # noqa: F401
 from vqpy.operator.video_reader import FrameStream

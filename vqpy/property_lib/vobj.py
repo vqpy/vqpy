@@ -1,4 +1,4 @@
-from vqpy import vqpy_func_logger
+from vqpy.property_lib.wrappers import vqpy_func_logger
 
 
 @vqpy_func_logger(['tlbr'], ['bbox_velocity'], ['tlbr'], required_length=2)
