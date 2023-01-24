@@ -1,6 +1,5 @@
 import argparse
 import vqpy
-import vqpy.query.output_config
 
 
 def make_parser():
@@ -79,8 +78,8 @@ class Person(vqpy.VObjBase):
 class CountPersonOnCrosswalk(vqpy.QueryBase):
 
     @staticmethod
-    def set_output_configs() -> vqpy.query.output_config.OutputConfig:
-        return vqpy.query.output_config.OutputConfig(
+    def set_output_configs() -> vqpy.query.OutputConfig:
+        return vqpy.query.OutputConfig(
             # output_frame_vobj_num=True,
             output_total_vobj_num=True
             )
@@ -94,7 +93,7 @@ class CountPersonOnCrosswalk(vqpy.QueryBase):
         CROSSWALK_REGIONS = [CROSSWALK_REGION_1, CROSSWALK_REGION_2]
 
         filter_cons = {"__class__": lambda x: x == Person,
-                       "bottom_center": vqpy.utils.within_regions(
+                       "bottom_center": vqpy.query.utils.within_regions(
                             CROSSWALK_REGIONS
                             )}
         select_cons = {"track_id": None,

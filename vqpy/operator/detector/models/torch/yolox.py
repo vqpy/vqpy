@@ -86,5 +86,3 @@ class YOLOXDetector(DetectorBase):
                          "score": score.item(),
                          "class_id": int(class_id.item())})
         return rets
-
-

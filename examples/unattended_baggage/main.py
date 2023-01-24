@@ -65,7 +65,7 @@ class FindUnattendedBaggage(vqpy.QueryBase):
     def setting() -> vqpy.VObjConstraint:
         filter_cons = {
             "__class__": lambda x: x == Baggage,
-            "owner": vqpy.utils.continuing(
+            "owner": vqpy.query.continuing(
                 condition=lambda x: x is None, duration=3, name="no_owner"
             ),
         }
