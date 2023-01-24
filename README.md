@@ -23,11 +23,11 @@ pip3 install lap cython_bbox shapely scipy numpy<1.24.0
 ```
 Next, run the `download_models.sh` script to download and install the models in vqpy model zoo, including yolox, license plate detection models.
 ```shell
-bash download_models.sh
+./download_models.sh
 ```
 If you are not interested in querying on vehicles and don't want to download models for vehicle, you can run
 ```shell
-bash download_models.sh false
+./download_models.sh false
 ```
 
 #### Step 2: install VQPy from source
