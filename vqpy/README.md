@@ -1,12 +1,8 @@
-## Setup
+## Code Structure
 
-To setup the current VQPy library, you need to setup a basic pytorch environment. After you have a proper pytorch workspace, the following shell script will help you setup the running environment.
-
-TODO: Add readme for setup openalpr environments.
-
-```shell
-mkdir models && cd models
-git clone https://github.com/xuexingyu24/License_Plate_Detection_Pytorch.git
-mv License_Plate_Detection_Pytorch lpdetect && cd ..
-pip3 install cython_bbox
-```
+* `obj`: Data type defined in vqpy, including `vobj` and  `frame`, where `vobj` is the objects of interest (e.g., cars, humans, animals, etc.) in video data, and `frame` contains all `vobjs`  on a video frame.
+* `operator`: internal operators which generate or operate on the data, including `detector`, `tracker` and `video_reader`.
+* `property_lib`: built-in property library calculates the properties for `vobj`.
+* `query`: video query interface.
+* `class_names`: names of detection classes, like coco classes.
+* `utils`: utility functions.
