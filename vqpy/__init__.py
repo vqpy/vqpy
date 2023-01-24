@@ -19,6 +19,7 @@ from vqpy.operator.tracker import setup_ground_tracker
 from vqpy.class_names.coco import COCO_CLASSES  # noqa: F401
 from vqpy.operator.video_reader import FrameStream
 from . import utils  # noqa: F401
+from . import query  # noqa: F401
 
 
 def launch(cls_name,

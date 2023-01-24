@@ -27,8 +27,8 @@ class People_loitering_query(vqpy.QueryBase):
 
         filter_cons = {
             "__class__": lambda x: x == Person,
-            "bottom_center": vqpy.utils.continuing(
-                condition=vqpy.utils.within_regions(REGIONS),
+            "bottom_center": vqpy.query.continuing(
+                condition=vqpy.query.utils.within_regions(REGIONS),
                 duration=10, name="in_roi"
             ),
         }

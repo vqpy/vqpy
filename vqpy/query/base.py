@@ -40,7 +40,7 @@ class QueryBase(object):
             total_vobj_num_data = {
                 OUTPUT_TOTAL_VOBJ_NUM_NAME: len(self._total_ids)
             }
-            if frame_id == 1:
+            if frame_id == 0:
                 self._query_data = [total_vobj_num_data]
             else:
                 assert OUTPUT_TOTAL_VOBJ_NUM_NAME in self._query_data[0]
