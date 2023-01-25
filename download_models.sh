@@ -52,6 +52,6 @@ if [ "$vehicle" == "true" ]; then
     echo "Found installed openalpr."
   else
     pip install openalpr==1.0
-    "Openalpr is installed."
+    echo "Openalpr is installed."
   fi
 fi

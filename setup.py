@@ -1,5 +1,5 @@
 from pathlib import Path
-from setuptools import setup, find_packages
+import setuptools
 
 
 def get_version() -> str:
@@ -11,14 +11,14 @@ def get_description():
     return open("README.md", "r", encoding="utf-8").read()
 
 
-setup(
+setuptools.setup(
     name="vqpy",
     version=get_version(),
     description="A language for video analytics",
     long_description=get_description(),
     long_description_content_type="text/markdown",
     package_dir={"vqpy": "vqpy"},
-    packages=find_packages(include=['vqpy', "vqpy.*"]),
+    packages=['vqpy'],
     python_requires=">=3.7",
     install_requires=["loguru",
                       "tqdm",
