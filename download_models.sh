@@ -10,6 +10,9 @@ mkdir -p $DETECTOR_WEIGHTS_DIR
 PROPERTY_LIB_DIR="$(cd ${VQPY_SRC_ROOT}/property_lib; pwd)"
 #echo $PROPERTY_LIB_DIR
 
+# workaround install for byte tracker dependencies
+pip3 install cython_bbox lap
+
 # install yolox
 if python -c "import yolox" &> /dev/null; then
   echo "Found installed yolox."
