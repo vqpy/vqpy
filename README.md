@@ -10,38 +10,35 @@ VQPy is still under active development. VQPy compiler, which generates a query p
 
 We have not supported installing VQPy automatically yet. You can follow the steps below to install VQPy manually.
 
-It is recommended to use Python 3.8 to avoid any compatibility issues with YOLOX.
+We recommend using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) to prepare the Python environment as follows:
+```shell
+conda create -n vqpy python=3.8  # "vqpy" is conda environment name, you can use any name you like.
+conda activate vqpy
+```
 
 #### Step 1: install VQPy dependences
+First, you can run below command to install vqpy dependency packages.
+```shell
+pip3 install lap cython_bbox shapely scipy numpy<1.24.0
 ```
-pip3 install lap cython_bbox shapely
+Next, run the `download_models.sh` script to download and install the models in vqpy model zoo, including yolox, license plate detection models.
+```shell
+./download_models.sh
 ```
-
-VQPy uses [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX) as the default built-in object detection model.
-
-We need to install it from source. YOLOX requires PyTorch (version>=1.7) for pre-compiling ops, so please install it first.
-
-```
-git clone https://github.com/Megvii-BaseDetection/YOLOX.git
-cd YOLOX
-pip3 install -v -e .
-```
-
-The pretrained YOLOX model can be downloaded from [here](https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth).
-
-```
-wget https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth
+If you are not interested in querying on vehicles and don't want to download models for vehicle, you can run
+```shell
+./download_models.sh false
 ```
 
 #### Step 2: install VQPy from source
 
 First, clone vqpy repository from GitHub.
-```
+```shell
 git clone https://github.com/uclasystem/VQPy.git
 ```
 
 Next, add vqpy to your `$PYTHONPATH`. For example, if your local VQPy repository is `$HOME/sources/VQPy`, then you can add your path to VQPy repository to `$PYTHONPATH` with
-```
+```shell
 export $PYTHONPATH=$PYTHONPATH:$HOME/sources/VQPy
 ```
 You can test the installation with
