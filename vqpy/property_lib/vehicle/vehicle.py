@@ -11,5 +11,7 @@ def license_plate_openalpr(obj, image):
 @vqpy_func_logger(['image'], ['license_plate'], [], required_length=1)
 def license_plate_lprnet(obj, image):
     """recognize license plate using LPRNet"""
-    from vqpy.property_lib.vehicle.models.lprnet import GetLP
-    return [GetLP(image)]
+    raise ValueError("LPRNet for license plate detection is not supported "
+                     "for now. Please use 'openalpr' instead.")
+    # from vqpy.property_lib.vehicle.models.lprnet import GetLP
+    # return [GetLP(image)]

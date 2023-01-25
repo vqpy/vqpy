@@ -37,20 +37,21 @@ vehicle=${1:-true}
 if [ "$vehicle" == "true" ]; then
   echo "Vehicle models will be prepared."
   # download license plate model LPR
-  cd $PROPERTY_LIB_DIR/vehicle/models
-  LICENCE_PLATE_MODEL_DIR="lpdetect"
-  if [ ! -f $PWD/${LICENCE_PLATE_MODEL_DIR}/main.py ]; then
-    echo "Downloading licence plate detection model (LPR) into $PWD."
-    git clone https://github.com/xuexingyu24/License_Plate_Detection_Pytorch.git
-    mv License_Plate_Detection_Pytorch $LICENCE_PLATE_MODEL_DIR
-  else
-    echo "Licence plate detection model (LPR) exists. Skip download."
-  fi
+  # cd $PROPERTY_LIB_DIR/vehicle/models
+  # LICENCE_PLATE_MODEL_DIR="lpdetect"
+  # if [ ! -f $PWD/${LICENCE_PLATE_MODEL_DIR}/main.py ]; then
+  #   echo "Downloading licence plate detection model (LPR) into $PWD."
+  #   git clone https://github.com/xuexingyu24/License_Plate_Detection_Pytorch.git
+  #   mv License_Plate_Detection_Pytorch $LICENCE_PLATE_MODEL_DIR
+  # else
+  #   echo "Licence plate detection model (LPR) exists. Skip download."
+  # fi
+  cd $VQPY_SRC_ROOT
   # install license plate model openalpr
   if python -c "import openalpr" &> /dev/null; then
     echo "Found installed openalpr."
   else
-    pip install openalpr
+    pip install openalpr==1.0
     "Openalpr is installed."
   fi
 fi
