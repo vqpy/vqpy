@@ -8,6 +8,8 @@ To solve these problems, VQPy embraces the four pillars of object-orientation: <
 
 VQPy is still under active development. VQPy compiler, which generates a query plan with optimized performance for users' video analytics applications, is working in progress. With VQPy compiler, users can simply focus on the declaration of video queries for their own applications, and multiple optimizations defined in the compiler will be transparently applied to the user’s video analytics pipeline.  
 
+The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harryxu)'s group at UCLA, and has evovled over the time into a community effort, 
+
 ## Installation
 
 <details><summary>Show installation details</summary>
