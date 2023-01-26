@@ -32,7 +32,11 @@ class Vehicle(vqpy.VObjBase):
         return self.infer('license_plate', {'license_plate': 'openalpr'})
 ```
 
-After the inheritance, you can get access to two basic interfaces. Both `getv` and `infer` are inferring an attribute of the video object. This attribute can be either the user-defined property, the video stream information and the library-defined properties (in property library). Currently, the specification should be a dictionary, which provide a string hint to the backend.
+#### Retrieve property value in `VObj`
+
+We can see a builtin interface `infer` provided by the library in the first example. In VQPy, there are two basic interfaces `infer` and `getv`, both of which are used to infer an attribute.  This attribute can be either the user-defined property, the video stream information and the library-defined properties (in property library). Currently, the specification should be a dictionary, which provide a string hint to the backend.
+
+There are two differences in the functions: `getv` can retrieve values in historic frames using `object.getv(property, index=)` if the property is marked by `@vqpy.stateful` decorator; `getv` consider user-defined names first and `infer` directly look up the library. Consequently, `infer` is mostly used when implementing the properties to avoid circular reference, and `getv` can be used as the interface to access the data within this object.
 
 ```python
 class VObjBase:
