@@ -49,7 +49,7 @@ import vqpy
 ## Overview
 Below is an architecture graph which describes VQPy framework.
 <p align="center">
-  <img src="docs/resources/architecture.png" width="480" title="architecture">
+  <img src="docs/resources/architecture.png" width="700" title="architecture">
 </p>
 
 In frontend, we provide interfaces for users to declare their query, i.e `VObj` and `Query`.
