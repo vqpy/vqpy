@@ -6,10 +6,11 @@
 - [Pedestrian Counting](count_person): count the number of pedestrians at the crosswalk.
 - [Detect people loitering](loitering): detect people loitering at specified region. [video](https://youtu.be/EuLMrUFNRxQ)
 - [Unattended baggage](unattended_baggage): detect baggage with people around. [video](https://www.kaggle.com/datasets/szahid405/baggage?select=baggage.mp4)
+- [Fall detection](fall_detection): detect people's pose. [video](https://youtu.be/ctniCxIdpTY); extra pretrained models required to run the query, see [here](fall_detection/README.md) for instructions
 
 ## Running examples
 
-Videos from the links above needs to be downloaded before running examples.
+Videos from the links above needs to be downloaded before running examples. Some examples (e.g. fall detection) requires additional pretrained models, see README's in their corresponding folders for instructions.
 
 ### Running as a script
 
