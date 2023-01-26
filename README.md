@@ -1,4 +1,4 @@
-# VQPy : An object-oriented Video Query Language
+# VQPy : An Object-Oriented Approach to Modern Video Analytics
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-brightgreen.svg)](https://github.com/uclasystem/VQPy/blob/main/LICENSE)
 
