@@ -1,10 +1,14 @@
-# VQPy : An object-oriented Video Query Language
+# VQPy : An Object-Oriented Approach to Modern Video Analytics
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-brightgreen.svg)](https://github.com/uclasystem/VQPy/blob/main/LICENSE)
 
-VQPy is an object-oriented language for modern video analytics. With VQPy, users can express their video queries in a composable and reusable manner with Python.
+VQPy is an object-oriented language, designed to address two major issues in video analytics: (1) it is hard to express complex query logic with a pure declarative language (like SQL) and perform actions (e.g., send a message) when certain events are detected (e.g., a senior person falls) and (2) it is hard to ``grow'' queries in similar ways to how an object-oriented language (such as Java) allows its programs to build on top of each other (check out Guy Steel's OOPSLA'98 keynote on [growing a language](https://www.youtube.com/watch?v=lw6TaiXzHAE)).  
 
-VQPy is still under active development. VQPy compiler, which generates a query plan with optimized performance for users' video analytics applications, is working in progress. With VQPy compiler, users can simply focus on the declaration of video queries for their own applications, and multiple optimizations defined in the compiler will be transparently applied to the user’s video analytics pipeline.
+To solve these problems, VQPy embraces the four pillars of object-orientation: <b>Inheritance</b>, <b>Polymorphism</b>, <b>Encapsulation</b>, and <b>Abstraction</b>, with syntax designed specifically for analyzing video frames.  VQPy allows a complex query to be expressed with a very small number of lines of code. VQPy supports query sharing and composition---finding a red car can build on an existing query that finds a general car; monitoring traffic for a city can build on car monitoring queries built for individual districts and intersections, thereby significantly simplifying development and deployment. Please check out our examples below for details. 
+
+VQPy is still under active development. VQPy compiler, which generates a query plan with optimized performance for users' video analytics applications, is working in progress. With VQPy compiler, users can simply focus on the declaration of video queries for their own applications, and multiple optimizations defined in the compiler will be transparently applied to the user’s video analytics pipeline.  
+
+The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harryxu)'s group at UCLA, and has evovled over the time into a community effort, involving folks from both academia and industry. 
 
 ## Installation
 
