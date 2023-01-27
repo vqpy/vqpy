@@ -26,7 +26,7 @@ else
   fi
   echo "Install yolox."
   cd YOLOX
-  pip3 install -v -e .
+  pip3 install -v .
 fi
 
 cd $DETECTOR_WEIGHTS_DIR
