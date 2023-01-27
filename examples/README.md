@@ -22,12 +22,10 @@ Then run the script with arguments:
 python VQPy/examples/example/script.py
     --path /path/to/video
     --save_folder /path/to/output/folder
-    -d /path/to/yolox/model/folder
 ```
 
 - `--path`: path of video;
 - `--save_folder`: the folder to save query result;
-- `-d`: directory containing pre-trained models (only model for YOLOX is used unless explicitly specified).
 
 ### Run in Jupyter notebook
 
