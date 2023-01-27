@@ -22,6 +22,12 @@ def make_parser():
         default=None,
         help="the folder to save the final result",
     )
+    parser.add_argument(
+        "--model_dir",
+        default=None,
+        help="folder containing pretrained model \
+                fast_res50_256x192.pth and tsstg-model.pth"
+    )
     return parser
 
 
@@ -75,7 +81,7 @@ class FallDetection(vqpy.QueryBase):
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
-    model_dir = args.pretrained_model_dir
+    model_dir = args.model_dir
     pose_model = SPPE_FastPose(
         'resnet50', 224, 160, device='cuda',
         weights_file=os.path.join(
@@ -93,5 +99,4 @@ if __name__ == '__main__':
         tasks=[FallDetection()],
         video_path=args.path,
         save_folder=args.save_folder,
-        detector_model_dir=args.pretrained_model_dir
     )
