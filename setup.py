@@ -3,7 +3,7 @@ import setuptools
 
 
 def get_version() -> str:
-    root = Path(__file__).parent.parent
+    root = Path(__file__).parent
     return open(root / "version.txt", "r").read().strip()
 
 
