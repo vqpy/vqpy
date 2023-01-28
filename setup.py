@@ -1,5 +1,6 @@
 from pathlib import Path
 import setuptools
+from setuptools import find_packages
 
 
 def get_version() -> str:
@@ -18,7 +19,7 @@ setuptools.setup(
     long_description=get_description(),
     long_description_content_type="text/markdown",
     package_dir={"vqpy": "vqpy"},
-    packages=['vqpy'],
+    packages=find_packages(),
     python_requires=">=3.7",
     install_requires=["cython",
                       "torch",
