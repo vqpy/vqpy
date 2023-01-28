@@ -159,8 +159,8 @@ We have included several real-world video analytics examples for demonstrating V
 
 ## Getting Support
 
-- Welcome to [join vqpy slack](https://join.slack.com/t/vqpy/shared_invite/zt-1mnq3uh9v-o2~uNUnRQRudNTrYCNHeUA) to ask questions and share ideas!
-- Create a github [issue](https://github.com/vqpy/vqpy/issues) to vqpy.
+- Use VQPy's [slack channel](https://join.slack.com/t/vqpy/shared_invite/zt-1mnq3uh9v-o2~uNUnRQRudNTrYCNHeUA) to ask questions and share ideas!
+- Create a github [issue](https://github.com/vqpy/vqpy/issues).
 
 ## Acknowledgements
 
