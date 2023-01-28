@@ -13,5 +13,5 @@ To run the example as a script `main.py`, please
     python VQPy/examples/fall_detection/main.py
         --path /path/to/video
         --save_folder /path/to/output/folder
-        --model /path/to/pose/detection/model/folder
+        --model_dir /path/to/pose/detection/model/folder
     ```
