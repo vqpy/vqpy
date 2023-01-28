@@ -151,10 +151,10 @@ We also support customizing components (e.g. detector) to build the end to end q
 
 We have included several real-world video analytics examples for demonstrating VQPy.
 
-- [Fall Detection](examples/fall_detection): detect people in the video and recognize fallen person.
-- [List red moving vehicle](examples/list_red_moving_vehicle): show license plate of red moving vehicle.
-- [People Loitering](examples/loitering): detect suspicious activity of person loitering around.
-- [People Counting](examples/people_counting): count the number of person heading different directions.
+- [Fall Detection](examples/fall_detection): Recognize fallen people in a video.
+- [List red moving vehicle](examples/list_red_moving_vehicle): show the license plates of red moving vehicles.
+- [People Loitering](examples/loitering): detect suspicious activities of person loitering around.
+- [People Counting](examples/people_counting): count the number of people heading different directions.
 - [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages.
 
 ## Getting Support
