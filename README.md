@@ -51,14 +51,14 @@ import vqpy
 </details>
 
 ## Overview
-Below is an architecture graph which describes VQPy framework.
+Below is an architecture graph which describes the VQPy framework.
 <p align="center">
   <img src="docs/resources/architecture.png" width="700" title="architecture">
 </p>
 
-In frontend, we provide interfaces for users to declare their query, i.e `VObj` and `Query`.
+In the frontend, we provide interfaces for users to declare their query, i.e `VObj` and `Query`.
 
-In backend, vqpy automatically select the best plan to execute the query, within user specified budget (e.g. accuracy, inference time, .etc).
+In the backend, vqpy automatically select the best plan to execute the query, within user specified budget (e.g. accuracy, inference time, .etc).
 
 VQPy also provides a library containing rich models and property functions that help save users' efforts to build queries.
 
@@ -87,7 +87,7 @@ class Vehicle(vqpy.VObjBase):
         return self.infer('license_plate', {'license_plate': 'openalpr'})
 ```
 
-And if we want to query the owner of a baggage object, where the baggage's owner is a person object who is closest to the baggage. We can define our interested `VObj`s as below. Note that the `owner` property of `Baggage` `VObj` should be decorcated with `@vqpy.cross_vobj_property`.
+And if we want to query the owner of a baggage object where the baggage's owner is a person object who is closest to the baggage. We can define our interested `VObj`s as below. Note that the `owner` property of `Baggage` `VObj` should be decorcated with `@vqpy.cross_vobj_property`.
 
 ```python
 class Person(vqpy.VObjBase):
@@ -161,3 +161,11 @@ We have included several real-world video analytics examples for demonstrating V
 
 - Welcome to [join vqpy slack](https://join.slack.com/t/vqpy/shared_invite/zt-1mnq3uh9v-o2~uNUnRQRudNTrYCNHeUA) to ask questions and share ideas!
 - Create a github [issue](https://github.com/vqpy/vqpy/issues) to vqpy.
+
+## Acknowledgements
+
+We are grateful to the generous support from:
+
+<img src="https://www.nsf.gov/policies/images/NSF_Official_logo_High_Res_1200ppi.png" />
+<img src="https://1000logos.net/wp-content/uploads/2016/11/Cisco-logo.png" />
+
