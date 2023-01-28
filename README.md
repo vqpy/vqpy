@@ -166,6 +166,6 @@ We have included several real-world video analytics examples for demonstrating V
 
 We are grateful to the generous support from:
 
-<img src="https://www.nsf.gov/policies/images/NSF_Official_logo_High_Res_1200ppi.png" height=50in weight=50in />
-<img src="https://1000logos.net/wp-content/uploads/2016/11/Cisco-logo.png" height=50in weight=100in />
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/12/NSF.svg" height=10in weight=10in />
+<img src="https://1000logos.net/wp-content/uploads/2016/11/Cisco-logo.png" height=10in weight=20in />
 
