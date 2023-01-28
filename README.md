@@ -145,7 +145,7 @@ Under the hood, VQPy will automatically select an object detection model that ou
 
 ### Advanced Usage
 
-We also support customize components (e.g. detector) to build the end to end query pipeline. For more details on customization, please refer to the document [here](docs/customization.md).
+We also support customizing components (e.g. detector) to build the end to end query pipeline. For more details on customization, please refer to the document [here](docs/customization.md).
 
 ## Examples
 
