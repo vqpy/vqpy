@@ -27,7 +27,7 @@ class Person(vqpy.VObjBase):
 
 
 class Baggage(vqpy.VObjBase):
-    @vqpy.stateful()
+    @vqpy.stateful(length=2)
     @vqpy.cross_vobj_property(
         vobj_type=Person, vobj_num="ALL",
         vobj_input_fields=("track_id", "tlbr")
@@ -66,13 +66,13 @@ class FindUnattendedBaggage(vqpy.QueryBase):
         filter_cons = {
             "__class__": lambda x: x == Baggage,
             "owner": vqpy.query.continuing(
-                condition=lambda x: x is None, duration=3, name="no_owner"
+                condition=lambda x: x is None, duration=10, name="no_owner"
             ),
         }
         select_cons = {
             "track_id": None,
             "tlbr": lambda x: str(x),
-            "no_owner_periods": lambda x: str(x),
+            "no_owner_periods": None,
         }
         return vqpy.VObjConstraint(
             filter_cons=filter_cons,
