@@ -5,7 +5,7 @@ on:
     paths:
       - 'vqpy/**'
       - 'test/**'
-      - '.github/workflows/unit_test.yml'
+      - '.github/workflows/**'
 
 jobs:
   flake8:
