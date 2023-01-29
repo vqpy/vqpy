@@ -21,6 +21,7 @@ setuptools.setup(
     package_dir={"vqpy": "vqpy"},
     packages=find_packages(),
     python_requires=">=3.7",
+    setup_requires=["torch", "torchvision"]
     install_requires=["cython",
                       "torch",
                       "torchvision",
