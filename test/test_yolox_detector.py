@@ -1,10 +1,10 @@
 from vqpy.operator.detector import vqpy_detectors
-from vqpy.class_names.coco import COCO_CLASSES
 from PIL import Image
 import numpy as np
 import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 resource_dir = os.path.join(current_dir, "resources/")
+
 
 def test_yolox_detector_basic():
     detector_type, model_weights_path = vqpy_detectors["yolox"]
@@ -21,7 +21,3 @@ def test_yolox_detector_basic():
     assert np.allclose(output[0]["tlbr"], expected_tlbr, rtol=0, atol=1)
     assert np.allclose(output[0]["score"], expected_score, rtol=0, atol=0.01)
     assert output[0]["class_id"] == expected_class_id
-
-if __name__ == "__main__":
-    test_yolox_detector()
-    
