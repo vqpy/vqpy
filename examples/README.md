@@ -2,19 +2,19 @@
 
 ## Basic Examples
 
-- [List red moving vehicle](list_red_moving_vehicle): show license plate of red moving vehicle.
-- [Pedestrian Counting](count_person): count the number of pedestrians at the crosswalk.
-- [Detect people loitering](loitering): detect people loitering at specified region. [video](https://youtu.be/EuLMrUFNRxQ)
-- [Unattended baggage](unattended_baggage): detect baggage with people around. [video](https://www.kaggle.com/datasets/szahid405/baggage?select=baggage.mp4)
-- [Fall detection](fall_detection): detect people's pose. [video](https://youtu.be/ctniCxIdpTY); extra pretrained models required to run the query, see [here](fall_detection/README.md) for instructions
+- [Fall Detection](examples/fall_detection): Recognize fallen people in a video. [video](https://youtu.be/ctniCxIdpTY)
+- [List red moving vehicle](examples/list_red_moving_vehicle): show the license plates of red moving vehicles.
+- [People Loitering](examples/loitering): detect suspicious activities of person loitering around. [video](https://youtu.be/EuLMrUFNRxQ)
+- [People Counting](examples/people_counting): count the number of people heading different directions.
+- [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages. [video](https://www.kaggle.com/datasets/szahid405/baggage?select=baggage.mp4)
 
-## Running examples
+## Run Examples
 
-Videos from the links above needs to be downloaded before running examples. Some examples (e.g. fall detection) requires additional pretrained models, see README's in their corresponding folders for instructions.
+### Run python script
 
-### Running as a script
+You can follow the instructions [here](../README.md#installation) to prepare your environment for VQPy.
 
-You can follow the instructions [here](../../README.md#installation) to prepare your environment for VQPy. No other dependency is used.
+You can download videos with the links in the above example list to prepare data for the examples. Note that the Fall Detection example requires downloading pre-trained models, and you can follow the instructions [here](fall_detection/README.md) instead.
 
 Then run the script with arguments:
 
@@ -29,6 +29,6 @@ python VQPy/examples/example/script.py
 
 ### Run in Jupyter notebook
 
-Or follow `demo.ipynb` in each example's directory. The notebooks contain more details about the queries.
+You can easily try our examples with Jupyter notebook (The `demo.ipynb` in each example's repo). The notebooks will guide you through running video queries with VQPy from scratch.
 
-Notebook is tested in Google Colab, it's advised to use a unused Python3.8 environment if you prefer to run it locally.
+You can directly open and run the notebooks on Google Colab. However, if you prefer to run the notebooks locally, we recommend creating a new environment for VQPy with python 3.8 installed.
