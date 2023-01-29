@@ -1,16 +1,3 @@
-# import yolox
-# import numpy as np
-# from yolox.exp.build import get_exp
-# model_path = "/home/yang/sources/vqpy/vqpy/operator/detector/weights/yolox_x.pth"
-# exp = get_exp(None, "yolox_x")
-# model = exp.get_model()
-# model.eval()
-# ckpt = torch.load(model_path, map_location="cpu")
-# model.load_state_dict(ckpt["model"])
-
-# data = np.random.randint()
-# model()
-
 from vqpy.operator.detector import vqpy_detectors
 from vqpy.class_names.coco import COCO_CLASSES
 from PIL import Image
