@@ -29,6 +29,6 @@ python VQPy/examples/example/script.py
 
 ### Run in Jupyter notebook
 
-You can easily try our examples with Jupyter notebook (The `demo.ipynb` in each example's repo). The notebooks will guide you through running video queries with VQPy from scratch.
+You can easily try our examples with Jupyter notebook (The `demo.ipynb` in each example's directory). The notebooks will guide you through running video queries with VQPy from scratch.
 
 You can directly open and run the notebooks on Google Colab. However, if you prefer to run the notebooks locally, we recommend creating a new environment for VQPy with python 3.8 installed.
