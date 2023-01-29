@@ -24,5 +24,4 @@ def test_yolox_detector_basic():
 
 if __name__ == "__main__":
     test_yolox_detector()
-
     
