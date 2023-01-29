@@ -7,7 +7,8 @@ resource_dir = os.path.join(current_dir, "resources/")
 
 
 def test_yolox_detector_basic():
-    detector_name, detector = setup_detector(None, "yolox", detector_args={"device": "cpu"})
+    detector_name, detector = setup_detector(None, "yolox",
+                                             detector_args={"device": "cpu"})
     assert detector_name == "yolox"
 
     input_data = np.asarray(Image.open(os.path.join(resource_dir, "cat.jpg")))

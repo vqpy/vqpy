@@ -17,7 +17,11 @@ DEFAULT_DETECTOR_WEIGHTS_DIR = os.path.join(dir_path, "weights/")
 vqpy_detectors = {}
 
 
-def register(detector_name, detector_type, model_weights_path, model_weights_url=None):
+def register(detector_name,
+             detector_type,
+             model_weights_path,
+             model_weights_url=None):
+
     detector_name_lower = detector_name.lower()
     if detector_name_lower in vqpy_detectors:
         raise ValueError(f"Detector name {detector_name} is already in VQPy."
@@ -26,12 +30,15 @@ def register(detector_name, detector_type, model_weights_path, model_weights_url
                                            model_weights_path,
                                            model_weights_url)
 
+
 yolox_path = os.path.join(DEFAULT_DETECTOR_WEIGHTS_DIR, "yolox_x.pth")
-yolox_url = "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_x.pth"
+yolox_url = "https://github.com/Megvii-BaseDetection/YOLOX/" + \
+    "releases/download/0.1.1rc0/yolox_x.pth"
 
 register("yolox", YOLOXDetector, yolox_path, yolox_url)
 
-faster_rnnn_path =  os.path.join(DEFAULT_DETECTOR_WEIGHTS_DIR, "FasterRCNN-10.onnx")
+faster_rnnn_path = os.path.join(DEFAULT_DETECTOR_WEIGHTS_DIR,
+                                "FasterRCNN-10.onnx")
 register("faster_rcnn", FasterRCNNDdetector, faster_rnnn_path, None)
 
 yolov4_path = os.path.join(DEFAULT_DETECTOR_WEIGHTS_DIR, "yolov4.onnx")
@@ -49,20 +56,21 @@ def setup_detector(cls_names,
         if detector_name not in vqpy_detectors:
             raise ValueError(f"Detector name of {detector_name} hasn't been"
                              f"registered to VQPy")
-        detector_type, model_weights_path, url = vqpy_detectors[detector_name]
+        detector_type, weights_path, url = vqpy_detectors[detector_name]
 
     else:
         # TODO: add automatic detector selection interface here
         for detector_name in vqpy_detectors:
             # Optional TODO: add ambiguous class match here
-            detector_type, model_weights_path, url = vqpy_detectors[detector_name]
+            detector_type, weights_path, url = vqpy_detectors[detector_name]
             if cls_names == detector_type.cls_names:
                 print(f"Detector {detector_name} has been selected!")
                 break
     logger.info(f"Detector {detector_name} is chosen!")
-    if not os.path.exists(model_weights_path):
+    if not os.path.exists(weights_path):
         if url is not None:
-            torch.hub.download_url_to_file(url, model_weights_path)
+            torch.hub.download_url_to_file(url, weights_path)
         else:
-            raise ValueError(f"Cannot find weights path {model_weights_path}")
-    return detector_name, detector_type(model_path=model_weights_path, **detector_args)
+            raise ValueError(f"Cannot find weights path {weights_path}")
+    return detector_name, detector_type(model_path=weights_path,
+                                        **detector_args)
