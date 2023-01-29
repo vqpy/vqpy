@@ -13,22 +13,6 @@ PROPERTY_LIB_DIR="$(cd ${VQPY_SRC_ROOT}/property_lib; pwd)"
 # workaround install for byte tracker dependencies
 pip3 install cython_bbox lap
 
-# install yolox
-if python -c "import yolox" &> /dev/null; then
-  echo "Found installed yolox."
-else
-  cd $DETECTOR_MODEL_DIR/torch
-  if [ -f $PWD/YOLOX/setup.py ]; then
-    echo "Found cloned YOLOX repo."
-  else
-    echo "Cloning YOLOX into $PWD"
-    git clone https://github.com/Megvii-BaseDetection/YOLOX.git
-  fi
-  echo "Install yolox."
-  cd YOLOX
-  pip3 install -v .
-fi
-
 cd $DETECTOR_WEIGHTS_DIR
 if [ ! -f $PWD/yolox_x.pth ]; then
   echo "Downloading yolox weights into $PWD"
