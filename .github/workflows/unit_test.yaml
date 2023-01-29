@@ -2,6 +2,10 @@ name: Unit Test
 
 on:
   pull_request:
+    paths:
+      - 'vqpy/**'
+      - 'test/**'
+      - '.github/workflows/unit_test.yml'
 
 jobs:
   flake8:
