@@ -14,6 +14,10 @@ import torch.hub
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 DEFAULT_DETECTOR_WEIGHTS_DIR = os.path.join(dir_path, "weights/")
+
+if not os.path.exists(DEFAULT_DETECTOR_WEIGHTS_DIR):
+    os.makedirs(DEFAULT_DETECTOR_WEIGHTS_DIR)
+
 vqpy_detectors = {}
 
 
