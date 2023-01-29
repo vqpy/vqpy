@@ -21,7 +21,7 @@ We recommend using [conda](https://docs.conda.io/projects/conda/en/latest/user-g
 ```shell
 conda create -n vqpy python=3.8  # "vqpy" is conda environment name, you can use any name you like.
 conda activate vqpy
-pip install torch torchvision numpy<1.24.0 cython
+pip install torch torchvision numpy==1.23.5 cython
 ```
 
 #### Step 1: install VQPy from source

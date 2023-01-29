@@ -37,7 +37,7 @@ jobs:
       - name: Install Dependencies
         shell: bash
         run: |
-          pip install torch torchvision numpy<1.24.0 cython
+          pip install torch torchvision numpy==1.23.5 cython
           pip install pytest
 
       - name: install vqpy
