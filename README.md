@@ -32,7 +32,7 @@ cd vqpy
 pip install -e .
 ```
 
-#### Step 3: test installation
+#### Step 2: test installation
 
 You can test the installation with
 ```python
