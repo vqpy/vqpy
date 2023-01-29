@@ -14,7 +14,7 @@
 
 You can follow the instructions [here](../README.md#installation) to prepare your environment for VQPy.
 
-You can download videos with the links in the above example list to prepare data for the examples. Note that the Fall Detection example requires downloading pre-trained models, and you can follow the instructions [here](fall_detection/README.md) instead.
+You can download videos with the links in the above example list to prepare data for the examples. Note that the Fall Detection example requires downloading pre-trained models; to run the Fall Detection example, you can follow the instructions [here](fall_detection/README.md) instead.
 
 Then run the script with arguments:
 
