@@ -8,6 +8,7 @@ on:
       - 'setup.py'
       - 'pyproject.toml'
       - '.github/workflows/**'
+  workflow_dispatch:
 
 jobs:
   flake8:
