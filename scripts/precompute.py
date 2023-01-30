@@ -1,9 +1,12 @@
-import os
+# precompute detection with YOLOX detection
 
+import os
+import argparse
 from loguru import logger
 from tqdm import tqdm
 import pickle
 
+import vqpy
 from vqpy.operator.detector import setup_detector
 from vqpy.operator.video_reader import FrameStream
 
@@ -14,19 +17,8 @@ def launch(
     save_folder: str = None,
     detector_name: str = "yolox",
 ):
-    """Launch the VQPy tasks with specific setting.
-    Args:
-        cls_name: the detector classification result classes.
-        cls_type: the mapping from each class to corresponding VObj.
-        tasks (List[QueryBase]): the list of queries to apply.
-        video_path (str): the path of the queried video.
-        save_folder: the folder to save final result.
-        save_freq: the frequency of save when processing.
-        detector_model_dir: the directory for all pretrained detectors.
-        detector_name: the specific detector name you desire to use.
-    """
     logger.info(
-        f"VQPy Launch I/O Setting: \
+        f"VQPy detection precompute I/O Setting: \
                   video_path={video_path}, save_folder={save_folder}"
     )
     video_name = os.path.basename(video_path).split(".")[0]
@@ -46,3 +38,23 @@ def launch(
     with open(save_path, "wb") as f:
         pickle.dump(precomputed, f)
     logger.info("Done!")
+
+
+def make_parser():
+    parser = argparse.ArgumentParser("VQPy detection precompute!")
+    parser.add_argument("--path", help="path to video")
+    parser.add_argument(
+        "--save_folder",
+        default=None,
+        help="the folder to save precomputation result",
+    )
+    return parser
+
+
+if __name__ == "__main__":
+    args = make_parser().parse_args()
+    launch(
+        cls_name=vqpy.COCO_CLASSES,
+        video_path=args.path,
+        save_folder=args.save_folder,
+    )
