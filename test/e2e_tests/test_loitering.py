@@ -10,8 +10,12 @@ root = Path(__file__).parent.parent.parent.parent
 video_path = (root / "videos/loitering.mp4").as_posix()
 precomputed_path = (root / "precomputed/loitering_yolox.pkl").as_posix()
 save_folder = (root / "e2e_outputs/").as_posix()
-result_path = (root / "e2e_outputs/loitering_loitering_fake-yolox.json").as_posix()
-expected_path = (root / "expected/loitering_loitering_yolox.json").as_posix()
+result_path = (
+    root / "e2e_outputs/loitering_loitering_fake-yolox.json"
+).as_posix()
+expected_result_path = (
+    root / "expected_results/loitering_loitering_yolox.json"
+).as_posix()
 
 
 class Person(vqpy.VObjBase):
@@ -21,7 +25,13 @@ class Person(vqpy.VObjBase):
 class People_loitering_query(vqpy.QueryBase):
     @staticmethod
     def setting() -> vqpy.VObjConstraint:
-        REGION = [(550, 550), (1162, 400), (1720, 720), (1430, 1072), (600, 1073)]
+        REGION = [
+            (550, 550),
+            (1162, 400),
+            (1720, 720),
+            (1430, 1072),
+            (600, 1073),
+        ]
         REGIONS = [REGION]
 
         filter_cons = {
@@ -37,7 +47,9 @@ class People_loitering_query(vqpy.QueryBase):
             "coordinate": lambda x: str(x),
             "in_roi_periods": None,
         }
-        return vqpy.VObjConstraint(filter_cons, select_cons, filename="loitering")
+        return vqpy.VObjConstraint(
+            filter_cons, select_cons, filename="loitering"
+        )
 
 
 def test_loitering():
@@ -51,4 +63,4 @@ def test_loitering():
         detector_name="fake-yolox",
     )
 
-    compare(result_path, expected_path)
+    compare(result_path, expected_result_path)

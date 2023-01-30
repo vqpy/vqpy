@@ -25,10 +25,10 @@ class FakeYOLOX(DetectorBase):
 
 
 # compare results
-def compare(result_path, expected_path):
+def compare(result_path, expected_result_path):
     with open(result_path, "r") as f:
         result = json.load(f)
-    with open(expected_path, "r") as f:
+    with open(expected_result_path, "r") as f:
         expected = json.load(f)
     assert len(result) == len(
         expected
@@ -36,7 +36,9 @@ def compare(result_path, expected_path):
     for i in range(len(result)):
         assert (
             result[i]["frame_id"] == expected[i]["frame_id"]
-        ), f"{i}th entry has frame_id {result[i]['frame_id']}, expect {expected[i]['frame_id']}"
+        ), f"{i}th entry has frame_id {result[i]['frame_id']}, \
+        expect {expected[i]['frame_id']}"
         assert (
             result[i]["data"] == expected[i]["data"]
-        ), f"frame {result[i]['frame_id']} has data {result[i]['data']}, expect {expected[i]['data']}"
+        ), f"frame {result[i]['frame_id']} has data {result[i]['data']},\
+            expect {expected[i]['data']}"

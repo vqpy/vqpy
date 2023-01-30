@@ -23,7 +23,7 @@ def launch(
     )
     video_name = os.path.basename(video_path).split(".")[0]
     stream = FrameStream(video_path)
-    detector_name, detector = setup_detector(cls_name, detector_name=detector_name)
+    detector_name, detector = setup_detector(cls_name, detector_name)
 
     precomputed = {}
 
