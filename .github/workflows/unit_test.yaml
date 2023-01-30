@@ -49,3 +49,19 @@ jobs:
         shell: bash
         run: |
           pytest test/unit_tests
+
+      - name: prepare files for e2e tests
+        uses: keithweaver/aws-s3-github-action@v1.0.0
+        with:
+          command: cp
+          source: s3://vqpy/tests/
+          destination: ./
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-west-2
+          flags: --recursive
+
+      - name: e2e tests
+        shell: bash
+        run: |
+          pytest test/e2e_tests
