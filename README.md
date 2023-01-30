@@ -29,7 +29,7 @@ You can run below commands to clone vqpy repository and install.
 ```shell
 git clone https://github.com/vqpy/vqpy.git
 cd vqpy
-pip install -e .
+pip install .
 ```
 
 #### Step 2: test installation

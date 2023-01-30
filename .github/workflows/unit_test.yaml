@@ -43,7 +43,7 @@ jobs:
       - name: install vqpy
         shell: bash
         run: |
-          pip install -e .
+          pip install .
 
       - name: unit tests
         shell: bash
