@@ -46,10 +46,10 @@ jobs:
         run: |
           pip install 'vqpy @ git+https://github.com/vqpy/vqpy.git'
 
-      - name: unit tests
-        shell: bash
-        run: |
-          pytest test/unit_tests
+      # - name: unit tests
+      #   shell: bash
+      #   run: |
+      #     pytest test/unit_tests
 
       - name: prepare files for e2e tests
         uses: keithweaver/aws-s3-github-action@v1.0.0

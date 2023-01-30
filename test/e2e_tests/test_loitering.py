@@ -6,7 +6,7 @@ from vqpy.operator.detector import register
 
 from e2e import FakeYOLOX, compare
 
-root = Path(__file__).parent.parent.parent.parent
+root = Path(__file__).parent.parent.parent
 video_path = (root / "videos/loitering.mp4").as_posix()
 precomputed_path = (root / "precomputed/loitering_yolox.pkl").as_posix()
 save_folder = (root / "e2e_outputs/").as_posix()
