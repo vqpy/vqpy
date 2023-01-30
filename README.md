@@ -15,28 +15,27 @@ The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harr
 <details><summary>Show installation details</summary>
 <p>
 
-We have not supported installing VQPy automatically yet. You can follow the steps below to install VQPy manually.
+You can follow the steps below to install VQPy.
 
+### Step 0: prepare environment
 We recommend using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) to prepare the Python environment as follows:
 ```shell
 conda create -n vqpy python=3.8  # "vqpy" is conda environment name, you can use any name you like.
 conda activate vqpy
-pip install torch torchvision numpy==1.23.5 cython
 ```
 
-#### Step 1: install VQPy from source
-You can run below commands to clone vqpy repository and install.
+### Step 1: install VQPy
+We haven't publish vqpy to pypi yet. You can use the commands below to install VQPy from Github.
 ```shell
-git clone https://github.com/vqpy/vqpy.git
-cd vqpy
-pip install .
+pip install torch torchvision numpy==1.23.5 cython
+pip install 'vqpy @ git+https://github.com/vqpy/vqpy.git'
 ```
 
-#### Step 2: test installation
-
-You can test the installation with
+### Step 2: test installation
+You can test whether vqpy has been successfully installed with
 ```python
 import vqpy
+from vqpy import query
 ```
 </p>
 </details>
