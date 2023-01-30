@@ -33,5 +33,9 @@ setuptools.setup(
                       "numpy<1.24.0",
                       "requests",
                       "opencv-python",
+                      "yolox==0.3.0",
+                      "cython_bbox",
+                      "lap",
+                      "openalpr==1.0"
                       ],
 )

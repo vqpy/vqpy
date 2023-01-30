@@ -21,6 +21,7 @@ We recommend using [conda](https://docs.conda.io/projects/conda/en/latest/user-g
 ```shell
 conda create -n vqpy python=3.8  # "vqpy" is conda environment name, you can use any name you like.
 conda activate vqpy
+pip install torch torchvision numpy==1.23.5 cython
 ```
 
 #### Step 1: install VQPy from source
@@ -28,20 +29,10 @@ You can run below commands to clone vqpy repository and install.
 ```shell
 git clone https://github.com/vqpy/vqpy.git
 cd vqpy
-pip install -e .
+pip install .
 ```
 
-#### Step 2: install VQPy model zoo dependency
-You can run the `download_models.sh` script to download and install the models in vqpy model zoo, including yolox, license plate detection models.
-```shell
-./download_models.sh
-```
-If you are not interested in querying on vehicles and don't want to download models for vehicle, you can run
-```shell
-./download_models.sh false
-```
-
-#### Step 3: test installation
+#### Step 2: test installation
 
 You can test the installation with
 ```python

@@ -5,6 +5,8 @@ on:
     paths:
       - 'vqpy/**'
       - 'test/**'
+      - 'setup.py'
+      - 'pyproject.toml'
       - '.github/workflows/**'
 
 jobs:
@@ -34,13 +36,14 @@ jobs:
 
       - name: Install Dependencies
         shell: bash
-        run: pip install pytest
+        run: |
+          pip install torch torchvision numpy==1.23.5 cython
+          pip install pytest
 
       - name: install vqpy
         shell: bash
         run: |
-          pip install -e .
-          ./download_models.sh
+          pip install .
 
       - name: unit tests
         shell: bash

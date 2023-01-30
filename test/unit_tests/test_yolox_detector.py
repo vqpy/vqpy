@@ -1,4 +1,4 @@
-from vqpy.operator.detector import vqpy_detectors
+from vqpy.operator.detector import setup_detector
 from PIL import Image
 import numpy as np
 import os
@@ -7,8 +7,9 @@ resource_dir = os.path.join(current_dir, "resources/")
 
 
 def test_yolox_detector_basic():
-    detector_type, model_weights_path = vqpy_detectors["yolox"]
-    detector = detector_type(model_path=model_weights_path, device="cpu")
+    detector_name, detector = setup_detector(None, "yolox",
+                                             detector_args={"device": "cpu"})
+    assert detector_name == "yolox"
 
     input_data = np.asarray(Image.open(os.path.join(resource_dir, "cat.jpg")))
 
