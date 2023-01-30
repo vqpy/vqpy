@@ -2,8 +2,8 @@
 from typing import Dict, List
 import argparse
 import os
-import json
 import numpy as np
+import pickle
 
 import vqpy
 from vqpy.operator.detector.base import DetectorBase
@@ -29,13 +29,14 @@ class FakeYOLOX(DetectorBase):
 
     def __init__(self, model_path):
         # load file
-        with open(model_path, "r") as file:
-            self.detection_result = json.load(file)
+        with open(model_path, "rb") as file:
+            self.detection_result = pickle.load(file)
         self.frame_id = 1
+
 
     def inference(self, img) -> List[Dict]:
         # read from file
-        outputs = self.detection_result[str(self.frame_id)]
+        outputs = self.detection_result[self.frame_id]
         for output in outputs:
             output["tlbr"] = np.asarray(output["tlbr"])
         self.frame_id += 1
@@ -75,8 +76,9 @@ register(
     "fake-yolox",
     FakeYOLOX,
     os.path.join(
-        args.path, f"{os.path.splitext(os.path.basename(args.video))[0]}_yolox.json"
+        args.path, f"{os.path.splitext(os.path.basename(args.video))[0]}_yolox.pkl"
     ),
+    None
 )
 
 vqpy.launch(
@@ -89,4 +91,3 @@ vqpy.launch(
 )
 
 # result saved to {save_folder}/{video_name}_{task_name}_{detector_name}.json
-# python nvqpy/test/e2e.py --path ./precomputed --video videos/loitering/loitering.mp4 --save_folder e2e
