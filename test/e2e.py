@@ -2,7 +2,6 @@
 from typing import Dict, List
 import argparse
 import os
-import numpy as np
 import pickle
 
 import vqpy
@@ -37,8 +36,6 @@ class FakeYOLOX(DetectorBase):
     def inference(self, img) -> List[Dict]:
         # read from file
         outputs = self.detection_result[self.frame_id]
-        for output in outputs:
-            output["tlbr"] = np.asarray(output["tlbr"])
         self.frame_id += 1
         return outputs
 
