@@ -9,6 +9,7 @@ from vqpy.query.base import SurfaceTrackerBase
 from vqpy.obj.vobj.base import VObjBase, VObjGeneratorType
 from vqpy.operator.video_reader import FrameStream
 from vqpy.obj.frame import Frame
+from vqpy.operator.tracker.base_track import BaseTrack
 
 TrackerGeneratorType = Callable[[FrameStream], GroundTrackerBase]
 
@@ -22,6 +23,8 @@ class MultiTracker(SurfaceTrackerBase):
                  cls_name: Mapping[int, str],
                  cls_type: Mapping[str, VObjGeneratorType]):
         """TODO: complete the __init__ docstring"""
+        # reset BaseTrack counter whenever we start a new task group with vqpy.launch
+        BaseTrack._count = 0
         self.tracker = tracker
         self.cls_name = cls_name
         self.cls_type = cls_type
