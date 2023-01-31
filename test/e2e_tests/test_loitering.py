@@ -7,14 +7,17 @@ from vqpy.operator.detector import register
 from e2e import FakeYOLOX, compare
 
 root = Path(__file__).parent.parent.parent
-video_path = (root / "videos/loitering.mp4").as_posix()
-precomputed_path = (root / "precomputed/loitering_yolox.pkl").as_posix()
-save_folder = (root / "e2e_outputs/").as_posix()
+video_name = "loitering"
+video_ext = "mp4"
+task_name = "loitering"
+video_path = (root / f"videos/{video_name}.{video_ext}").as_posix()
+precomputed_path = (root / f"precomputed/{video_name}_yolox.pkl").as_posix()
+save_folder = (root / f"e2e_outputs/").as_posix()
 result_path = (
-    root / "e2e_outputs/loitering_loitering_fake-yolox.json"
+    root / f"e2e_outputs/{video_name}_{task_name}_fake-yolox.json"
 ).as_posix()
 expected_result_path = (
-    root / "expected_results/loitering_loitering_yolox.json"
+    root / f"expected_results/{video_name}_{task_name}_yolox.json"
 ).as_posix()
 
 
