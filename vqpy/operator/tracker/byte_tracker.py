@@ -7,7 +7,7 @@ from vqpy.operator.tracker.base import GroundTrackerBase
 from vqpy.operator.video_reader import FrameStream
 
 from . import matching
-from .base_track import BaseTrack, TrackState
+from vqpy.operator.tracker.base_track import BaseTrack, TrackState
 from .kalman_filter import KalmanFilter
 
 
