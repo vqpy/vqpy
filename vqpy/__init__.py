@@ -12,6 +12,7 @@ from vqpy.operator.detector import setup_detector
 from vqpy.obj.vobj.wrappers import property, stateful, postproc, cross_vobj_property  # noqa: F401,E501
 from vqpy.property_lib.wrappers import vqpy_func_logger  # noqa: F401
 from vqpy.operator.tracker.multiclass_tracker import MultiTracker
+from vqpy.operator.tracker.byte_tracker import ByteTracker
 from vqpy.obj.vobj.base import VObjBase
 from vqpy.query.vobj_constraint import VObjConstraint  # noqa: F401
 from vqpy.obj.frame import Frame
@@ -41,6 +42,9 @@ def launch(cls_name,
         detector_model_dir: the directory for all pretrained detectors.
         detector_name: the specific detector name you desire to use.
     """
+    # explicitly reset Tracker each time we start a new run
+    ByteTracker.Data.reset()
+
     logger.info(f"VQPy Launch I/O Setting: \
                   video_path={video_path}, save_folder={save_folder}")
     video_name = os.path.basename(video_path).split(".")[0]
