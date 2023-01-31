@@ -23,7 +23,7 @@ class MultiTracker(SurfaceTrackerBase):
                  cls_name: Mapping[int, str],
                  cls_type: Mapping[str, VObjGeneratorType]):
         """TODO: complete the __init__ docstring"""
-        # reset BaseTrack counter whenever we start a new task group with vqpy.launch
+        # reset BaseTrack count when we start a new task group with vqpy.launch
         BaseTrack._count = 0
         self.tracker = tracker
         self.cls_name = cls_name

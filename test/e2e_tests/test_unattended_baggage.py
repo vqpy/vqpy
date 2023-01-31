@@ -13,7 +13,7 @@ task_name = "unattended_baggage"
 fake_detector_name = f"fake-yolox-{video_name}"
 video_path = (root / f"videos/{video_name}.{video_ext}").as_posix()
 precomputed_path = (root / f"precomputed/{video_name}_yolox.pkl").as_posix()
-save_folder = (root / f"e2e_outputs/").as_posix()
+save_folder = (root / "e2e_outputs/").as_posix()
 result_path = (
     root / f"e2e_outputs/{video_name}_{task_name}_{fake_detector_name}.json"
 ).as_posix()
