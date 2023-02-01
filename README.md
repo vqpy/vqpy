@@ -14,6 +14,7 @@ The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harr
 
 <details><summary>Show installation details</summary>
 <p>
+VQPy is developed and tested on Linux. Therefore we highly recomand you to try VQPy on Linux, to avoid encountering some unknown errors.
 
 You can follow the steps below to install VQPy.
 
