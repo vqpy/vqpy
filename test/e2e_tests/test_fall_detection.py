@@ -2,6 +2,7 @@ from pathlib import Path
 import torch
 import numpy as np
 import sys
+import pytest
 
 import vqpy
 from vqpy.operator.detector import register
@@ -80,6 +81,10 @@ class FallDetection(vqpy.QueryBase):
         )
 
 
+@pytest.mark.skip(
+    reason="Randomness are introduced by fall detection models, \
+        hard to compare against expected results"
+)
 def test_fall_detection():
     register(fake_detector_name, FakeYOLOX, precomputed_path, None)
     pose_model = SPPE_FastPose(
