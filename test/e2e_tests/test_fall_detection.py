@@ -27,6 +27,7 @@ expected_result_path = (
 fall_detection_lib_path = (root / "Human-Falling-Detect-Tracks").as_posix()
 sys.path.append(fall_detection_lib_path)
 
+
 class Person(vqpy.VObjBase):
     required_fields = ["class_id", "tlbr"]
 
