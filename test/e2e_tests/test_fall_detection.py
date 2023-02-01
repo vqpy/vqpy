@@ -27,10 +27,6 @@ expected_result_path = (
 fall_detection_lib_path = (root / "Human-Falling-Detect-Tracks").as_posix()
 sys.path.append(fall_detection_lib_path)
 
-from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
-from ActionsEstLoader import TSSTG  # noqa: E402
-
-
 class Person(vqpy.VObjBase):
     required_fields = ["class_id", "tlbr"]
 
@@ -86,6 +82,8 @@ class FallDetection(vqpy.QueryBase):
         hard to compare against expected results"
 )
 def test_fall_detection():
+    from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
+    from ActionsEstLoader import TSSTG  # noqa: E402
     register(fake_detector_name, FakeYOLOX, precomputed_path, None)
     pose_model = SPPE_FastPose(
         backbone="resnet50",
