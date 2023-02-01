@@ -9,6 +9,12 @@ on:
       - 'pyproject.toml'
       - '.github/workflows/**'
   push:
+    paths:
+      - 'vqpy/**'
+      - 'test/**'
+      - 'setup.py'
+      - 'pyproject.toml'
+      - '.github/workflows/**'
 
 jobs:
   flake8:
@@ -46,12 +52,13 @@ jobs:
         run: |
           pip install . -v
 
-      # - name: unit tests
-      #   shell: bash
-      #   run: |
-      #     pytest test/unit_tests
+      - name: unit tests
+        shell: bash
+        run: |
+          pytest test/unit_tests
 
       - name: prepare files for e2e tests
+        if: github.event.pull_request.head.repo.fork == false
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
           command: cp
@@ -62,13 +69,15 @@ jobs:
           aws_region: us-west-2
           flags: --recursive
       
-      - name: prepare repo for fall detection
-        uses: actions/checkout@v3
-        with:
-          repository: hanryxu/Human-Falling-Detect-Tracks
-          path: Human-Falling-Detect-Tracks
+      # - name: prepare repo for fall detection
+      #   if: github.event.pull_request.head.repo.fork == false
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: hanryxu/Human-Falling-Detect-Tracks
+      #     path: Human-Falling-Detect-Tracks
       
       - name: e2e tests
+        if: github.event.pull_request.head.repo.fork == false
         shell: bash
         run: |
           pytest test/e2e_tests
