@@ -5,6 +5,7 @@
 - [Fall Detection](examples/fall_detection): Recognize fallen people in a video. [video](https://youtu.be/ctniCxIdpTY)
 - [List red moving vehicle](examples/list_red_moving_vehicle): show the license plates of red moving vehicles.
 - [People Loitering](examples/loitering): detect suspicious activities of person loitering around. [video](https://youtu.be/EuLMrUFNRxQ)
+- [Person Search](examples/person_search): retrieve the target person in videos.
 - [People Counting](examples/people_counting): count the number of people heading different directions.
 - [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages. [video](https://www.kaggle.com/datasets/szahid405/baggage?select=baggage.mp4)
 
