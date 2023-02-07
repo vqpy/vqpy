@@ -84,7 +84,7 @@ def test_fall_detection():
     torch.manual_seed(0)
     np.random.seed(0)
     random.seed(0)
-    
+
     from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
     from ActionsEstLoader import TSSTG  # noqa: E402
     register(fake_detector_name, FakeYOLOX, precomputed_path, None)
