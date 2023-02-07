@@ -42,9 +42,6 @@ def launch(cls_name,
         detector_model_dir: the directory for all pretrained detectors.
         detector_name: the specific detector name you desire to use.
     """
-    # explicitly reset Tracker each time we start a new run
-    ByteTracker.Data.reset()
-
     logger.info(f"VQPy Launch I/O Setting: \
                   video_path={video_path}, save_folder={save_folder}")
     video_name = os.path.basename(video_path).split(".")[0]
@@ -75,4 +72,8 @@ def launch(cls_name,
                 with open(save_path, 'w') as f:
                     json.dump(task.vqpy_getdata(), f)
             tag += stream.n_frames
+
+    # reset Tracker after we finish
+    tracker.reset()
+    
     logger.info("Done!")

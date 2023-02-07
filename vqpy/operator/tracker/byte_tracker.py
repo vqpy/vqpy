@@ -291,6 +291,9 @@ class ByteTracker(GroundTrackerBase):
 
         return ([x.extract_data() for x in self.tracked_stracks],
                 [x.extract_data() for x in self.lost_stracks])
+        
+    def reset(self):
+        ByteTracker.Data.reset()
 
 
 def joint_stracks(tlista: List[ByteTracker.Data],

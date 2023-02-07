@@ -66,3 +66,7 @@ class MultiTracker(SurfaceTrackerBase):
                 frame.update_vobjs(func, track_id, None)
             # logger.info(f"tracking done")
         return frame
+    
+    def reset(self):
+        for tracker in self.tracker_dict.values():
+            tracker.reset()
