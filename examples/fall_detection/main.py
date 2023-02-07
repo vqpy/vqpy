@@ -83,7 +83,8 @@ if __name__ == '__main__':
     args = make_parser().parse_args()
     model_dir = args.model_dir
     pose_model = SPPE_FastPose(
-        'resnet50', 224, 160, device='cuda',
+        backbone="resnet50",
+        device="cpu",
         weights_file=os.path.join(
             os.path.abspath(model_dir), "fast_res50_256x192.pth"
         )
