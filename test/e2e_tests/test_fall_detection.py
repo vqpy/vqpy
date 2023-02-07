@@ -1,6 +1,7 @@
 from pathlib import Path
 import torch
 import numpy as np
+import random
 import sys
 
 import vqpy
@@ -78,6 +79,12 @@ class FallDetection(vqpy.QueryBase):
 
 
 def test_fall_detection():
+    # avoid randomness
+    torch.use_deterministic_algorithms(True)
+    torch.manual_seed(0)
+    np.random.seed(0)
+    random.seed(0)
+    
     from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
     from ActionsEstLoader import TSSTG  # noqa: E402
     register(fake_detector_name, FakeYOLOX, precomputed_path, None)
