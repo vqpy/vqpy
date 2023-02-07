@@ -12,7 +12,6 @@ from vqpy.operator.detector import setup_detector
 from vqpy.obj.vobj.wrappers import property, stateful, postproc, cross_vobj_property  # noqa: F401,E501
 from vqpy.property_lib.wrappers import vqpy_func_logger  # noqa: F401
 from vqpy.operator.tracker.multiclass_tracker import MultiTracker
-from vqpy.operator.tracker.byte_tracker import ByteTracker
 from vqpy.obj.vobj.base import VObjBase
 from vqpy.query.vobj_constraint import VObjConstraint  # noqa: F401
 from vqpy.obj.frame import Frame
@@ -75,5 +74,5 @@ def launch(cls_name,
 
     # reset Tracker after we finish
     tracker.reset()
-    
+
     logger.info("Done!")
