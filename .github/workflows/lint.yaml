@@ -1,0 +1,33 @@
+name: Lint
+
+on:
+  pull_request:
+    paths:
+      - 'vqpy/**'
+      - 'test/**'
+      - 'setup.py'
+      - 'pyproject.toml'
+      - '.github/workflows/**'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'vqpy/**'
+      - 'test/**'
+      - 'setup.py'
+      - 'pyproject.toml'
+      - '.github/workflows/**'
+
+jobs:
+  flake8:
+    name: flake8
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
