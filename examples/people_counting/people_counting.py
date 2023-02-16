@@ -53,7 +53,9 @@ class Person(vqpy.VObjBase):
             return occurence_count.most_common(1)[0][0]
 
         hist_len = 5
-        tlbr_past = [self.getv("tlbr", (-1)*i) for i in range(1, 1 + hist_len)]
+        tlbr_past = [
+            self.getv("tlbr", i) for i in range(-(1 + hist_len), -1)
+        ]
         for value in tlbr_past:
             if value is None:
                 return None
