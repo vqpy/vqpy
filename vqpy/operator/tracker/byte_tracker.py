@@ -7,7 +7,7 @@ from vqpy.operator.tracker.base import GroundTrackerBase
 from vqpy.operator.video_reader import FrameStream
 
 from . import matching
-from .base_track import BaseTrack, TrackState
+from vqpy.operator.tracker.base_track import BaseTrack, TrackState
 from .kalman_filter import KalmanFilter
 
 
@@ -291,6 +291,9 @@ class ByteTracker(GroundTrackerBase):
 
         return ([x.extract_data() for x in self.tracked_stracks],
                 [x.extract_data() for x in self.lost_stracks])
+
+    def reset(self):
+        ByteTracker.Data.reset()
 
 
 def joint_stracks(tlista: List[ByteTracker.Data],

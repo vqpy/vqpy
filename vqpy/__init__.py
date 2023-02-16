@@ -71,4 +71,8 @@ def launch(cls_name,
                 with open(save_path, 'w') as f:
                     json.dump(task.vqpy_getdata(), f)
             tag += stream.n_frames
+
+    # reset Tracker after we finish
+    tracker.reset()
+
     logger.info("Done!")

@@ -10,19 +10,6 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  flake8:
-    name: flake8
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - name: flake8 Lint
-        uses: py-actions/flake8@v2
-
   unit-tests:
     runs-on: ubuntu-latest
     steps:
@@ -32,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: "3.8"
 
       - name: Install Dependencies
         shell: bash
@@ -43,7 +30,7 @@ jobs:
       - name: install vqpy
         shell: bash
         run: |
-          pip install 'vqpy @ git+https://github.com/vqpy/vqpy.git'
+          pip install . -v
 
       - name: unit tests
         shell: bash

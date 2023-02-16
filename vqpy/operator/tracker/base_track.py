@@ -21,6 +21,16 @@ class BaseTrack(object):
         return self.frame_id
 
     @staticmethod
+    def reset():
+        BaseTrack._count = 0
+        BaseTrack.track_id = 0
+        BaseTrack.is_activated = False
+        BaseTrack.state = TrackState.New
+        BaseTrack.score = 0
+        BaseTrack.start_frame = 0
+        BaseTrack.frame_id = 0
+
+    @staticmethod
     def next_id():
         BaseTrack._count += 1
         return BaseTrack._count
