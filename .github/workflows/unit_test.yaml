@@ -1,9 +1,7 @@
 name: Unit Test
 
 on:
-  push:
-    branches:
-      - 'main'
+  pull_request:
     paths:
       - 'vqpy/**'
       - 'test/**'
@@ -13,7 +11,6 @@ on:
 
 jobs:
   unit-tests:
-    if: ${{ github.repository == 'vqpy/vqpy' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: "3.8"
 
       - name: Install Dependencies
         shell: bash
@@ -33,31 +30,9 @@ jobs:
       - name: install vqpy
         shell: bash
         run: |
-          pip install 'vqpy @ git+https://github.com/vqpy/vqpy.git'
+          pip install . -v
 
       - name: unit tests
         shell: bash
         run: |
           pytest test/unit_tests
-
-      - name: prepare files for e2e tests
-        uses: keithweaver/aws-s3-github-action@v1.0.0
-        with:
-          command: cp
-          source: s3://vqpy/tests/
-          destination: ./
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: us-west-2
-          flags: --recursive
-      
-      - name: prepare repo for fall detection
-        uses: actions/checkout@v3
-        with:
-          repository: hanryxu/Human-Falling-Detect-Tracks
-          path: Human-Falling-Detect-Tracks
-      
-      - name: e2e tests
-        shell: bash
-        run: |
-          pytest test/e2e_tests
