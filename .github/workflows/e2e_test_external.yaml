@@ -10,7 +10,7 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  unit-tests:
+  e2e-tests:
     if: ${{ github.repository != 'vqpy/vqpy' }}
     runs-on: ubuntu-latest
     steps:
