@@ -61,15 +61,19 @@ def _build_model(cfg, pretrained=True, verbose=True):
     )
 
     import importlib.util
+    import inspect
 
-    repo_dir = _get_cache_or_reload(
-        __fast_reid_repository__,
-        force_reload=False, verbose=verbose)
+    if 'trust_repo' in inspect.getfullargspec(_get_cache_or_reload):  #
+        repo_dir = _get_cache_or_reload(
+            __fast_reid_repository__,
+            force_reload=False, verbose=verbose,
+            trust_repo="check", calling_fn="load")
+    else:
+        repo_dir = _get_cache_or_reload(
+            __fast_reid_repository__,
+            force_reload=False, verbose=verbose)
 
-    load_state_dict_from_url(
-        __weights_urls__[cfg],
-        model_dir=repo_dir, progress=verbose
-    )
+    load_state_dict_from_url(__weights_urls__[cfg], progress=verbose)
 
     # import pip
     # pip.main(["install", "-t", repo_dir, "-r", repo_dir + "/docs/requirements.txt"])
@@ -92,7 +96,8 @@ def _build_model(cfg, pretrained=True, verbose=True):
             f"could not import Fast-ReID module: fastreid.utils.checkpoint"
         checkpointer = importlib.import_module('fastreid.utils.checkpoint').Checkpointer
         checkpointer(model).load(path=os.path.join(
-            repo_dir, os.path.split(__weights_urls__[cfg])[1]))
+            os.path.join(torch.hub.get_dir(), 'checkpoints'),
+            os.path.split(__weights_urls__[cfg])[1]))
 
     sys.path.remove(repo_dir)
 
