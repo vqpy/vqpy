@@ -99,9 +99,9 @@ if __name__ == '__main__':
 
     # extract the feature of query images
     gallery_features = []
-    for file_name in os.listdir(args.query_dir):
+    for file_name in os.listdir(args.query_folder):
         # extract features for all images from given directory
-        img_path = os.path.join(args.query_dir, file_name)
+        img_path = os.path.join(args.query_folder, file_name)
         preds = feature_predictor(img_path)
         gallery_features.append(preds)
     gallery_features = np.concatenate(gallery_features, axis=0)
