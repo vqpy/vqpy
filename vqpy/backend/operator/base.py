@@ -1,4 +1,4 @@
-from vqpy.obj.frame_new import Frame
+from vqpy.backend.frame import Frame
 from abc import abstractmethod
 
 
