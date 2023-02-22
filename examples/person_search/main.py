@@ -57,7 +57,8 @@ class Person(vqpy.VObjBase):
         for query_feature in query_features:
             # iterate features from the last 30 frames
             if query_feature is not None:
-                dist = np.dot(gallery_features, query_feature)  # cosine similarity distance
+                # cosine similarity distance
+                dist = np.dot(gallery_features, query_feature)
                 past_ids.append(np.argmax(dist))  # the most similar IDs
                 past_dist.append(np.max(dist))  # the most similarity distance
 
@@ -95,7 +96,8 @@ if __name__ == '__main__':
 
     # load pre-trained models for person feature extracting
     from models import ReIDPredictor
-    feature_predictor = ReIDPredictor(cfg="MSMT17/bagtricks_R50.yml") # https://github.com/JDAI-CV/fast-reid/tree/master/configs
+    # https://github.com/JDAI-CV/fast-reid/tree/master/configs
+    feature_predictor = ReIDPredictor(cfg="MSMT17/bagtricks_R50.yml")
 
     # extract the feature of query images
     gallery_features = []
