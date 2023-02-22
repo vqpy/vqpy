@@ -2,21 +2,6 @@ name: Lint
 
 on:
   pull_request:
-    paths:
-      - 'vqpy/**'
-      - 'test/**'
-      - 'setup.py'
-      - 'pyproject.toml'
-      - '.github/workflows/**'
-  push:
-    branches:
-      - 'main'
-    paths:
-      - 'vqpy/**'
-      - 'test/**'
-      - 'setup.py'
-      - 'pyproject.toml'
-      - '.github/workflows/**'
 
 jobs:
   flake8:
