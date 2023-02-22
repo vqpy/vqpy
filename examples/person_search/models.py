@@ -9,48 +9,50 @@ from torchvision.transforms.functional import to_tensor
 
 __fast_reid_repository__ = "JDAI-CV/fast-reid:v1.3.0"
 
+ROOT_URL = "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/"
+
 __weights_urls__ = {
-    "MSMT17/bagtricks_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_bot_S50.pth",
-    "MSMT17/bagtricks_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_bot_R50.pth",
-    "MSMT17/bagtricks_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_bot_R50-ibn.pth",
-    "MSMT17/bagtricks_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_bot_R101-ibn.pth",
-    "MSMT17/AGW_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_agw_S50.pth",
-    "MSMT17/AGW_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_agw_R50.pth",
-    "MSMT17/AGW_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_agw_R50-ibn.pth",
-    "MSMT17/AGW_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_agw_R101-ibn.pth",
-    "MSMT17/sbs_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_sbs_S50.pth",
-    "MSMT17/sbs_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_sbs_R50.pth",
-    "MSMT17/sbs_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_sbs_R50-ibn.pth",
-    "MSMT17/sbs_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_sbs_R101-ibn.pth",
-    "MSMT17/mgn_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/msmt_mgn_R50-ibn.pth",
+    "MSMT17/bagtricks_S50.yml": ROOT_URL + "msmt_bot_S50.pth",
+    "MSMT17/bagtricks_R50.yml": ROOT_URL + "msmt_bot_R50.pth",
+    "MSMT17/bagtricks_R50-ibn.yml": ROOT_URL + "msmt_bot_R50-ibn.pth",
+    "MSMT17/bagtricks_R101-ibn.yml": ROOT_URL + "msmt_bot_R101-ibn.pth",
+    "MSMT17/AGW_S50.yml": ROOT_URL + "msmt_agw_S50.pth",
+    "MSMT17/AGW_R50.yml": ROOT_URL + "msmt_agw_R50.pth",
+    "MSMT17/AGW_R50-ibn.yml": ROOT_URL + "msmt_agw_R50-ibn.pth",
+    "MSMT17/AGW_R101-ibn.yml": ROOT_URL + "msmt_agw_R101-ibn.pth",
+    "MSMT17/sbs_S50.yml": ROOT_URL + "msmt_sbs_S50.pth",
+    "MSMT17/sbs_R50.yml": ROOT_URL + "msmt_sbs_R50.pth",
+    "MSMT17/sbs_R50-ibn.yml": ROOT_URL + "msmt_sbs_R50-ibn.pth",
+    "MSMT17/sbs_R101-ibn.yml": ROOT_URL + "msmt_sbs_R101-ibn.pth",
+    "MSMT17/mgn_R50-ibn.yml": ROOT_URL + "msmt_mgn_R50-ibn.pth",
 
-    "Market1501/bagtricks_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_bot_S50.pth",
-    "Market1501/bagtricks_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_bot_R50.pth",
-    "Market1501/bagtricks_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_bot_R50-ibn.pth",
-    "Market1501/bagtricks_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_bot_R101-ibn.pth",
-    "Market1501/AGW_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_agw_S50.pth",
-    "Market1501/AGW_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_agw_R50.pth",
-    "Market1501/AGW_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_agw_R50-ibn.pth",
-    "Market1501/AGW_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_agw_R101-ibn.pth",
-    "Market1501/sbs_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_sbs_S50.pth",
-    "Market1501/sbs_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_sbs_R50.pth",
-    "Market1501/sbs_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_sbs_R50-ibn.pth",
-    "Market1501/sbs_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_sbs_R101-ibn.pth",
-    "Market1501/mgn_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/market_mgn_R50-ibn.pth",
+    "Market1501/bagtricks_S50.yml": ROOT_URL + "market_bot_S50.pth",
+    "Market1501/bagtricks_R50.yml": ROOT_URL + "market_bot_R50.pth",
+    "Market1501/bagtricks_R50-ibn.yml": ROOT_URL + "market_bot_R50-ibn.pth",
+    "Market1501/bagtricks_R101-ibn.yml": ROOT_URL + "market_bot_R101-ibn.pth",
+    "Market1501/AGW_S50.yml": ROOT_URL + "market_agw_S50.pth",
+    "Market1501/AGW_R50.yml": ROOT_URL + "market_agw_R50.pth",
+    "Market1501/AGW_R50-ibn.yml": ROOT_URL + "market_agw_R50-ibn.pth",
+    "Market1501/AGW_R101-ibn.yml": ROOT_URL + "market_agw_R101-ibn.pth",
+    "Market1501/sbs_S50.yml": ROOT_URL + "market_sbs_S50.pth",
+    "Market1501/sbs_R50.yml": ROOT_URL + "market_sbs_R50.pth",
+    "Market1501/sbs_R50-ibn.yml": ROOT_URL + "market_sbs_R50-ibn.pth",
+    "Market1501/sbs_R101-ibn.yml": ROOT_URL + "market_sbs_R101-ibn.pth",
+    "Market1501/mgn_R50-ibn.yml": ROOT_URL + "market_mgn_R50-ibn.pth",
 
-    "DukeMTMC/bagtricks_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_bot_S50.pth",
-    "DukeMTMC/bagtricks_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_bot_R50.pth",
-    "DukeMTMC/bagtricks_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_bot_R50-ibn.pth",
-    "DukeMTMC/bagtricks_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_bot_R101-ibn.pth",
-    "DukeMTMC/AGW_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_agw_S50.pth",
-    "DukeMTMC/AGW_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_agw_R50.pth",
-    "DukeMTMC/AGW_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_agw_R50-ibn.pth",
-    "DukeMTMC/AGW_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_agw_R101-ibn.pth",
-    "DukeMTMC/sbs_S50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_sbs_S50.pth",
-    "DukeMTMC/sbs_R50.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_sbs_R50.pth",
-    "DukeMTMC/sbs_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_sbs_R50-ibn.pth",
-    "DukeMTMC/sbs_R101-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_sbs_R101-ibn.pth",
-    "DukeMTMC/mgn_R50-ibn.yml": "https://github.com/JDAI-CV/fast-reid/releases/download/v0.1.1/duke_mgn_R50-ibn.pth",
+    "DukeMTMC/bagtricks_S50.yml": ROOT_URL + "duke_bot_S50.pth",
+    "DukeMTMC/bagtricks_R50.yml": ROOT_URL + "duke_bot_R50.pth",
+    "DukeMTMC/bagtricks_R50-ibn.yml": ROOT_URL + "duke_bot_R50-ibn.pth",
+    "DukeMTMC/bagtricks_R101-ibn.yml": ROOT_URL + "duke_bot_R101-ibn.pth",
+    "DukeMTMC/AGW_S50.yml": ROOT_URL + "duke_agw_S50.pth",
+    "DukeMTMC/AGW_R50.yml": ROOT_URL + "duke_agw_R50.pth",
+    "DukeMTMC/AGW_R50-ibn.yml": ROOT_URL + "duke_agw_R50-ibn.pth",
+    "DukeMTMC/AGW_R101-ibn.yml": ROOT_URL + "duke_agw_R101-ibn.pth",
+    "DukeMTMC/sbs_S50.yml": ROOT_URL + "duke_sbs_S50.pth",
+    "DukeMTMC/sbs_R50.yml": ROOT_URL + "duke_sbs_R50.pth",
+    "DukeMTMC/sbs_R50-ibn.yml": ROOT_URL + "duke_sbs_R50-ibn.pth",
+    "DukeMTMC/sbs_R101-ibn.yml": ROOT_URL + "duke_sbs_R101-ibn.pth",
+    "DukeMTMC/mgn_R50-ibn.yml": ROOT_URL + "duke_mgn_R50-ibn.pth",
 }
 
 
@@ -76,25 +78,28 @@ def _build_model(cfg, pretrained=True, verbose=True):
     load_state_dict_from_url(__weights_urls__[cfg], progress=verbose)
 
     # import pip
-    # pip.main(["install", "-t", repo_dir, "-r", repo_dir + "/docs/requirements.txt"])
+    # pip.main(["install", "-t", repo_dir, "-r",
+    #  repo_dir + "/docs/requirements.txt"])
 
     sys.path.insert(0, repo_dir)
 
     assert importlib.util.find_spec('fastreid.config.config'), \
-        f"could not import Fast-ReID module: fastreid.config.config"
+        "could not import Fast-ReID module: fastreid.config.config"
     _cfg = importlib.import_module('fastreid.config.config').get_cfg()
     _cfg.merge_from_file(os.path.join(repo_dir, 'configs', cfg))
     _cfg.MODEL.BACKBONE.PRETRAIN = False
 
     assert importlib.util.find_spec('fastreid.modeling.meta_arch.build'), \
-        f"could not import Fast-ReID module: fastreid.modeling.meta_arch.build"
-    model = importlib.import_module('fastreid.modeling.meta_arch.build').build_model(_cfg)
+        "could not import Fast-ReID module: fastreid.modeling.meta_arch.build"
+    build = importlib.import_module('fastreid.modeling.meta_arch.build')
+    model = build.build_model(_cfg)
     model.eval()
 
     if pretrained:
         assert importlib.util.find_spec('fastreid.utils.checkpoint'), \
-            f"could not import Fast-ReID module: fastreid.utils.checkpoint"
-        checkpointer = importlib.import_module('fastreid.utils.checkpoint').Checkpointer
+            "could not import Fast-ReID module: fastreid.utils.checkpoint"
+        checkpoint = importlib.import_module('fastreid.utils.checkpoint')
+        checkpointer = checkpoint.Checkpointer
         checkpointer(model).load(path=os.path.join(
             os.path.join(torch.hub.get_dir(), 'checkpoints'),
             os.path.split(__weights_urls__[cfg])[1]))
