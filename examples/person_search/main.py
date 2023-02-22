@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
     # load pre-trained models for person feature extracting
     from models import ReIDPredictor
-     # https://github.com/JDAI-CV/fast-reid/tree/master/configs
+    # https://github.com/JDAI-CV/fast-reid/tree/master/configs
     feature_predictor = ReIDPredictor(cfg="MSMT17/bagtricks_R50.yml")
 
     # extract the feature of query images
