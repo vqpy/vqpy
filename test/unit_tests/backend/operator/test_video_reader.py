@@ -4,7 +4,7 @@ import pytest
 import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-resource_dir = os.path.join(current_dir, "..", "resources/")
+resource_dir = os.path.join(current_dir, "..", "..", "resources/")
 
 
 @pytest.fixture(scope='module')
