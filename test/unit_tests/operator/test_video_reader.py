@@ -35,4 +35,3 @@ def test_next(video_reader):
         frame_width = frame.video_metadata["frame_width"]
         assert frame.frame_image.shape == (frame_height, frame_width, 3)
         counter += 1
-
