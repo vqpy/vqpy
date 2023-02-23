@@ -44,7 +44,7 @@ class Person(vqpy.VObjBase):
         tlbr = self.getv("tlbr")
         if tlbr is None:
             return None
-        return Person.pose_model.predict(image, torch.tensor([tlbr]))
+        return Person.pose_model.predict(image, torch.tensor(np.array([tlbr])))
 
     @vqpy.property()
     def pose(self) -> str:
@@ -87,6 +87,7 @@ def test_fall_detection():
 
     from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
     from ActionsEstLoader import TSSTG  # noqa: E402
+
     register(fake_detector_name, FakeYOLOX, precomputed_path, None)
     pose_model = SPPE_FastPose(
         backbone="resnet50",
