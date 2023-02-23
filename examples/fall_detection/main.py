@@ -47,7 +47,7 @@ class Person(vqpy.VObjBase):
         tlbr = self.getv('tlbr')
         if tlbr is None:
             return None
-        return Person.pose_model.predict(image, torch.tensor([tlbr]))
+        return Person.pose_model.predict(image, torch.tensor(np.array([tlbr])))
 
     @vqpy.property()
     def pose(self) -> str:

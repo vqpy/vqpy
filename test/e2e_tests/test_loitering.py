@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 
 import vqpy
 from vqpy.class_names.coco import COCO_CLASSES
@@ -22,41 +23,9 @@ expected_result_path = (
 ).as_posix()
 
 
-class Person(vqpy.VObjBase):
-    pass
+def test_loitering(setup_example_path):
+    from loitering.main import Person, People_loitering_query  # noqa: E402
 
-
-class People_loitering_query(vqpy.QueryBase):
-    @staticmethod
-    def setting() -> vqpy.VObjConstraint:
-        REGION = [
-            (550, 550),
-            (1162, 400),
-            (1720, 720),
-            (1430, 1072),
-            (600, 1073),
-        ]
-        REGIONS = [REGION]
-
-        filter_cons = {
-            "__class__": lambda x: x == Person,
-            "bottom_center": vqpy.query.continuing(
-                condition=vqpy.query.utils.within_regions(REGIONS),
-                duration=10,
-                name="in_roi",
-            ),
-        }
-        select_cons = {
-            "track_id": None,
-            "coordinate": lambda x: str(x),
-            "in_roi_periods": None,
-        }
-        return vqpy.VObjConstraint(
-            filter_cons, select_cons, filename="loitering"
-        )
-
-
-def test_loitering():
     register(fake_detector_name, FakeYOLOX, precomputed_path, None)
     vqpy.launch(
         cls_name=COCO_CLASSES,
