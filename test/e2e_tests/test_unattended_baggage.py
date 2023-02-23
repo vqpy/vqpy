@@ -1,5 +1,4 @@
 from pathlib import Path
-import sys
 
 import vqpy
 from vqpy.class_names.coco import COCO_CLASSES
