@@ -2,7 +2,7 @@
 from typing import Dict, List
 import pickle
 import json
-import logging
+import warnings
 
 from vqpy.operator.detector.base import DetectorBase
 from vqpy.class_names.coco import COCO_CLASSES
@@ -66,4 +66,7 @@ def compare(result_path, expected_result_path, tolerance=0.1):
     ), f"mismatched {mismatch_cnt} frames > {len(result)*tolerance} tolerance"
 
     if mismatch_cnt > 0:
-        logging.warning(f"mismatched {mismatch_cnt} frames")
+        warnings.warn(
+            f"compare result {result_path} to expected {expected_result_path},"
+            f" mismatched {mismatch_cnt} frames"
+        )
