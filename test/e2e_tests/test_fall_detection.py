@@ -1,7 +1,9 @@
+import pytest
 from pathlib import Path
 import torch
 import numpy as np
 import random
+import sys
 
 import vqpy
 from vqpy.operator.detector import register
@@ -22,6 +24,15 @@ result_path = (
 expected_result_path = (
     root / f"expected_results/{video_name}_{task_name}_yolox.json"
 ).as_posix()
+
+fall_detection_lib_path = (root / "Human-Falling-Detect-Tracks").as_posix()
+
+
+@pytest.fixture
+def setup_fall_detection_lib_path():
+    sys.path.append(fall_detection_lib_path)
+    yield
+    sys.path.remove(fall_detection_lib_path)
 
 
 def test_fall_detection(setup_example_path, setup_fall_detection_lib_path):
