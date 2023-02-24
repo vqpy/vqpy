@@ -20,6 +20,7 @@ def test_single_class_object_detector(video_reader):
         prev=video_reader,
         class_names="person",
         detector_name="yolox",
+        detector_args={"device": "cpu"}
     )
 
     person_detected = False
@@ -39,6 +40,7 @@ def test_multi_class_object_detector(video_reader):
         prev=video_reader,
         class_names={"car", "truck"},
         detector_name="yolox",
+        detector_args={"device": "cpu"}
     )
     car_detected = False
     while object_detector.has_next():
