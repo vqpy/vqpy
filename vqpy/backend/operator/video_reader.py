@@ -5,7 +5,7 @@ from vqpy.backend.frame import Frame
 
 
 class VideoReader(Operator):
-    def __init__(self, video_path):
+    def __init__(self, video_path: str):
         self._cap = cv2.VideoCapture(video_path)
         self.frame_id = -1
         self.metadata = self.get_metadata()
