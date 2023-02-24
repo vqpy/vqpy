@@ -29,7 +29,7 @@ def test_single_class_object_detector(video_reader):
             assert frame.vobj_data.keys() == {"person"}
             person_0 = frame.vobj_data["person"][0]
             assert person_0["tlbr"].shape == (4,)
-            assert 1 > person_0["score"] > 0 
+            assert 1 > person_0["score"] > 0
             person_detected = True
     assert person_detected
 
