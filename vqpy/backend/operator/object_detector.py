@@ -14,11 +14,11 @@ class ObjectDetector(Operator):
                  detector_name: Optional[str] = None,
                  detector_args: dict = dict(),
                  ):
-        """Object detector Operator. 
+        """Object detector Operator.
         It uses the built-in object detector with name of {detector_name}
         for detecting interested classes defined in {class_names}. It also
-        generates the `vobj_data` field in `frame`, which contains the 
-        detected vobjs of interested class, where each vobj is a dictionary 
+        generates the `vobj_data` field in `frame`, which contains the
+        detected vobjs of interested class, where each vobj is a dictionary
         of detection outputs (e.g. "class_id", "tlbr", "score").
 
         Args:
@@ -65,8 +65,6 @@ class ObjectDetector(Operator):
 
     def _gen_vobj_data(self, frame_image):
         detector_outputs = self.detector.inference(frame_image)
-        interested_class_ids = [self.detector.cls_names.index(class_name)
-                                for class_name in self.class_names]
         vobj_data = defaultdict(list)
         for d in detector_outputs:
             class_name = self.detector.cls_names[d["class_id"]]

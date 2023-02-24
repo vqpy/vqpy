@@ -41,14 +41,14 @@ def test_multi_class_object_detector(video_reader):
         detector_name="yolox",
     )
     car_detected = False
-    truck_detected = False
     while object_detector.has_next():
         frame = object_detector.next()
         if frame.vobj_data:
             if "car" in frame.vobj_data:
                 car_0 = frame.vobj_data["car"][0]
                 assert car_0["tlbr"].shape == (4,)
-                assert 1 > car_0["score"] > 0 
+                assert 1 > car_0["score"] > 0
                 car_detected = True
             else:
                 assert "truck" in frame.vobj_data
+    assert car_detected
