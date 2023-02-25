@@ -10,6 +10,10 @@ class Frame:
         self._video_metadata = video_metadata
         self._id = id
         self._image = image
+        # vobj_data is a dictionary of detected vobjs of interested class,
+        # where the key is the class name and the value is a list of vobjs.
+        # Each vobj is a dictionary of properties
+        # (e.g. {"class_id": 0, "score": 0.9}).
         self.vobj_data = dict()
 
     @property

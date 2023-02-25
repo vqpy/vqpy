@@ -19,7 +19,7 @@ class ObjectDetector(Operator):
         for detecting interested classes defined in {class_names}. It also
         generates the `vobj_data` field in `frame`, which contains the
         detected vobjs of interested class, where each vobj is a dictionary
-        of detection outputs (e.g. "class_id", "tlbr", "score").
+        of detection outputs (e.g. "tlbr", "score").
 
         Args:
             prev (Operator): The previous operator instance.
@@ -33,12 +33,18 @@ class ObjectDetector(Operator):
         """
         self.prev = prev
 
-        if not isinstance(class_names, set):
-            self.class_names = {class_names}
-        else:
-            self.class_names = class_names
+        self._check_set_class_names(class_names)
         self.detector = self._setup_detector(detector_name, detector_args)
         self.detector_name = detector_name
+
+    def _check_set_class_names(self, class_names):
+        if not isinstance(class_names, set):
+            self.class_names = {class_names}
+        elif isinstance(class_names, str):
+            self.class_names = class_names
+        else:
+            raise ValueError(f"Invalid class_names: {class_names}, which "
+                             f"should be either a string or a set of strings.")
 
     def _setup_detector(self, detector_name, detector_args):
         # check whether detector_name is valid
@@ -76,7 +82,8 @@ class ObjectDetector(Operator):
     def next(self) -> Frame:
         frame = self.prev.next()
         vobj_data = self._gen_vobj_data(frame.image)
-        # sanity check: the new detected classes don't exist in vobj_data.
+        # Sanity check: the new detected classes don't exist in vobj_data.
+        # Different detectors should not detect the same class.
         assert not self.class_names & frame.vobj_data.keys()
         frame.vobj_data.update(vobj_data)
         return frame
