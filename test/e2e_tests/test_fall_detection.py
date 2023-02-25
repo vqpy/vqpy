@@ -1,3 +1,4 @@
+import pytest
 from pathlib import Path
 import torch
 import numpy as np
@@ -25,68 +26,26 @@ expected_result_path = (
 ).as_posix()
 
 fall_detection_lib_path = (root / "Human-Falling-Detect-Tracks").as_posix()
-sys.path.append(fall_detection_lib_path)
 
 
-class Person(vqpy.VObjBase):
-    required_fields = ["class_id", "tlbr"]
-
-    # default values, to be assigned in main()
-    pose_model = None
-    action_model = None
-
-    @vqpy.property()
-    @vqpy.stateful(30)
-    def keypoints(self):
-        # per-frame property, but tracker can return objects
-        # not in the current frame
-        image = self._ctx.frame
-        tlbr = self.getv("tlbr")
-        if tlbr is None:
-            return None
-        return Person.pose_model.predict(image, torch.tensor([tlbr]))
-
-    @vqpy.property()
-    def pose(self) -> str:
-        keypoints_list = []
-        for i in range(-self._track_length, 0):
-            keypoint = self.getv("keypoints", i)
-            if keypoint is not None:
-                keypoints_list.append(keypoint)
-            if len(keypoints_list) >= 30:
-                break
-        if len(keypoints_list) < 30:
-            return "unknown"
-        pts = np.array(keypoints_list, dtype=np.float32)
-        out = Person.action_model.predict(pts, self._ctx.frame.shape[:2])
-        action_name = Person.action_model.class_names[out[0].argmax()]
-        return action_name
+@pytest.fixture
+def setup_fall_detection_lib_path():
+    sys.path.append(fall_detection_lib_path)
+    yield
+    sys.path.remove(fall_detection_lib_path)
 
 
-class FallDetection(vqpy.QueryBase):
-    """The class obtaining all fallen person"""
-
-    @staticmethod
-    def setting() -> vqpy.VObjConstraint:
-        filter_cons = {
-            "__class__": lambda x: x == Person,
-            "pose": lambda x: x == "Fall Down",
-        }
-        select_cons = {"track_id": None, "tlbr": lambda x: str(x)}
-        return vqpy.VObjConstraint(
-            filter_cons=filter_cons, select_cons=select_cons, filename="fall"
-        )
-
-
-def test_fall_detection():
+def test_fall_detection(setup_example_path, setup_fall_detection_lib_path):
     # avoid randomness
     torch.use_deterministic_algorithms(True)
     torch.manual_seed(0)
     np.random.seed(0)
     random.seed(0)
 
+    from fall_detection.main import Person, FallDetection  # noqa: E402
     from PoseEstimateLoader import SPPE_FastPose  # noqa: E402
     from ActionsEstLoader import TSSTG  # noqa: E402
+
     register(fake_detector_name, FakeYOLOX, precomputed_path, None)
     pose_model = SPPE_FastPose(
         backbone="resnet50",

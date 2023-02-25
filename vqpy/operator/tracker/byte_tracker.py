@@ -23,14 +23,14 @@ class ByteTracker(GroundTrackerBase):
             self.track_id = self.next_id()
             # TODO: remove unnecessary track_id assignments
             self.data = data
-            self._tlbr = np.asarray(data["tlbr"], dtype=np.float)
+            self._tlbr = np.asarray(data["tlbr"], dtype=float)
             self.score = data["score"]
 
             self.is_activated = False
             self.tracklet_len = 0
 
         def set_tlbr(self, tlbr):
-            self._tlbr = np.asarray(tlbr, dtype=np.float)
+            self._tlbr = np.asarray(tlbr, dtype=float)
 
         def initiate(self, frame_id):
             """Initiate a VObj, so that it have tracking property
