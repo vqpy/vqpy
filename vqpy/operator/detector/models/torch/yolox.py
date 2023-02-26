@@ -21,7 +21,7 @@ class YOLOXDetector(DetectorBase):
     """The YOLOX detector for object detection"""
 
     cls_names = COCO_CLASSES
-    output_fields = ["tlbr", "score", "class_id"]
+    output_fields = ["class_id", "tlbr", "score"]
 
     def __init__(self, model_path, device="gpu", fp16=True):
         # TODO: start a new process handling this

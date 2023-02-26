@@ -29,9 +29,10 @@ def test_next(video_reader):
     while video_reader.has_next():
         frame = video_reader.next()
         assert isinstance(frame, Frame)
-        assert frame.frame_id == counter
+        assert frame.id == counter
         assert frame.video_metadata == video_reader.metadata
         frame_height = frame.video_metadata["frame_height"]
         frame_width = frame.video_metadata["frame_width"]
-        assert frame.frame_image.shape == (frame_height, frame_width, 3)
+        assert frame.image.shape == (frame_height, frame_width, 3)
         counter += 1
+    assert counter == video_reader.metadata["n_frames"]
