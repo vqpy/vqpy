@@ -30,12 +30,6 @@ class FrameFilter(Operator):
         else:
             raise StopIteration
 
-    @classmethod
-    def create_vobj_filter(cls, prev: Operator):
-        def condition_func(frame: Frame):
-            return frame.vobj is not None
-        return cls(prev, condition_func)
-
 
 class VObjFrameFilter(FrameFilter):
     def __init__(self, prev: Operator, vobj_filter_index: int = 0):
