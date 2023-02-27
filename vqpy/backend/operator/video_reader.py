@@ -34,20 +34,23 @@ class VideoReader(Operator):
             return False
 
     def next(self) -> Frame:
-        self.frame_id += 1
-        ret_val, frame_image = self._cap.read()
-        if not ret_val:
-            logger.info(f"Failed to load frame stream with id of "
-                        f"{self.frame_id}")
-            raise IOError
-        ch = cv2.waitKey(1)
-        if ch == 27 or ch == ord("q") or ch == ord('Q'):
-            raise KeyboardInterrupt
+        if self.has_next():
+            self.frame_id += 1
+            ret_val, frame_image = self._cap.read()
+            if not ret_val:
+                logger.info(f"Failed to load frame stream with id of "
+                            f"{self.frame_id}")
+                raise IOError
+            ch = cv2.waitKey(1)
+            if ch == 27 or ch == ord("q") or ch == ord('Q'):
+                raise KeyboardInterrupt
 
-        frame = Frame(video_metadata=self.metadata,
-                      id=self.frame_id,
-                      image=frame_image)
-        return frame
+            frame = Frame(video_metadata=self.metadata,
+                          id=self.frame_id,
+                          image=frame_image)
+            return frame
+        else:
+            raise StopIteration
 
     def close(self):
         self._cap.release()
