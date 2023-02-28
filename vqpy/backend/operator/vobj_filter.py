@@ -15,7 +15,7 @@ class VObjFilter(Operator):
         :param prev: previous operator
         :param condition_func: a callable function that takes in a vobj
             and returns a bool value.
-            If condition_func is a string or a list of string, it should be 
+            If condition_func is a string or a list of string, it should be
             one or more class name.
             The vobjs with the class name(s) will be filtered.
         :param filter_index: the index of the filter.
@@ -63,8 +63,8 @@ class VObjFilter(Operator):
                 for index in vobj_indexes:
                     vobj_data = frame.vobj_data[class_name][index]
                     assert self.property_name in vobj_data, \
-                        f"property_name {self.property_name} of index {index} of {class_name} \
-                        is not computed before filtering"
+                        f"property_name {self.property_name} of index {index} \
+                        of {class_name} is not computed before filtering."
                     if self.condition_func(vobj_data[self.property_name]):
                         new_vobj_indexes.append(index)
                 # update filtered vobjs on frame
