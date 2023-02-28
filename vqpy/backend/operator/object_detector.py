@@ -80,10 +80,13 @@ class ObjectDetector(Operator):
         return vobj_data
 
     def next(self) -> Frame:
-        frame = self.prev.next()
-        vobj_data = self._gen_vobj_data(frame.image)
-        # Sanity check: the new detected classes don't exist in vobj_data.
-        # Different detectors should not detect the same class.
-        assert not self.class_names & frame.vobj_data.keys()
-        frame.vobj_data.update(vobj_data)
-        return frame
+        if self.has_next():
+            frame = self.prev.next()
+            vobj_data = self._gen_vobj_data(frame.image)
+            # Sanity check: the new detected classes don't exist in vobj_data.
+            # Different detectors should not detect the same class.
+            assert not self.class_names & frame.vobj_data.keys()
+            frame.vobj_data.update(vobj_data)
+            return frame
+        else:
+            raise StopIteration
