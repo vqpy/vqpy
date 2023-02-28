@@ -57,6 +57,8 @@ class VObjFilter(Operator):
             if self.property_name is None:
                 raise ValueError("property_name must be provided if \
                     condition_func is a function")
+            assert self.filter_index not in frame.filtered_vobjs, \
+                "Filter on properties before filtering on vobj classes."
             filtered_vobjs = frame.filtered_vobjs[self.filter_index]
             for class_name, vobj_indexes in filtered_vobjs.items():
                 new_vobj_indexes = []

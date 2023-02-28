@@ -32,16 +32,16 @@ def test_non_exist_class_name(object_detector):
     class_name = "none"
     assert object_detector.next()
 
-    wrong_vobj_filter = VObjFilter(
+    vobj_filter_non_exist_class = VObjFilter(
         prev=object_detector,
         condition_func=class_name,
         filter_index=0,
     )
-    frame = wrong_vobj_filter.next()
+    frame = vobj_filter_non_exist_class.next()
     assert frame.filtered_vobjs[0][class_name] == []
 
 
-def test_vobj_filter_class_name(object_detector):
+def test_class_name_diff_index(object_detector):
     person_vobj_filter = VObjFilter(
         prev=object_detector,
         condition_func="person",
@@ -122,7 +122,7 @@ def test_multi_class_names(object_detector):
             assert frame.filtered_vobjs[0]["car"] == []
 
 
-def test_exist_class(object_detector):
+def test_existed_class(object_detector):
     car_vobj_filter = VObjFilter(
         prev=object_detector,
         condition_func="car",
