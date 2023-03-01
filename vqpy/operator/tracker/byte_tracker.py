@@ -4,7 +4,6 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 from vqpy.operator.tracker.base import GroundTrackerBase
-from vqpy.operator.video_reader import FrameStream
 
 from . import matching
 from vqpy.operator.tracker.base_track import BaseTrack, TrackState
@@ -130,13 +129,11 @@ class ByteTracker(GroundTrackerBase):
                 ret[_field] = getattr(self, _field)
             return ret
 
-    def __init__(self, ctx: FrameStream):
-        self.ctx = ctx
-
+    def __init__(self, fps):
         self.track_thresh = 0.6
         self.det_thresh = self.track_thresh + 0.1
         self.match_thresh = 0.9
-        self.buffer_size = int(ctx.fps / 30.0 * 30)
+        self.buffer_size = int(fps / 30.0 * 30)
         self.max_time_lost = self.buffer_size
         self.kalman_filter = KalmanFilter()
 
@@ -185,8 +182,10 @@ class ByteTracker(GroundTrackerBase):
         track.mean, track.covariance = prediction
         track.set_tlbr(ByteTracker.Data.xyah_to_tlbr(track.mean[:4]))
 
-    def update(self, data: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
-        frame_id = self.ctx.frame_id
+    def update(self,
+               frame_id: int,
+               data: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
+        frame_id = frame_id
         dets: List[ByteTracker.Data] = [ByteTracker.Data(x) for x in data]
 
         activated_stracks: List[ByteTracker.Data] = []
