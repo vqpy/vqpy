@@ -80,20 +80,20 @@ class VObjPropertyFilter(VObjFilter):
     def __init__(self,
                  prev: Operator,
                  property_name: str,
-                 condition_func: Union[Callable[[Dict], bool], str, List[str]],
+                 property_condition_func: Callable[[Dict], bool],
                  filter_index: int = 0,
                  ):
         """
         Filter vobjs based on property value.
         :param prev: previous operator
-        :param condition_func: a callable function that takes in a vobj
-            property value and returns a bool value.
+        :param property_condition_func: a callable function that takes in a 
+            vobj property value and returns a bool value.
         :filter_index: the index of the filter.
         :param property_name: the name of the property on vobj.
         """
         def condition_func(vobj_data: Dict):
-            assert self.property_name in vobj_data, \
+            assert property_name in vobj_data, \
                         f"property_name {self.property_name} is not computed \
                             before filtering."
-            return condition_func(vobj_data[property_name])
-        super().__init__(prev, condition_func, filter_index, property_name)
+            return property_condition_func(vobj_data[property_name])
+        super().__init__(prev, condition_func, filter_index)
