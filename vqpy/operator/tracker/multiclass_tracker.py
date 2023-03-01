@@ -49,7 +49,9 @@ class MultiTracker(SurfaceTrackerBase):
 
         for func, dets in detections.items():
             if func not in self.tracker_dict:
-                self.tracker_dict[func] = self.tracker(ctx.fps)
+                self.tracker_dict[func] = self.tracker(
+                    tracker_name="byte",
+                    fps=ctx.fps)
 
         for func, tracker in self.tracker_dict.items():
             # logger.info(f"Multitracking type {func}")
@@ -58,7 +60,6 @@ class MultiTracker(SurfaceTrackerBase):
                 dets = detections[func]
             f_tracked, f_lost = tracker.update(frame_id=ctx.frame_id,
                                                data=dets)
-            ctx._objdatas = f_tracked
             for item in f_tracked:
                 track_id = item['track_id']
                 frame.update_vobjs(func, track_id, item)
