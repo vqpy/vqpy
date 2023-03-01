@@ -86,7 +86,7 @@ class VObjPropertyFilter(VObjFilter):
         """
         Filter vobjs based on property value.
         :param prev: previous operator
-        :param property_condition_func: a callable function that takes in a 
+        :param property_condition_func: a callable function that takes in a
             vobj property value and returns a bool value.
         :filter_index: the index of the filter.
         :param property_name: the name of the property on vobj.
