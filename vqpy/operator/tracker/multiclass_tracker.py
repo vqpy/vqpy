@@ -49,7 +49,7 @@ class MultiTracker(SurfaceTrackerBase):
 
         for func, dets in detections.items():
             if func not in self.tracker_dict:
-                self.tracker_dict[func] = self.tracker(ctx)
+                self.tracker_dict[func] = self.tracker(ctx.fps)
 
         for func, tracker in self.tracker_dict.items():
             # logger.info(f"Multitracking type {func}")
