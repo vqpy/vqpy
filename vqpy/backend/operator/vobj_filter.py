@@ -1,32 +1,27 @@
 from vqpy.backend.operator.base import Operator
 from vqpy.backend.frame import Frame
-from typing import Callable, Union, Optional, List
+from typing import Callable, Union, List, Dict
 
 
 class VObjFilter(Operator):
     def __init__(self,
                  prev: Operator,
-                 condition_func: Union[Callable, str, List[str]],
+                 condition_func: Union[Callable[[Dict], bool], str, List[str]],
                  filter_index: int = 0,
-                 property_name: Optional[str] = None,
                  ):
         """
         Filter vobjs based on the condition_func.
         :param prev: previous operator
-        :param condition_func: a callable function that takes in a vobj
-            and returns a bool value.
+        :param condition_func: a callable function that takes in the data of
+            one vobj and returns a bool value.
             If condition_func is a string or a list of string, it should be
             one or more class name.
             The vobjs with the class name(s) will be filtered.
         :param filter_index: the index of the filter.
             If the index is already used, raise ValueError.
-        :param property_name: the name of the property on vobj.
-            If condition_func is a callable function, property_name must be
-            provided.
         """
         self.condition_func = condition_func
         self.filter_index = filter_index
-        self.property_name = property_name
         super().__init__(prev)
 
     def _update_filtered_class(self, class_name, frame: Frame):
@@ -54,9 +49,6 @@ class VObjFilter(Operator):
             if not callable(self.condition_func):
                 raise ValueError("condition_func must be either a string \
                     or a function")
-            if self.property_name is None:
-                raise ValueError("property_name must be provided if \
-                    condition_func is a function")
             assert self.filter_index not in frame.filtered_vobjs, \
                 "Filter on properties before filtering on vobj classes."
             filtered_vobjs = frame.filtered_vobjs[self.filter_index]
@@ -67,7 +59,7 @@ class VObjFilter(Operator):
                     assert self.property_name in vobj_data, \
                         f"property_name {self.property_name} of index {index} \
                         of {class_name} is not computed before filtering."
-                    if self.condition_func(vobj_data[self.property_name]):
+                    if self.condition_func(vobj_data):
                         new_vobj_indexes.append(index)
                 # update filtered vobjs on frame
                 frame.filtered_vobjs[self.filter_index][class_name] = \
@@ -82,3 +74,26 @@ class VObjFilter(Operator):
             return frame
         else:
             raise StopIteration
+
+
+class VObjPropertyFilter(VObjFilter):
+    def __init__(self,
+                 prev: Operator,
+                 property_name: str,
+                 condition_func: Union[Callable[[Dict], bool], str, List[str]],
+                 filter_index: int = 0,
+                 ):
+        """
+        Filter vobjs based on property value.
+        :param prev: previous operator
+        :param condition_func: a callable function that takes in a vobj
+            property value and returns a bool value.
+        :filter_index: the index of the filter.
+        :param property_name: the name of the property on vobj.
+        """
+        def condition_func(vobj_data: Dict):
+            assert self.property_name in vobj_data, \
+                        f"property_name {self.property_name} is not computed \
+                            before filtering."
+            return condition_func(vobj_data[property_name])
+        super().__init__(prev, condition_func, filter_index, property_name)
