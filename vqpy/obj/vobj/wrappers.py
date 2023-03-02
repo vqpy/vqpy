@@ -4,58 +4,98 @@ import functools
 from typing import Callable, Dict, List, Optional
 
 from vqpy.obj.vobj.base import VObjBaseInterface
+from vqpy.backend.planner.deps import Dependency
 
 
-def property():
-    """
-    @property decorator should ALWAYS appear as the FIRST decorator.
-    Ensures a method of an VObj is computed exactly once per frame.
-    When having incoming updates, call all functions with @property decorators.
-    TODO: add more features for @property
-    NOTE: This is never called directly hence overriding is not a problem.
-    """
+# Ensures a method of an VObj is computed exactly once per frame
+# used by @stateful, @stateless, and @cross_vobj_property, for compatibility
+# equivalent to previous @property
+def caching(self: VObjBaseInterface, func, *args, **kwargs):
+    if len(self._datas) > 0:
+        vidx = "__record_" + func.__name__
+        aidx = "__index_" + func.__name__
+        if getattr(self, aidx, None) == self._ctx.frame_id:
+            return getattr(self, vidx)
+        else:
+            value = func(self, *args, **kwargs)
+            setattr(self, vidx, value)
+            setattr(self, aidx, self._ctx.frame_id)
+            return value
+    elif func.__name__ not in self._registered_names:
+        # initialization
+        self._registered_names.add(func.__name__)
+        return None
+
+
+# property that requires history values of inputs
+# use implementation of previous @property + previous @stateful
+def stateful(inputs):
     def decorator(func: Callable):
         @functools.wraps(func)
         def wrapper(self: VObjBaseInterface, *args, **kwargs):
-            if len(self._datas) > 0:
-                vidx = '__record_' + func.__name__
-                aidx = '__index_' + func.__name__
-                if getattr(self, aidx, None) == self._ctx.frame_id:
-                    return getattr(self, vidx)
-                else:
-                    value = func(self, *args, **kwargs)
-                    setattr(self, vidx, value)
-                    setattr(self, aidx, self._ctx.frame_id)
-                    return value
-            elif func.__name__ not in self._registered_names:
-                # initialization
-                self._registered_names.add(func.__name__)
-                return None
-        return wrapper
-    return decorator
-
-
-def stateful(length: int = 0):
-    """
-    @stateful decorator stores the return value into `__state_` field.
-    A function decorated withthis also should be decorated with @property.
-    TODO: we can merge @property and @stateful.
-    length: number of frames to reserve the value, by default store all values.
-    """
-    def decorator(func: Callable):
-        @functools.wraps(func)
-        def wrapper(self: VObjBaseInterface, *args, **kwargs):
-            attr = '__state_' + func.__name__
+            # read length to save from VObj after resolving dependencies
+            # between properties in planner
+            length_to_save = self.attr_length[func.__name__]
+            attr = "__state_" + func.__name__
             if not hasattr(self, attr):
                 setattr(self, attr, [])
-            new_value = func(self, *args, **kwargs)
+            new_value = caching(self, func, *args, **kwargs)
             values: List = getattr(self, attr)
-            if length > 0 and len(values) == length:
+            if length_to_save > 0 and len(values) == length_to_save:
                 values = values[1:]
             values.append(new_value)
             setattr(self, attr, values)
             return values[-1]
+
+        # Dependencies between properties of VObj should be registered to
+        # planner at VObj class declaration, can't use getattr to get type of
+        # VObj by then, thus can't write dependencies of attrs to VObj
+        # themselves
+        # Workaround: use name of VObj (extracted from func.__qualname__)
+        # to save dependencies to somewhere also accessible to planner
+        # somewhere: vqpy.backend.planner.deps.Dependency
+
+        # get name of VObj from __qualname__
+        vobj_name = func.__qualname__.split(".", 1)[0]
+        # deps: dependency with VObj type annotation
+        # e.g.
+        # inputs: bbox -> direction
+        # deps: Car.bbox -> Car.direction
+        deps = dict()
+        for attr, hist_len in inputs.items():
+            deps[f"{vobj_name}.{attr}"] = hist_len
+        # True: stateful=True
+        Dependency[f"{vobj_name}.{func.__name__}"] = (deps, True)
         return wrapper
+
+    return decorator
+
+
+# property that does NOT require history values of inputs
+# i.e. only dependent on current frame
+def stateless(inputs):
+    def decorator(func: Callable):
+        @functools.wraps(func)
+        def wrapper(self: VObjBaseInterface, *args, **kwargs):
+            # also read length_to_save from VObj
+            length_to_save = self.attr_length[func.__name__]
+            attr = "__no_state_" + func.__name__
+            if not hasattr(self, attr):
+                setattr(self, attr, [])
+            new_value = caching(self, func, *args, **kwargs)
+            values: List = getattr(self, attr)
+            if length_to_save > 0 and len(values) == length_to_save:
+                values = values[1:]
+            values.append(new_value)
+            setattr(self, attr, values)
+            return values[-1]
+
+        vobj_name = func.__qualname__.split(".", 1)[0]
+        deps = [f"{vobj_name}.{attr}" for attr in inputs]
+        # False: stateful = False
+        Dependency[f"{vobj_name}.{func.__name__}"] = (deps, False)
+        return wrapper
+
     return decorator
 
 
@@ -66,13 +106,13 @@ def postproc(params: Dict):
     Currently only `majority` is supported, it has a integer parameter N,
       denoting that we return the majority vote of the result in last N frames.
     """
-    if 'majority' in params:
-        size = params['majority']
+    if "majority" in params:
+        size = params["majority"]
 
         def decorator(func: Callable):
             @functools.wraps(func)
             def wrapper(self: VObjBaseInterface, *args, **kwargs):
-                name = '__postproc_majority_' + func.__name__
+                name = "__postproc_majority_" + func.__name__
                 if not hasattr(self, name):
                     setattr(self, name, [])
                 values = getattr(self, name)
@@ -90,7 +130,9 @@ def postproc(params: Dict):
                     if it is not None and v > ret[1]:
                         ret = (it, v)
                 return ret[0]
+
             return wrapper
+
         return decorator
     else:
         raise NotImplementedError
@@ -112,13 +154,14 @@ def access_data(cond: Dict[str, Callable]):
 """
 
 
+# exclude @cross_vobj_property from planner for now
 # for declaring data dependencies and retrieving data from other vobjs
 # currently don't register dependencies since execution sequence is fixed
 # cross_vobj_property only needs to provide the required list of properties
 # of vobjs
 def cross_vobj_property(
-        vobj_type=None, vobj_num="ALL", vobj_input_fields=None
-        ):
+    vobj_type=None, vobj_num="ALL", vobj_input_fields=None
+):
     """Decorator for cross-object property computation.
 
     Wrapper for cross-object property computation.
@@ -146,15 +189,14 @@ def cross_vobj_property(
     def wrap(func: Callable):
         @functools.wraps(func)
         def wrapped_func(
-            self: VObjBaseInterface,
-            cross_vobj_arg: Optional[List] = None
+            self: VObjBaseInterface, cross_vobj_arg: Optional[List] = None
         ):
             # parameter cross_vobj_arg has default value None to maintain
             # the "same" interface with @property upon being called directly
             # this compatibility is used in VObjBase.__init__ at instance()
             if len(self._datas) > 0:
-                vidx = '__record_' + func.__name__
-                aidx = '__index_' + func.__name__
+                vidx = "__record_" + func.__name__
+                aidx = "__index_" + func.__name__
                 if getattr(self, aidx, None) == self._ctx.frame_id:
                     return getattr(self, vidx)
                 else:
@@ -165,8 +207,12 @@ def cross_vobj_property(
             elif func.__name__ not in self._registered_cross_vobj_names:
                 # initialization
                 # register function name, required VObj type and fields
-                self._registered_cross_vobj_names[func.__name__] = \
-                    (vobj_type, vobj_input_fields)
+                self._registered_cross_vobj_names[func.__name__] = (
+                    vobj_type,
+                    vobj_input_fields,
+                )
                 return None
+
         return wrapped_func
+
     return wrap

@@ -9,7 +9,7 @@ from vqpy.operator.detector.base import DetectorBase  # noqa: F401
 from vqpy.query.base import QueryBase
 from vqpy.operator.tracker.base import GroundTrackerBase  # noqa: F401
 from vqpy.operator.detector import setup_detector
-from vqpy.obj.vobj.wrappers import property, stateful, postproc, cross_vobj_property  # noqa: F401,E501
+from vqpy.obj.vobj.wrappers import stateful, stateless, postproc, cross_vobj_property  # noqa: F401,E501
 from vqpy.property_lib.wrappers import vqpy_func_logger  # noqa: F401
 from vqpy.operator.tracker.multiclass_tracker import MultiTracker
 from vqpy.obj.vobj.base import VObjBase
@@ -20,6 +20,8 @@ from vqpy.class_names.coco import COCO_CLASSES  # noqa: F401
 from vqpy.operator.video_reader import FrameStream
 from . import utils  # noqa: F401
 from . import query  # noqa: F401
+from vqpy.backend.planner.planner import Planner
+from vqpy.backend.planner.deps import Dependency
 
 
 def launch(cls_name,
@@ -41,6 +43,11 @@ def launch(cls_name,
         detector_model_dir: the directory for all pretrained detectors.
         detector_name: the specific detector name you desire to use.
     """
+    planner = Planner()
+    # get all VObj types used in the query (see Dependency for more info)
+    cls_names = [vobj_type.__name__ for vobj_type in set(cls_type.values())]
+    planner.register_deps(vobj_types=cls_names, deps=Dependency)
+
     logger.info(f"VQPy Launch I/O Setting: \
                   video_path={video_path}, save_folder={save_folder}")
     video_name = os.path.basename(video_path).split(".")[0]
