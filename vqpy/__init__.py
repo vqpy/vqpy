@@ -45,9 +45,10 @@ def launch(cls_name,
     """
     planner = Planner()
     # get all VObj types used in the query (see Dependency for more info)
-    cls_names = [vobj_type.__name__ for vobj_type in set(cls_type.values())]
-    planner.register_deps(vobj_types=cls_names, deps=Dependency)
-
+    planner.register_deps(
+        vobj_types=list(set(cls_type.values())),
+        deps=Dependency
+    )
     logger.info(f"VQPy Launch I/O Setting: \
                   video_path={video_path}, save_folder={save_folder}")
     video_name = os.path.basename(video_path).split(".")[0]
