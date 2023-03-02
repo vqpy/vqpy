@@ -35,7 +35,7 @@ def stateful(inputs):
         def wrapper(self: VObjBaseInterface, *args, **kwargs):
             # read length to save from VObj after resolving dependencies
             # between properties in planner
-            length_to_save = self.attr_length[func.__name__]
+            length_to_save = self.hist_len[func.__name__]
             attr = "__state_" + func.__name__
             if not hasattr(self, attr):
                 setattr(self, attr, [])
@@ -78,8 +78,8 @@ def stateless(inputs):
         @functools.wraps(func)
         def wrapper(self: VObjBaseInterface, *args, **kwargs):
             # also read length_to_save from VObj
-            length_to_save = self.attr_length[func.__name__]
-            attr = "__no_state_" + func.__name__
+            length_to_save = self.hist_len[func.__name__]
+            attr = "__state_" + func.__name__
             if not hasattr(self, attr):
                 setattr(self, attr, [])
             new_value = caching(self, func, *args, **kwargs)
