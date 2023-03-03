@@ -8,8 +8,7 @@ from vqpy.backend.planner.deps import Dependency
 
 
 # Ensures a method of an VObj is computed exactly once per frame
-# used by @stateful, @stateless, and @cross_vobj_property, for compatibility
-# equivalent to previous @property
+# used by @stateful, @stateless, equivalent to previous @property
 def caching(self: VObjBaseInterface, func, *args, **kwargs):
     if len(self._datas) > 0:
         vidx = "__record_" + func.__name__
@@ -47,8 +46,8 @@ def stateful(inputs):
             setattr(self, attr, values)
             return values[-1]
 
-        # Dependencies between properties of VObj should be registered to
-        # planner at VObj class declaration, can't use getattr to get type of
+        # Dependencies between properties of VObj should be registered at VObj
+        # class declaration, before planner, can't use getattr to get type of
         # VObj by then, thus can't write dependencies of attrs to VObj
         # themselves
         # Workaround: use name of VObj (extracted from func.__qualname__)
@@ -65,7 +64,9 @@ def stateful(inputs):
         for attr, hist_len in inputs.items():
             deps[f"{vobj_name}.{attr}"] = hist_len
         # True: stateful=True
-        Dependency[f"{vobj_name}.{func.__name__}"] = (deps, True)
+        Dependency.register_dep(
+            attr=f"{vobj_name}.{func.__name__}", deps=(deps, True)
+        )
         return wrapper
 
     return decorator
@@ -93,7 +94,9 @@ def stateless(inputs):
         vobj_name = func.__qualname__.split(".", 1)[0]
         deps = [f"{vobj_name}.{attr}" for attr in inputs]
         # False: stateful = False
-        Dependency[f"{vobj_name}.{func.__name__}"] = (deps, False)
+        Dependency.register_dep(
+            attr=f"{vobj_name}.{func.__name__}", deps=(deps, False)
+        )
         return wrapper
 
     return decorator
