@@ -14,8 +14,8 @@ class Frame:
         # vobj_data is a dictionary of detected vobjs of interested class,
         # where the key is the class name and the value is a list of vobjs.
         # Each vobj is a dictionary of properties,
-        # (e.g. {"class_id": 0, "score": 0.9}).
-        # eg. vobj_data: {"person": [{"class_id": 0, "score": 0.9},],
+        # (e.g. {"tlbr": [], "score": 0.9}).
+        # eg. vobj_data: {"person": [{"tlbr": [], "score": 0.9},],
         self.vobj_data = defaultdict(list)
 
         # filtered_vobjs is a dictionary of filtered vobjs,

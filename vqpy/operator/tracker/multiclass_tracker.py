@@ -58,6 +58,8 @@ class MultiTracker(SurfaceTrackerBase):
             dets = []
             if func in detections:
                 dets = detections[func]
+                for i, det in enumerate(dets):
+                    det["index"] = i
             f_tracked, f_lost = tracker.update(frame_id=ctx.frame_id,
                                                data=dets)
             for item in f_tracked:

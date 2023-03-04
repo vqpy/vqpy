@@ -24,6 +24,7 @@ class ByteTracker(GroundTrackerBase):
             self.data = data
             self._tlbr = np.asarray(data["tlbr"], dtype=float)
             self.score = data["score"]
+            self.index = data["index"]
 
             self.is_activated = False
             self.tracklet_len = 0
@@ -58,6 +59,7 @@ class ByteTracker(GroundTrackerBase):
             self.data = new_track.data
             self._tlbr = new_track._tlbr
             self.score = new_track.score
+            self.index = new_track.index
             if reactivate:
                 self.tracklet_len = 0
             else:
