@@ -21,7 +21,6 @@ def test_single_class_object_detector(video_reader):
         prev=video_reader,
         class_names="person",
         detector_name="fake_yolox",
-        detector_kwargs={"device": "cpu"}
     )
     counter = 0
     person_detected = False
@@ -43,7 +42,7 @@ def test_multi_class_object_detector(video_reader):
         prev=video_reader,
         class_names={"car", "truck"},
         detector_name="fake_yolox",
-        detector_kwargs={"device": "cpu"}
+        device="cpu",
     )
     counter = 0
     car_detected = False

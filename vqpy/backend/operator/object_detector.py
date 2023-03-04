@@ -12,9 +12,11 @@ class ObjectDetector(Operator):
                  prev: Operator,
                  class_names: Union[str, Set[str]],
                  detector_name: Optional[str] = None,
-                 detector_kwargs: dict = dict(),
+                 **detector_kwargs,
                  ):
         """Object detector Operator.
+        Todo:
+            - [ ] Add support for detector class name(s) to vobj class name.
         It uses the built-in object detector with name of {detector_name}
         for detecting interested classes defined in {class_names}. It also
         generates the `vobj_data` field in `frame`, which contains the
@@ -28,13 +30,12 @@ class ObjectDetector(Operator):
                         supported by the detector with {detector_name}.
             detector_name: Oject detector name. e.g. "yolox".
                            Defaults to None.
-            detector_kwargs (dict, optional): Additional arguments for object
-                        detector . Defaults to dict().
+            detector_kwargs: Keyword arguments for the detector.
         """
         self.prev = prev
 
         self._check_set_class_names(class_names)
-        self.detector = self._setup_detector(detector_name, detector_kwargs)
+        self.detector = self._setup_detector(detector_name, **detector_kwargs)
         self.detector_name = detector_name
 
     def _check_set_class_names(self, class_names):
@@ -46,7 +47,7 @@ class ObjectDetector(Operator):
             raise ValueError(f"Invalid class_names: {class_names}, which "
                              f"should be either a string or a set of strings.")
 
-    def _setup_detector(self, detector_name, detector_kwargs):
+    def _setup_detector(self, detector_name, **detector_kwargs):
         # check whether detector_name is valid
         if detector_name not in vqpy_detectors:
             raise ValueError(f"Detector name of {detector_name} hasn't been"
