@@ -55,7 +55,8 @@ class Tracker(Operator):
             if self.filter_index is not None:
                 if self.filter_index not in frame.filtered_vobjs:
                     raise ValueError("filter_index is not in filtered_vobjs")
-                vobj_indexes = frame.filtered_vobjs[self.filter_index][self.class_name]
+                vobj_indexes = \
+                    frame.filtered_vobjs[self.filter_index][self.class_name]
             else:
                 if self.class_name not in frame.vobj_data:
                     return frame
