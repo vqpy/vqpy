@@ -49,16 +49,14 @@ class VObjFilter(Operator):
             if not callable(self.condition_func):
                 raise ValueError("condition_func must be either a string \
                     or a function")
-            assert self.filter_index not in frame.filtered_vobjs, \
-                "Filter on properties before filtering on vobj classes."
             filtered_vobjs = frame.filtered_vobjs[self.filter_index]
             for class_name, vobj_indexes in filtered_vobjs.items():
                 new_vobj_indexes = []
                 for index in vobj_indexes:
                     vobj_data = frame.vobj_data[class_name][index]
-                    assert self.property_name in vobj_data, \
-                        f"property_name {self.property_name} of index {index} \
-                        of {class_name} is not computed before filtering."
+                    # assert self.property_name in vobj_data, \
+                    #     f"property_name {self.property_name} of index {index} \
+                    #     of {class_name} is not computed before filtering."
                     if self.condition_func(vobj_data):
                         new_vobj_indexes.append(index)
                 # update filtered vobjs on frame

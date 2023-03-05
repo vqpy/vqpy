@@ -38,3 +38,6 @@ class Frame:
     @property
     def image(self):
         return self._image
+
+    def __repr__(self) -> str:
+        return f"Frame(id={self.id}, video_metadata={self.video_metadata}, vobj_data={self.vobj_data}, filtered_vobjs={self.filtered_vobjs})"
