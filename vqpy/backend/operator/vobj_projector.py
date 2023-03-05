@@ -140,7 +140,7 @@ class VObjProjector(Operator):
         return hist_data, True
 
     def _compute_property(self, non_hist_data, hist_data, frame):
-        # Todo: allow user to fill property without enough history with a 
+        # Todo: allow user to fill property without enough history with a
         # default value. Currently fill with None
         for i, cur_dep in enumerate(non_hist_data):
             vobj_index = cur_dep["vobj_index"]
