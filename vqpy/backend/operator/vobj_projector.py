@@ -70,7 +70,7 @@ class VObjProjector(Operator):
                 # sanity check: dependencies should be in vobj_data
                 assert all([dep_name in vobj_data for dep_name in
                             self.dependencies.keys()]), \
-                    f"vobj_data does not have all dependencies. Keys of "
+                    "vobj_data does not have all dependencies. Keys of "
                 f"vobj_data: {vobj_data.keys()}. Keys of dependencies: "
                 f"{self.dependencies.keys()}"
                 # dependency data as current frame depenedency
