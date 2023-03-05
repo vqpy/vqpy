@@ -170,19 +170,12 @@ def test_stateful_projector(tracker):
     assert not projector._hist_buffer.empty
     assert checked
 
-    # test not engough history
     # test delete history
-    # test add history
-    # projector = VObjProjector("hist_tlbr", hist_tlbr, {"tlbr": 2}, "person", 0)
-    # frame = Frame({"width": 100, "height": 100}, 0, np.zeros((100, 100, 3)))
-    # frame.vobj_data["person"] = [{"tlbr": [0, 0, 10, 10]}]
-    # projector(frame)
-    # assert not projector._hist_buffer.empty
-    # assert frame.vobj_data["person"][0]["hist_tlbr"] == hist_tlbr(projector._hist_buffer.get())
-    pass
+
 
 def test_stateful_projector_dep_self():
     pass
+
 
 def test_stateful_projector_multi_deps():
     pass

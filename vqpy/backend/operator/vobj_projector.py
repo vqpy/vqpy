@@ -37,14 +37,17 @@ class VObjProjector(Operator):
         self.filter_index = filter_index
         self.class_name = class_name
         self._hist_dependencies = {name: hist_len
-                                   for name, hist_len in self.dependencies.items()
+                                   for name, hist_len in
+                                   self.dependencies.items()
                                    if hist_len > 0}
         self._non_hist_dependencies = {name: hist_len
-                                       for name, hist_len in self.dependencies.items()
-                                   if hist_len == 0}
+                                       for name, hist_len in
+                                       self.dependencies.items()
+                                       if hist_len == 0}
         self._stateful = len(self._hist_dependencies) > 0
         self._max_history_len = max(dependencies.values())
-        columns = ["track_id", "frame_id", "vobj_index"] + list(self._hist_dependencies.keys())
+        columns = ["track_id", "frame_id", "vobj_index"] + \
+            list(self._hist_dependencies.keys())
         self._hist_buffer = pd.DataFrame(columns=columns)
 
         super().__init__(prev)
@@ -152,9 +155,9 @@ class VObjProjector(Operator):
                 track_id = hist_dep["track_id"]
                 frame_id = hist_dep["frame_id"]
                 dep_data, enough = self._get_hist_dependency(dependency_name,
-                                                        track_id=track_id,
-                                                        frame_id=frame_id,
-                                                        hist_len=hist_len)
+                                                             track_id=track_id,
+                                                             frame_id=frame_id,
+                                                             hist_len=hist_len)
                 all_enough = all_enough and enough
                 dep_data_dict[dependency_name] = dep_data
 
