@@ -2,6 +2,7 @@ from vqpy.backend.operator.base import Operator
 from vqpy.backend.frame import Frame
 from typing import Callable, Dict, Any
 import pandas as pd
+import numpy as np
 
 
 class VObjProjector(Operator):
@@ -35,9 +36,15 @@ class VObjProjector(Operator):
         self.dependencies = dependencies
         self.filter_index = filter_index
         self.class_name = class_name
+        self._hist_dependencies = {name: hist_len
+                                   for name, hist_len in self.dependencies.items()
+                                   if hist_len > 0}
+        self._non_hist_dependencies = {name: hist_len
+                                       for name, hist_len in self.dependencies.items()
+                                   if hist_len == 0}
+        self._stateful = len(self._hist_dependencies) > 0
         self._max_history_len = max(dependencies.values())
-        columns = ["track_id", "frame_id", "vobj_index"].append(
-            list(dependencies.keys()))
+        columns = ["track_id", "frame_id", "vobj_index"] + list(self._hist_dependencies.keys())
         self._hist_buffer = pd.DataFrame(columns=columns)
 
         super().__init__(prev)
@@ -48,47 +55,65 @@ class VObjProjector(Operator):
         if self.filter_index not in frame.filtered_vobjs:
             raise ValueError("filter_index is not in filtered_vobjs")
         vobj_indexes = frame.filtered_vobjs[self.filter_index][self.class_name]
-        # 2. if has track id, get dictionary of key of vobj_index,
-        #  value of track id and dependency data
-        cur_frame_vobjs = []
+        # 2. get dependencies that need to be saved as history and current
+        # frame dependencies.
+        hist_deps = []
+        non_hist_deps = []
         for vobj_index in vobj_indexes:
             vobj_data = frame.vobj_data[self.class_name][vobj_index]
-            if "track_id" in vobj_data:
-                track_id = vobj_data["track_id"]
-                vobj_data_dep = {"vobj_index": vobj_index,
-                                 "track_id": track_id,
-                                 "frame_id": frame.id}
+            if self._stateful and "track_id" not in vobj_data:
+                continue
+            else:
+                # sanity check: dependencies should be in vobj_data
                 assert all([dep_name in vobj_data for dep_name in
                             self.dependencies.keys()]), \
                     f"vobj_data does not have all dependencies. Keys of "
                 f"vobj_data: {vobj_data.keys()}. Keys of dependencies: "
                 f"{self.dependencies.keys()}"
-                vobj_data_dep.update({dep_name: vobj_data[dep_name]
-                                      for dep_name in self.dependencies.keys()}
-                                     )
-                cur_frame_vobjs.append(vobj_data_dep)
-        return cur_frame_vobjs
+                # dependency data as current frame depenedency
+                cur_dep = {dep_name: vobj_data[dep_name]
+                           for dep_name in self._non_hist_dependencies.keys()}
+                cur_dep.update(
+                    {"vobj_index": vobj_index})
+                non_hist_deps.append(cur_dep)
 
-    def _update_hist_buffer(self, cur_frame_vobjs):
-        self._hist_buffer.append(cur_frame_vobjs)
+                # dependency data to be saved as history
+                if self._stateful:
+                    hist_dep = {dep_name: vobj_data[dep_name]
+                                for dep_name in self._hist_dependencies.keys()}
+                    hist_dep.update(
+                        {"vobj_index": vobj_index,
+                            "track_id": vobj_data["track_id"],
+                            "frame_id": frame.id})
+
+                    hist_deps.append(hist_dep)
+
+        # sanity check
+        if not self._stateful:
+            assert not hist_deps, "stateful_deps should be empty"
+        return non_hist_deps, hist_deps
+
+    def _update_hist_buffer(self, hist_deps):
+        self._hist_buffer = self._hist_buffer.append(hist_deps)
         # remove data that older than max history length
-        if cur_frame_vobjs:
-            cur_frame_id = cur_frame_vobjs[0]["frame_id"]
-            # frame_id starts from 0
-            oldest_frame_id = cur_frame_id + 1 - self._max_history_len
-            if oldest_frame_id >= 0:
-                self._hist_buffer = self._hist_buffer[
-                    self._hist_buffer["frame_id"] >= oldest_frame_id]
+        cur_frame_id = hist_deps[0]["frame_id"]
+        # frame_id starts from 0
+        oldest_frame_id = cur_frame_id + 1 - self._max_history_len
+        if oldest_frame_id >= 0:
+            self._hist_buffer = self._hist_buffer[
+                self._hist_buffer["frame_id"] >= oldest_frame_id]
 
     def _get_hist_dependency(self,
                              dependency_name,
                              track_id,
                              frame_id,
                              hist_len):
-        hist_start = frame_id - hist_len
+        # todo: allow user to fill missing data with a default value
+        # currently fill with None
+        hist_start = frame_id - hist_len + 1
         # return None if there isn't enough history
         if hist_start < 0:
-            return None
+            return None, False
         # if dependency is the property itself, get history data from
         # hist_start to hist_end-1, and append None to the end as current
         # frame data.
@@ -100,48 +125,49 @@ class VObjProjector(Operator):
         row = (self._hist_buffer["track_id"] == track_id) & \
               (self._hist_buffer["frame_id"] >= hist_start) & \
               (self._hist_buffer["frame_id"] <= hist_end)
+        hist_df = self._hist_buffer.loc[row, ["frame_id", dependency_name]].\
+            set_index("frame_id").reindex(range(hist_start, hist_end + 1))
+        # fill missing frames with None
+        hist_df = hist_df.replace(np.nan, None)
+        hist_data = hist_df[dependency_name].tolist()
+        assert len(hist_data) == hist_len
 
-        # data has been sorted by frame_id (writing order)
-        hist_data = self._hist_buffer.loc[row, dependency_name].tolist()
         if dependency_name == self.property_name:
             hist_data = hist_data.append(None)
-        return hist_data
+        return hist_data, True
 
-    def _compute_property(self, cur_frame_vobjs, frame):
-        """
-        Compute property for each vobj in cur frame vobjs.
-        :param cur_frame_vobjs: a list of vobj data dictionaries, with keys of
-        "vobj_index", "track_id", self.dependencies.keys().
+    def _compute_property(self, non_hist_data, hist_data, frame):
+        # Todo: allow user to fill property without enough history with a 
+        # default value. Currently fill with None
+        for i, cur_dep in enumerate(non_hist_data):
+            vobj_index = cur_dep["vobj_index"]
 
-        :return: frame with updated property values for filtered and tracked
-         vobjs.
-        """
-        if cur_frame_vobjs:
-            assert cur_frame_vobjs[0].keys() == {"vobj_index",
-                                                 "track_id",
-                                                 "frame_id",
-                                                 *self.dependencies.keys()}, \
-                "cur_frame_vobjs must have keys of vobj_index, track_id, " \
-                "and dependencies.keys()"
-        for vobj_data in cur_frame_vobjs:
-            vobj_index = vobj_data["vobj_index"]
-            track_id = vobj_data["track_id"]
-            frame_id = vobj_data["frame_id"]
             dep_data_dict = dict()
-            for dependency_name, hist_len in self.dependencies.items():
-                # get cur frame dependencies if dependency has history length 0
-                if hist_len == 0:
-                    dep_data_dict[dependency_name] = vobj_data[dependency_name]
-                # get dependency data from hist buffer if dependency data has
-                # history length > 0
-                else:
-                    dep_data = self._get_hist_dependency(dependency_name,
-                                                         track_id=track_id,
-                                                         frame_id=frame_id,
-                                                         hist_len=hist_len)
-                    dep_data_dict[dependency_name] = dep_data
+            all_enough = True
+            for dependency_name, hist_len in self._hist_dependencies.items():
+                hist_dep = hist_data[i]
+                assert hist_dep["vobj_index"] == vobj_index
+                assert dependency_name in hist_dep, \
+                    f"dependency {dependency_name} is not in hist_dep"
+                track_id = hist_dep["track_id"]
+                frame_id = hist_dep["frame_id"]
+                dep_data, enough = self._get_hist_dependency(dependency_name,
+                                                        track_id=track_id,
+                                                        frame_id=frame_id,
+                                                        hist_len=hist_len)
+                all_enough = all_enough and enough
+                dep_data_dict[dependency_name] = dep_data
+
+            for dependency_name in self._non_hist_dependencies:
+                assert dependency_name in cur_dep, \
+                    f"dependency {dependency_name} is not in cur_dep"
+                dep_data_dict[dependency_name] = cur_dep[dependency_name]
+
             # compute property
-            property_value = self.property_func(dep_data_dict)
+            if all_enough:
+                property_value = self.property_func(dep_data_dict)
+            else:
+                property_value = None
             # update frame vobj_data with computed property value for
             # corresponding vobj
             frame.vobj_data[self.class_name][vobj_index][self.property_name] =\
@@ -151,9 +177,10 @@ class VObjProjector(Operator):
     def next(self) -> Frame:
         if self.prev.has_next():
             frame = self.prev.next()
-            cur_frame_vobjs = self._get_cur_frame_dependencies(frame)
-            self._update_hist_buffer(cur_frame_vobjs=cur_frame_vobjs)
-            frame = self._compute_property(cur_frame_vobjs=cur_frame_vobjs,
+            non_hist_data, hist_data = self._get_cur_frame_dependencies(frame)
+            if self._stateful and hist_data:
+                self._update_hist_buffer(hist_deps=hist_data)
+            frame = self._compute_property(non_hist_data, hist_data,
                                            frame=frame)
         return frame
 
