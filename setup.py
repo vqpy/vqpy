@@ -36,6 +36,7 @@ setuptools.setup(
                       "yolox==0.3.0",
                       "cython_bbox",
                       "lap",
-                      "openalpr==1.0"
+                      "openalpr==1.0",
+                      "pandas",
                       ],
 )
