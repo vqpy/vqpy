@@ -37,6 +37,8 @@ class Dependency:
     # update hist lens requirement of VObj property with list of VObj types
     # used in query. Invoke at beginning of vqpy.launch
     def update_hist_lens(cls, vobj_types: List[VObjBase]):
+        cls.deps_in_use = dict()
+        cls.property_hist_len = defaultdict(int)
         vobj_names = [vobj_type.__name__ for vobj_type in vobj_types]
         vobj_types = dict(zip(vobj_names, vobj_types))
         for attr, (dep, stateful) in cls.registered_deps.items():
