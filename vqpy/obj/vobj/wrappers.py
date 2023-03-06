@@ -62,7 +62,9 @@ def stateful(inputs):
         # deps: Car.bbox -> Car.direction
         deps = dict()
         for attr, hist_len in inputs.items():
-            deps[f"{vobj_name}.{attr}"] = hist_len
+            if "." not in attr:
+                attr = f"{vobj_name}.{attr}"
+            deps[attr] = hist_len
         # True: stateful=True
         Dependency.register_dep(
             attr=f"{vobj_name}.{func.__name__}", deps=(deps, True)
@@ -92,7 +94,11 @@ def stateless(inputs):
             return values[-1]
 
         vobj_name = func.__qualname__.split(".", 1)[0]
-        deps = [f"{vobj_name}.{attr}" for attr in inputs]
+        deps = list()
+        for attr in inputs:
+            if "." not in attr:
+                attr = f"{vobj_name}.{attr}"
+            deps.append(attr)
         # False: stateful = False
         Dependency.register_dep(
             attr=f"{vobj_name}.{func.__name__}", deps=(deps, False)
