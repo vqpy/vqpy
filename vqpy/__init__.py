@@ -20,7 +20,7 @@ from vqpy.class_names.coco import COCO_CLASSES  # noqa: F401
 from vqpy.operator.video_reader import FrameStream
 from . import utils  # noqa: F401
 from . import query  # noqa: F401
-from vqpy.backend.planner.deps import Dependency
+from vqpy.obj.vobj.deps import Dependency
 
 
 def launch(cls_name,
