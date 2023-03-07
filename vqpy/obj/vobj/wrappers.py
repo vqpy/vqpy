@@ -4,7 +4,7 @@ import functools
 from typing import Callable, Dict, List, Optional
 
 from vqpy.obj.vobj.base import VObjBaseInterface
-from vqpy.backend.planner.deps import Dependency
+from vqpy.obj.vobj.deps import Dependency
 
 
 # Ensures a method of an VObj is computed exactly once per frame
@@ -56,18 +56,11 @@ def stateful(inputs):
 
         # get name of VObj from __qualname__
         vobj_name = func.__qualname__.split(".", 1)[0]
-        # deps: dependency with VObj type annotation
-        # e.g.
-        # inputs: bbox -> direction
-        # deps: Car.bbox -> Car.direction
-        deps = dict()
-        for attr, hist_len in inputs.items():
-            if "." not in attr:
-                attr = f"{vobj_name}.{attr}"
-            deps[attr] = hist_len
-        # True: stateful=True
         Dependency.register_dep(
-            attr=f"{vobj_name}.{func.__name__}", deps=(deps, True)
+            vobj_name=vobj_name,
+            attr_name=func.__name__,
+            deps=inputs,
+            stateful=True,
         )
         return wrapper
 
@@ -94,14 +87,12 @@ def stateless(inputs):
             return values[-1]
 
         vobj_name = func.__qualname__.split(".", 1)[0]
-        deps = list()
-        for attr in inputs:
-            if "." not in attr:
-                attr = f"{vobj_name}.{attr}"
-            deps.append(attr)
-        # False: stateful = False
         Dependency.register_dep(
-            attr=f"{vobj_name}.{func.__name__}", deps=(deps, False)
+            vobj_name=vobj_name,
+            attr_name=func.__name__,
+            # stateless, need 0 frames of history
+            deps=dict(zip(inputs, [0] * len(inputs))),
+            stateful=False,
         )
         return wrapper
 
