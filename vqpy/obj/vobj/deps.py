@@ -62,7 +62,7 @@ class Dependency:
                     cls.deps_in_use[attr][prereq_attr] = (
                         cls.registered_deps[attr][prereq_attr][0] - 1
                     )  # VObjProjector excludes current frame from history len
-                    # TODO: change VObjProjector to use range instead of hist_len
+                    # TODO: change VObjProjector to use range instead of len
                     cls.req_hist_len[prereq_attr] = max(
                         cls.req_hist_len[prereq_attr],
                         cls.registered_deps[attr][prereq_attr][0],
