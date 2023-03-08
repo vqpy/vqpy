@@ -154,13 +154,8 @@ def access_data(cond: Dict[str, Callable]):
 """
 
 
-# exclude @cross_vobj_property from planner for now
-# for declaring data dependencies and retrieving data from other vobjs
-# currently don't register dependencies since execution sequence is fixed
-# cross_vobj_property only needs to provide the required list of properties
-# of vobjs
 def cross_vobj_property(
-    vobj_type=None, vobj_num="ALL", vobj_input_fields=None
+    vobj_type=None, vobj_num="ALL", vobj_input_fields=None, inputs=dict()
 ):
     """Decorator for cross-object property computation.
 
@@ -181,9 +176,14 @@ def cross_vobj_property(
         type of VObj to retrieve
     vobj_num: int
         number of VObjs to retrieve
-    vobj_input_fields: List[str]
-        list of names of properties to retrieve from VObjs
+    vobj_input_fields: Dict[str, Union[Tuple[int, int], int]]
+        Dict: names of properties to retrieve from VObjs -> length of history
+        required
+    inputs: Dict[str, Union[Tuple[int, int], int]]
+        Dict: names of properties to obtain from self -> length of history
+        required
     """
+
     # vobj_num defaults to "ALL" for now
     # other possible options could be user-specified number
     def wrap(func: Callable):
@@ -200,7 +200,8 @@ def cross_vobj_property(
                 if getattr(self, aidx, None) == self._ctx.frame_id:
                     return getattr(self, vidx)
                 else:
-                    value = func(self, cross_vobj_arg)
+                    value = caching(self, func, cross_vobj_arg)
+                    # func(self, cross_vobj_arg)
                     setattr(self, vidx, value)
                     setattr(self, aidx, self._ctx.frame_id)
                     return value
@@ -213,6 +214,24 @@ def cross_vobj_property(
                 )
                 return None
 
+        # TODO: band-aid to support cross_vobj_property
+        vobj_name = func.__qualname__.split(".", 1)[0]
+        other_vobj_name = vobj_type.__name__
+        deps = dict()
+        stateful = False
+        for input_field, hist_len in vobj_input_fields.items():
+            deps[f"{other_vobj_name}.{input_field}"] = hist_len
+        deps.update(inputs)
+        # infer stateful/less from dependencies
+        for hist_len in deps.values():
+            if hist_len > 0:
+                stateful = True
+        Dependency.register_dep(
+            vobj_name=vobj_name,
+            attr_name=func.__name__,
+            deps=deps,
+            stateful=stateful,
+        )
         return wrapped_func
 
     return wrap

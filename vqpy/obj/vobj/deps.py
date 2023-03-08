@@ -32,18 +32,18 @@ class Dependency:
             # add vobj_name to attr if not specified (default to current VObj)
             if "." not in prereq_attr:
                 prereq_attr = f"{vobj_name}.{prereq_attr}"
-            # hist_range is (hist_req , 0] if user specifies hist_req as int
+            # hist_range is [hist_req , 0] if user specifies hist_req as int
             hist_range = (hist_req, 0) if type(hist_req) is int else hist_req
             cls.registered_deps[f"{vobj_name}.{attr_name}"][
                 prereq_attr
             ] = hist_range
         cls.stateful[f"{vobj_name}.{attr_name}"] = stateful
         # add track_id to deps if stateful
-        # (1,0) is range (1,0], current frame only
+        # (0,0) is range [0,0], current frame only
         if stateful:
             cls.registered_deps[f"{vobj_name}.{attr_name}"][
                 f"{vobj_name}.track_id"
-            ] = (1, 0)
+            ] = (0, 0)
 
     @classmethod
     # update hist lens requirement of VObj property with list of VObj types
@@ -59,9 +59,9 @@ class Dependency:
             if vobj_name in vobj_names:
                 for prereq_attr, hist_len in dep.items():
                     # need to store history since oldest frame_id
-                    cls.deps_in_use[attr][prereq_attr] = (
-                        cls.registered_deps[attr][prereq_attr][0] - 1
-                    )  # VObjProjector excludes current frame from history len
+                    cls.deps_in_use[attr][prereq_attr] = cls.registered_deps[
+                        attr
+                    ][prereq_attr][0]
                     # TODO: change VObjProjector to use range instead of len
                     cls.req_hist_len[prereq_attr] = max(
                         cls.req_hist_len[prereq_attr],
