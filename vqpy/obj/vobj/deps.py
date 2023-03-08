@@ -63,6 +63,7 @@ class Dependency:
                         attr
                     ][prereq_attr][0]
                     # TODO: change VObjProjector to use range instead of len
+                    # TODO: change VObjProjector to use range instead of hist_len
                     cls.req_hist_len[prereq_attr] = max(
                         cls.req_hist_len[prereq_attr],
                         cls.registered_deps[attr][prereq_attr][0],
