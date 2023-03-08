@@ -27,10 +27,10 @@ class Person(vqpy.VObjBase):
 
 
 class Baggage(vqpy.VObjBase):
-    @vqpy.stateful(length=2)
     @vqpy.cross_vobj_property(
         vobj_type=Person, vobj_num="ALL",
-        vobj_input_fields=("track_id", "tlbr")
+        vobj_input_fields={"track_id": 0, "tlbr": 0},
+        inputs={"owner": (1, 1)},
     )
     # function decorator responsible for retrieving list of properties
     # Person_id and Person_tlbr given as a list of track_id's and tlbr's
