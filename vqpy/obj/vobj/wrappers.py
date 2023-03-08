@@ -219,12 +219,14 @@ def cross_vobj_property(
         other_vobj_name = vobj_type.__name__
         deps = dict()
         stateful = False
-        for input_field, hist_len in vobj_input_fields.items():
-            deps[f"{other_vobj_name}.{input_field}"] = hist_len
+        for input_field, hist_req in vobj_input_fields.items():
+            deps[f"{other_vobj_name}.{input_field}"] = hist_req
         deps.update(inputs)
         # infer stateful/less from dependencies
-        for hist_len in deps.values():
-            if hist_len > 0:
+        for hist_req in deps.values():
+            if (hist_req is int and hist_req > 0) or (
+                hist_req is tuple and hist_req[0] > 0
+            ):
                 stateful = True
         Dependency.register_dep(
             vobj_name=vobj_name,
