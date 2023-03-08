@@ -45,7 +45,8 @@ class VObjProjector(Operator):
                                        self.dependencies.items()
                                        if hist_len == 0}
         self._stateful = len(self._hist_dependencies) > 0
-        self._max_history_len = max(dependencies.values())
+        # handle case where there is no dependency
+        self._max_history_len = max(dependencies.values()) if len(dependencies) > 0 else 0
         columns = ["track_id", "frame_id", "vobj_index"] + \
             list(self._hist_dependencies.keys())
         self._hist_buffer = pd.DataFrame(columns=columns)

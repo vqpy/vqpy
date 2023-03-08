@@ -20,7 +20,7 @@ from vqpy.class_names.coco import COCO_CLASSES  # noqa: F401
 from vqpy.operator.video_reader import FrameStream
 from . import utils  # noqa: F401
 from . import query  # noqa: F401
-from vqpy.obj.vobj.deps import Dependency
+from vqpy.backend.planner.planner import Planner
 
 
 def launch(cls_name,
@@ -42,7 +42,7 @@ def launch(cls_name,
         detector_model_dir: the directory for all pretrained detectors.
         detector_name: the specific detector name you desire to use.
     """
-    Dependency.update_hist_lens(vobj_types=list(set(cls_type.values())))
+    planner = Planner(cls_type)
     logger.info(f"VQPy Launch I/O Setting: \
                   video_path={video_path}, save_folder={save_folder}")
     video_name = os.path.basename(video_path).split(".")[0]
