@@ -10,9 +10,6 @@ class VObjBase(ABC):
         self.score = BuiltInProperty(self, "score")
         self.cls = BuiltInProperty(self, "cls")
 
-    # @stateful(inputs={"tlbr", 0})
-    # def image()
-
 
 def stateful(inputs: Dict[str, int]):
 

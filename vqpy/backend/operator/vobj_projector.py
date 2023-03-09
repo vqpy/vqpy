@@ -158,6 +158,8 @@ class VObjProjector(Operator):
                                                              track_id=track_id,
                                                              frame_id=frame_id,
                                                              hist_len=hist_len)
+                if enough:
+                    assert len(dep_data) == hist_len
                 all_enough = all_enough and enough
                 dep_data_dict[dependency_name] = dep_data
 

@@ -2,10 +2,13 @@ from vqpy.backend.operator.video_reader import VideoReader
 from vqpy.backend.operator.object_detector import ObjectDetector
 from vqpy.backend.operator.vobj_filter import VObjFilter
 from vqpy.backend.operator.frame_filter import VObjFrameFilter
+from vqpy.backend.operator.tracker import Tracker
+from vqpy.backend.operator.vobj_projector import VObjProjector
 from vqpy.frontend.query import QueryBase
 from vqpy.frontend.vobj import VObjBase
 from vqpy.frontend.vobj.predicates import Predicate, IsInstance
 from abc import abstractmethod
+from vqpy.frontend.vobj.property import VobjProperty
 from typing import Set, Union, Optional, Dict, Callable, Any, List
 
 
@@ -87,9 +90,62 @@ class ProjectionField:
 
 class ProjectorNode(AbstractPlanNode):
 
-    def __init__(self, projection_fields: Dict[str, List[ProjectionField]]):
-        self.projection_fields = projection_fields
+    def __init__(self,
+                 class_name: str,
+                 projection_field: ProjectionField,
+                 filter_index: int):
+        self.class_name = class_name
+        self.projection_field = projection_field
+        self.filter_index = filter_index
         super().__init__()
+
+    def to_operator(self, launch_args: dict):
+        return VObjProjector(
+            prev=self.prev.to_operator(launch_args),
+            property_name=self.projection_field.field_name,
+            property_func=self.projection_field.field_func,
+            dependencies=self.projection_field.dependent_fields,
+            class_name=self.class_name,
+            filter_index=self.filter_index
+        )
+
+    def __str__(self):
+        return f"ProjectorNode(class_name={self.class_name}, " \
+                f"property_name={self.projection_field.field_name}, " \
+                f"filter_index={self.filter_index}), " \
+                f"dependencies={self.projection_field.dependent_fields})," \
+                f"prev={self.prev.__class__.__name__}), "\
+                f"next={self.next.__class__.__name__})"
+
+
+class TrackerNode(AbstractPlanNode):
+    
+    def __init__(self,
+                 class_name: str,
+                 filter_index: Optional[int] = None,
+                 tracker_name: str = "byte",
+                 **tracker_kwargs):
+        self.class_name = class_name
+        self.filter_index = filter_index
+        self.tracker_name = tracker_name
+        self.tracker_kwargs = tracker_kwargs
+        super().__init__()
+
+    def to_operator(self, launch_args: dict):
+        return Tracker(
+            prev=self.prev.to_operator(launch_args),
+            class_name=self.class_name,
+            filter_index=self.filter_index,
+            tracker_name=self.tracker_name,
+            **self.tracker_kwargs
+        )
+
+    def __str__(self):
+        return f"TrackerNode(class_name={self.class_name}, " \
+            f"filter_index={self.filter_index}, " \
+            f"tracker_name={self.tracker_name}), " \
+            f"prev={self.prev.__class__.__name__}), "\
+            f"next={self.next.__class__.__name__})"
 
 
 class VObjFilterNode(AbstractPlanNode):
@@ -139,6 +195,9 @@ class Planer:
     def parse(self, query_obj: QueryBase):
         input_node = VideoReaderNode()
         output_node = self._create_object_detector_node(query_obj, input_node)
+        output_node = self._create_tracker_node(query_obj, output_node)
+        output_node = self._create_vobj_class_filter_node(query_obj, output_node)
+        output_node = self._create_pre_filter_projector(query_obj, output_node)
         output_node = self._create_frame_filter_node(query_obj, output_node)
         return output_node
 
@@ -157,23 +216,56 @@ class Planer:
                                detector_kwargs=detector_kwargs)
         )
 
-    def _create_pre_filter_projector(self, query_obj: QueryBase, input_node):
+    def _create_tracker_node(self, query_obj: QueryBase, input_node):
         frame_constraints = query_obj.frame_constraint()
-        if isinstance(frame_constraints, VObjBase):
-            projection_fields = dict()
-            return input_node.set_next(
-                ProjectorNode(projection_fields=projection_fields))
-        else:
-            raise NotImplementedError
-    
-    def _create_frame_filter_node(self, query_obj: QueryBase, input_node):
-        predicate = query_obj.frame_constraint()
-        vobjs = predicate.get_vobjs()
+        assert isinstance(frame_constraints, Predicate)
+        vobjs = frame_constraints.get_vobjs()
         assert len(vobjs) == 1, "Only support one vobj in the predicate"
         vobj = list(vobjs)[0]
-        output_node = input_node.set_next(
+        class_name = vobj.class_name
+        return input_node.set_next(
+            TrackerNode(class_name=class_name,
+                        fps=24.0)
+        )
+
+    def _create_pre_filter_projector(self, query_obj: QueryBase, input_node):
+        frame_constraints = query_obj.frame_constraint()
+        node = input_node
+
+        if isinstance(frame_constraints, Predicate):
+            vobjs = frame_constraints.get_vobjs()
+            assert len(vobjs) == 1, "Only support one vobj in the predicate"
+            vobj = list(vobjs)[0]
+            vobj_properties = frame_constraints.get_vobj_properties()
+            for p in vobj_properties:
+                projector_node = ProjectorNode(
+                    class_name=vobj.class_name,
+                    projection_field=ProjectionField(
+                        field_name=p.name,
+                        field_func=p,
+                        dependent_fields=p.inputs,
+                    ),
+                    filter_index=0
+                )
+                node = node.set_next(projector_node)
+
+        return node
+
+    def _create_vobj_class_filter_node(self, query_obj: QueryBase, input_node):
+        frame_constraints = query_obj.frame_constraint()
+        node = input_node
+
+        vobjs = frame_constraints.get_vobjs()
+        assert len(vobjs) == 1, "Only support one vobj in the predicate"
+        vobj = list(vobjs)[0]
+        node = node.set_next(
             VObjFilterNode(predicate=IsInstance(vobj), filter_index=0))
-        output_node = output_node.set_next(
+        return node
+
+    def _create_frame_filter_node(self, query_obj: QueryBase, input_node):
+        predicate = query_obj.frame_constraint()
+
+        output_node = input_node.set_next(
             VObjFilterNode(predicate=predicate, filter_index=0))
         output_node = output_node.set_next(VObjFrameFilterNode(filter_index=0))
         return output_node
@@ -184,7 +276,7 @@ class Executor:
     def __init__(self, root_plan_node, lanuch_args):
         self.root_plan_node = root_plan_node
         self.root_operator = root_plan_node.to_operator(lanuch_args)
-    
+
     def execute(self):
         result = []
         while self.root_operator.has_next():

@@ -1,8 +1,9 @@
 from vqpy.frontend.vobj.predicates import Equal, GreaterThan
 from typing import Dict, Callable
+from abc import ABC
 
 
-class Property(object):
+class Property(ABC):
 
     def get_vobjs(self):
         return set()
@@ -15,12 +16,19 @@ class Property(object):
         return Equal(self, other)
 
     def __gt__(self, other):
-        return GreaterThan(self, Literal(other))
-    
+        if not isinstance(other, Property):
+            other = Literal(other)
+        return GreaterThan(self, other)
+
     def __lt__(self, other):
-        return GreaterThan(Literal(other), self)
+        if not isinstance(other, Property):
+            other = Literal(other)
+        return GreaterThan(other, self)
 
     def is_literal(self):
+        return False
+
+    def is_vobj_property(self):
         return False
 
 
@@ -54,6 +62,7 @@ class VobjProperty(Property):
         self.inputs = inputs
         self.func = func
         self.name = func.__name__
+        self.stateful = any([hist_len > 0 for hist_len in inputs.values()])
 
     def __call__(self, *args, **kwargs):
         return self.func(self.vobj, *args, **kwargs)
@@ -63,3 +72,6 @@ class VobjProperty(Property):
 
     def get_vobjs(self):
         return {self.vobj}
+
+    def is_vobj_property(self):
+        return True
