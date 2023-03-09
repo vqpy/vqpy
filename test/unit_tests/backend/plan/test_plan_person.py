@@ -18,6 +18,7 @@ class Person(VObjBase):
         self.class_name = "person"
         self.object_detector = "fake_yolox"
         self.detector_kwargs = {"device": "cpu"}
+        super().__init__()
 
     @vobj_property(inputs={"tlbr": 0})
     def center(self, values):
@@ -67,12 +68,12 @@ class ListPerson(QueryBase):
 
 def test_plan():
 
-    planer = Planner()
+    planner = Planner()
     launch_args = {
         "video_path": video_path,
     }
-    root_plan_node = planer.parse(ListPerson())
-    planer.print_plan(root_plan_node)
+    root_plan_node = planner.parse(ListPerson())
+    planner.print_plan(root_plan_node)
     executor = Executor(root_plan_node, launch_args)
     result = executor.execute()
 

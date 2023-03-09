@@ -54,9 +54,6 @@ class VObjFilter(Operator):
                 new_vobj_indexes = []
                 for index in vobj_indexes:
                     vobj_data = frame.vobj_data[class_name][index]
-                    # assert self.property_name in vobj_data, \
-                    #     f"property_name {self.property_name} of index {index} \
-                    #     of {class_name} is not computed before filtering."
                     if self.condition_func(vobj_data):
                         new_vobj_indexes.append(index)
                 # update filtered vobjs on frame
