@@ -28,7 +28,8 @@ class BinaryPredicate(Predicate):
         self.right_pred = rp
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}(left={self.left_pred}, right={self.right_pred})"
+        return f"{self.__class__.__name__}\
+            (left={self.left_pred}, right={self.right_pred})"
 
     def get_vobjs(self):
         return self.left_pred.get_vobjs() | self.right_pred.get_vobjs()
@@ -97,7 +98,8 @@ class LeafPredicate(Predicate):
         self.right_prop = right_prop
 
     def __str__(self):
-        return f"{self.__class__.__name__}(left={self.left_prop}, right={self.right_prop})"
+        return f"{self.__class__.__name__}\
+            (left={self.left_prop}, right={self.right_prop})"
 
     def get_vobjs(self):
         return self.left_prop.get_vobjs() | self.right_prop.get_vobjs()
@@ -131,12 +133,12 @@ class LeafPredicate(Predicate):
 
             l_value = get_value(self.left_prop)
             r_value = get_value(self.right_prop)
-            if isinstance(l_value, NoneComputedProperty) or isinstance(r_value, NoneComputedProperty):
+            if isinstance(l_value, NoneComputedProperty) \
+                    or isinstance(r_value, NoneComputedProperty):
                 return False
             return l_value == r_value
 
         return condition_function
-    
 
 
 class Equal(Predicate):
@@ -166,7 +168,7 @@ class Equal(Predicate):
         def condition_function(vobj_data: dict):
             class NoneComputedProperty:
                 pass
-        
+
             def get_value(prop):
                 if prop.is_literal():
                     return prop.value
@@ -180,7 +182,8 @@ class Equal(Predicate):
 
             l_value = get_value(self.left_prop)
             r_value = get_value(self.right_prop)
-            if isinstance(l_value, NoneComputedProperty) or isinstance(r_value, NoneComputedProperty):
+            if isinstance(l_value, NoneComputedProperty)\
+                    or isinstance(r_value, NoneComputedProperty):
                 return False
             return l_value == r_value
 
@@ -214,7 +217,7 @@ class GreaterThan(Predicate):
         def condition_function(vobj_data: dict):
             class NoneComputedProperty:
                 pass
-        
+
             def get_value(prop):
                 if prop.is_literal():
                     return prop.value
@@ -228,7 +231,8 @@ class GreaterThan(Predicate):
 
             l_value = get_value(self.left_prop)
             r_value = get_value(self.right_prop)
-            if isinstance(l_value, NoneComputedProperty) or isinstance(r_value, NoneComputedProperty):
+            if isinstance(l_value, NoneComputedProperty)\
+                    or isinstance(r_value, NoneComputedProperty):
                 return False
 
             return l_value > r_value

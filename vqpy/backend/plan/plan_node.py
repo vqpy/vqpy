@@ -5,11 +5,9 @@ from vqpy.backend.operator.frame_filter import VObjFrameFilter
 from vqpy.backend.operator.tracker import Tracker
 from vqpy.backend.operator.vobj_projector import VObjProjector
 from vqpy.frontend.query import QueryBase
-from vqpy.frontend.vobj import VObjBase
 from vqpy.frontend.vobj.predicates import Predicate, IsInstance
 from abc import abstractmethod
-from vqpy.frontend.vobj.property import VobjProperty
-from typing import Set, Union, Optional, Dict, Callable, Any, List
+from typing import Set, Union, Optional, Dict, Callable, Any
 
 
 class AbstractPlanNode:
@@ -20,7 +18,8 @@ class AbstractPlanNode:
 
     def set_prev(self, plan_node):
         '''
-        Set the plan_node as the current node's child node. The current node will consume or depends on the child node.
+        Set the plan_node as the current node's child node. The current node
+        will consume or depends on the child node.
 
         return the child node
         '''
@@ -44,7 +43,9 @@ class AbstractPlanNode:
         pass
 
     def __str__(self):
-        return f"PlanNode({self.__class__.__name__}, prev={self.prev.__class__.__name__}, next={self.next.__class__.__name__})"
+        return f"PlanNode({self.__class__.__name__}, \
+            prev={self.prev.__class__.__name__}, \
+                next={self.next.__class__.__name__})"
 
 
 class VideoReaderNode(AbstractPlanNode):
@@ -119,7 +120,7 @@ class ProjectorNode(AbstractPlanNode):
 
 
 class TrackerNode(AbstractPlanNode):
-    
+
     def __init__(self,
                  class_name: str,
                  filter_index: Optional[int] = None,
@@ -182,7 +183,9 @@ class VObjFrameFilterNode(AbstractPlanNode):
                                vobj_filter_index=self.filter_index)
 
     def __str__(self):
-        return f"VObjFrameFilterNode(filter_index={self.filter_index}), prev={self.prev.__class__.__name__}), next={self.next.__class__.__name__})"
+        return f"VObjFrameFilterNode(filter_index={self.filter_index}), \
+            prev={self.prev.__class__.__name__}), \
+                next={self.next.__class__.__name__})"
 
 
 class Planner:
@@ -196,7 +199,8 @@ class Planner:
         input_node = VideoReaderNode()
         output_node = self._create_object_detector_node(query_obj, input_node)
         output_node = self._create_tracker_node(query_obj, output_node)
-        output_node = self._create_vobj_class_filter_node(query_obj, output_node)
+        output_node = self._create_vobj_class_filter_node(query_obj,
+                                                          output_node)
         output_node = self._create_pre_filter_projector(query_obj, output_node)
         output_node = self._create_frame_filter_node(query_obj, output_node)
         return output_node

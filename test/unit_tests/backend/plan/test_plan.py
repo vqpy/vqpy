@@ -1,9 +1,9 @@
 from vqpy.backend.plan import Planner, Executor
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
-import pytest
+import pytest # noqa F401
 import os
-import fake_yolox
+import fake_yolox # noqa F401
 import numpy as np
 import math
 
