@@ -4,6 +4,9 @@ from typing import Callable, Dict, Any
 import pandas as pd
 import numpy as np
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 
 class VObjProjector(Operator):
     def __init__(self,

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from vqpy.frontend.vobj.common import UnComputedProperty
 
 
 class Predicate(ABC):
@@ -28,8 +29,9 @@ class BinaryPredicate(Predicate):
         self.right_pred = rp
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}\
-            (left={self.left_pred}, right={self.right_pred})"
+        return f"{self.__class__.__name__}\n "\
+            f"\t(left={self.left_pred}, \n" \
+            f"\tright={self.right_pred})"
 
     def get_vobjs(self):
         return self.left_pred.get_vobjs() | self.right_pred.get_vobjs()
@@ -92,14 +94,15 @@ class IsInstance(Predicate):
         return self.vobj.class_name
 
 
-class LeafPredicate(Predicate):
+class Literal(Predicate):
     def __init__(self, left_prop, right_prop):
         self.left_prop = left_prop
         self.right_prop = right_prop
 
     def __str__(self):
-        return f"{self.__class__.__name__}\
-            (left={self.left_prop}, right={self.right_prop})"
+        return f"{self.__class__.__name__}\n"\
+            f"\t\t(left={self.left_prop},\n" \
+            f"\t\tright={self.right_prop})"
 
     def get_vobjs(self):
         return self.left_prop.get_vobjs() | self.right_prop.get_vobjs()
@@ -115,126 +118,51 @@ class LeafPredicate(Predicate):
                 vobj_properties.append(self.right_prop)
         return vobj_properties
 
+    def _get_prop_values(self, vobj_data):
+        def get_value(prop):
+            if prop.is_literal():
+                return prop.value
+            elif prop.is_vobj_property() and prop.stateful:
+                if prop.name in vobj_data:
+                    return vobj_data[prop.name]
+                else:
+                    return UnComputedProperty()
+            else:
+                return vobj_data[prop.name]
+        l_value = get_value(self.left_prop)
+        r_value = get_value(self.right_prop)
+        return l_value, r_value
+
+    @abstractmethod
+    def generate_condition_function(self):
+        raise NotImplementedError
+
+
+class Equal(Literal):
+
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
-            class NoneComputedProperty:
-                pass
-
-            def get_value(prop):
-                if prop.is_literal():
-                    return prop.value
-                elif prop.is_vobj_property() and prop.stateful:
-                    if prop.name in vobj_data:
-                        return vobj_data[prop.name]
-                    else:
-                        return NoneComputedProperty
-                else:
-                    return vobj_data[prop.name]
-
-            l_value = get_value(self.left_prop)
-            r_value = get_value(self.right_prop)
-            if isinstance(l_value, NoneComputedProperty) \
-                    or isinstance(r_value, NoneComputedProperty):
+            l_value, r_value = self._get_prop_values(vobj_data)
+            if isinstance(l_value, UnComputedProperty)\
+                    or isinstance(r_value, UnComputedProperty):
                 return False
             return l_value == r_value
 
         return condition_function
 
 
-class Equal(Predicate):
-
-    def __init__(self, left_prop, right_prop):
-        self.left_prop = left_prop
-        self.right_prop = right_prop
-
-    def __str__(self):
-        return f"Equal(left={self.left_prop}, right={self.right_prop})"
-
-    def get_vobjs(self):
-        return self.left_prop.get_vobjs() | self.right_prop.get_vobjs()
-
-    def get_vobj_properties(self):
-        vobj_properties = []
-        if self.left_prop.is_vobj_property():
-            vobj_properties.append(self.left_prop)
-        # remove duplicates if the same function is used
-        if self.right_prop.is_vobj_property():
-            if all([self.right_prop.func != vprop.func
-                    for vprop in vobj_properties]):
-                vobj_properties.append(self.right_prop)
-        return vobj_properties
+class GreaterThan(Literal):
 
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
-            class NoneComputedProperty:
-                pass
+            l_value, r_value = self._get_prop_values(vobj_data)
 
-            def get_value(prop):
-                if prop.is_literal():
-                    return prop.value
-                elif prop.is_vobj_property() and prop.stateful:
-                    if prop.name in vobj_data:
-                        return vobj_data[prop.name]
-                    else:
-                        return NoneComputedProperty
-                else:
-                    return vobj_data[prop.name]
-
-            l_value = get_value(self.left_prop)
-            r_value = get_value(self.right_prop)
-            if isinstance(l_value, NoneComputedProperty)\
-                    or isinstance(r_value, NoneComputedProperty):
-                return False
-            return l_value == r_value
-
-        return condition_function
-
-
-class GreaterThan(Predicate):
-
-    def __init__(self, left_prop, right_prop):
-        self.left_prop = left_prop
-        self.right_prop = right_prop
-
-    def __str__(self):
-        return f"GreaterThan(left={self.left_prop}, right={self.right_prop})"
-
-    def get_vobjs(self):
-        return self.left_prop.get_vobjs() | self.right_prop.get_vobjs()
-
-    def get_vobj_properties(self):
-        vobj_properties = []
-        if self.left_prop.is_vobj_property():
-            vobj_properties.append(self.left_prop)
-        # remove duplicates if the same function is used
-        if self.right_prop.is_vobj_property():
-            if all([self.right_prop.func != vprop.func
-                    for vprop in vobj_properties]):
-                vobj_properties.append(self.right_prop)
-        return vobj_properties
-
-    def generate_condition_function(self):
-        def condition_function(vobj_data: dict):
-            class NoneComputedProperty:
-                pass
-
-            def get_value(prop):
-                if prop.is_literal():
-                    return prop.value
-                elif prop.is_vobj_property() and prop.stateful:
-                    if prop.name in vobj_data:
-                        return vobj_data[prop.name]
-                    else:
-                        return NoneComputedProperty()
-                else:
-                    return vobj_data[prop.name]
-
-            l_value = get_value(self.left_prop)
-            r_value = get_value(self.right_prop)
-            if isinstance(l_value, NoneComputedProperty)\
-                    or isinstance(r_value, NoneComputedProperty):
+            if isinstance(l_value, UnComputedProperty)\
+                    or isinstance(r_value, UnComputedProperty):
                 return False
 
             return l_value > r_value
 
         return condition_function
+
+# todo, add `compare` predicate for UDFs

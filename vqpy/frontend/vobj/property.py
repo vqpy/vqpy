@@ -68,8 +68,8 @@ class VobjProperty(Property):
         return self.func(self.vobj, *args, **kwargs)
 
     def __str__(self):
-        return f"VObjProp(vobj={self.vobj.__class__.__name__},\
-             inputs={self.inputs}, Prop={self.name})"
+        return f"VObjProp(vobj={self.vobj.__class__.__name__},\n" \
+             f"\t\tinputs={self.inputs}, Prop={self.name})"
 
     def get_vobjs(self):
         return {self.vobj}

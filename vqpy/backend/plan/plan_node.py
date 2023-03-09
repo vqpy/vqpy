@@ -43,9 +43,9 @@ class AbstractPlanNode:
         pass
 
     def __str__(self):
-        return f"PlanNode({self.__class__.__name__}, \
-            prev={self.prev.__class__.__name__}, \
-                next={self.next.__class__.__name__})"
+        return f"PlanNode({self.__class__.__name__},\n" \
+                f"\tprev={self.prev.__class__.__name__},\n" \
+                f"\tnext={self.next.__class__.__name__})"
 
 
 class VideoReaderNode(AbstractPlanNode):
@@ -111,12 +111,12 @@ class ProjectorNode(AbstractPlanNode):
         )
 
     def __str__(self):
-        return f"ProjectorNode(class_name={self.class_name}, " \
-                f"property_name={self.projection_field.field_name}, " \
-                f"filter_index={self.filter_index}), " \
-                f"dependencies={self.projection_field.dependent_fields})," \
-                f"prev={self.prev.__class__.__name__}), "\
-                f"next={self.next.__class__.__name__})"
+        return f"ProjectorNode(class_name={self.class_name}, \n" \
+                f"\tproperty_name={self.projection_field.field_name}, \n" \
+                f"\tfilter_index={self.filter_index}), \n" \
+                f"\tdependencies={self.projection_field.dependent_fields}),\n"\
+                f"\tprev={self.prev.__class__.__name__}), \n"\
+                f"\text={self.next.__class__.__name__})"
 
 
 class TrackerNode(AbstractPlanNode):
@@ -142,11 +142,11 @@ class TrackerNode(AbstractPlanNode):
         )
 
     def __str__(self):
-        return f"TrackerNode(class_name={self.class_name}, " \
-            f"filter_index={self.filter_index}, " \
-            f"tracker_name={self.tracker_name}), " \
-            f"prev={self.prev.__class__.__name__}), "\
-            f"next={self.next.__class__.__name__})"
+        return f"TrackerNode(class_name={self.class_name}, \n" \
+            f"\tfilter_index={self.filter_index}, \n" \
+            f"\ttracker_name={self.tracker_name}), \n" \
+            f"\tprev={self.prev.__class__.__name__}), \n"\
+            f"\tnext={self.next.__class__.__name__})"
 
 
 class VObjFilterNode(AbstractPlanNode):
@@ -166,10 +166,10 @@ class VObjFilterNode(AbstractPlanNode):
         )
 
     def __str__(self):
-        return f"VObjFilterNode(predicate={self.predicate}, " \
-               f"filter_index={self.filter_index}), " \
-               f"prev={self.prev.__class__.__name__}), "\
-               f"next={self.next.__class__.__name__})"
+        return f"VObjFilterNode(predicate={self.predicate}, \n" \
+               f"\tfilter_index={self.filter_index}), \n" \
+               f"\tprev={self.prev.__class__.__name__}), \n"\
+               f"\tnext={self.next.__class__.__name__})"
 
 
 class VObjFrameFilterNode(AbstractPlanNode):
@@ -183,9 +183,9 @@ class VObjFrameFilterNode(AbstractPlanNode):
                                vobj_filter_index=self.filter_index)
 
     def __str__(self):
-        return f"VObjFrameFilterNode(filter_index={self.filter_index}), \
-            prev={self.prev.__class__.__name__}), \
-                next={self.next.__class__.__name__})"
+        return f"VObjFrameFilterNode(filter_index={self.filter_index}), \n"\
+            f"\tprev={self.prev.__class__.__name__}), \n" \
+            f"\tnext={self.next.__class__.__name__})"
 
 
 class Planner:
