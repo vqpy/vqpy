@@ -1,1 +1,1 @@
-from .plan_node import Planer, Executor
+from .plan_node import Planner, Executor

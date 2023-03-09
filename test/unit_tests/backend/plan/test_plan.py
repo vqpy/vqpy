@@ -1,10 +1,12 @@
-from vqpy.backend.plan import Planer, Executor
+from vqpy.backend.plan import Planner, Executor
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
 import pytest
 import os
 import fake_yolox
 import numpy as np
+import math
+
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 resource_dir = os.path.join(current_dir, "..", "..", "resources/")
@@ -31,9 +33,7 @@ class Vehicle(VObjBase):
 
     @vobj_property(inputs={"tlbr": 2})
     def velocity(self, values):
-        import math
         fps = 24.0
-        print(values)
         last_tlbr, tlbr = values["tlbr"]
         if last_tlbr is None or tlbr is None:
             return 0
@@ -49,13 +49,10 @@ class ListVehicle(QueryBase):
 
     def __init__(self) -> None:
         self.car = Vehicle()
-        super().__init__()
 
     def frame_constraint(self):
         return (self.car.score > 0.6) & (self.car.score < 0.7) & \
-            (self.car.velocity > 0)
-            # (self.car.license_plate == "ABC123") & \
-            # (self.car.velocity > 0)
+            (self.car.license_plate == "ABC123")
 
     def frame_output(self):
         return self.car.license_plate
@@ -63,17 +60,20 @@ class ListVehicle(QueryBase):
 
 def test_plan():
 
-    planer = Planer()
+    planner = Planner()
     launch_args = {
         "video_path": video_path,
     }
-    root_plan_node = planer.parse(ListVehicle())
-    planer.print_plan(root_plan_node)
+    root_plan_node = planner.parse(ListVehicle())
+    planner.print_plan(root_plan_node)
     executor = Executor(root_plan_node, launch_args)
     result = executor.execute()
 
     for frame in result:
-        print(frame)
+        # todo: put in planner
+        print(frame.id)
+        for person_idx in frame.filtered_vobjs[0]["car"]:
+            print(frame.vobj_data["car"][person_idx])
 
 
 if __name__ == "__main__":

@@ -185,7 +185,7 @@ class VObjFrameFilterNode(AbstractPlanNode):
         return f"VObjFrameFilterNode(filter_index={self.filter_index}), prev={self.prev.__class__.__name__}), next={self.next.__class__.__name__})"
 
 
-class Planer:
+class Planner:
 
     def print_plan(self, node: AbstractPlanNode = None):
         print(node)

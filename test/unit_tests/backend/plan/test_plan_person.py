@@ -1,4 +1,4 @@
-from vqpy.backend.plan import Planer, Executor
+from vqpy.backend.plan import Planner, Executor
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
 import pytest
@@ -18,7 +18,6 @@ class Person(VObjBase):
         self.class_name = "person"
         self.object_detector = "fake_yolox"
         self.detector_kwargs = {"device": "cpu"}
-        super().__init__()
 
     @vobj_property(inputs={"tlbr": 0})
     def center(self, values):
@@ -53,7 +52,6 @@ class ListPerson(QueryBase):
 
     def __init__(self) -> None:
         self.person = Person()
-        super().__init__()
 
     def frame_constraint(self):
         return (self.person.score > 0.6) & (self.person.score < 0.7) & \
@@ -69,7 +67,7 @@ class ListPerson(QueryBase):
 
 def test_plan():
 
-    planer = Planer()
+    planer = Planner()
     launch_args = {
         "video_path": video_path,
     }
