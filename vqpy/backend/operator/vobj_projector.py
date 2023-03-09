@@ -4,6 +4,9 @@ from typing import Callable, Dict, Any
 import pandas as pd
 import numpy as np
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 
 class VObjProjector(Operator):
     def __init__(self,
@@ -158,6 +161,8 @@ class VObjProjector(Operator):
                                                              track_id=track_id,
                                                              frame_id=frame_id,
                                                              hist_len=hist_len)
+                if enough:
+                    assert len(dep_data) == hist_len
                 all_enough = all_enough and enough
                 dep_data_dict[dependency_name] = dep_data
 

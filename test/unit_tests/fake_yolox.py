@@ -24,7 +24,7 @@ class FakeYOLOX(DetectorBase):
 
 
 video_name = "pedestrian_10s"
-resource_dir = Path(Path(__file__).parent.parent.parent, "resources/")
+resource_dir = Path(Path(__file__).parent, "resources/")
 
 precomputed_path = (resource_dir / f"{video_name}_yolox.pkl").as_posix()
 print(resource_dir)

@@ -37,7 +37,8 @@ class VObjFrameFilter(FrameFilter):
             if vobj_filter_index > len(frame.filtered_vobjs):
                 raise ValueError(f"Vobj filter index {vobj_filter_index} "
                                  f"out of range")
-            return bool(frame.filtered_vobjs[vobj_filter_index])
+            filtered_vobjs = frame.filtered_vobjs[vobj_filter_index]
+            return any([bool(filtered_vobjs[key]) for key in filtered_vobjs])
         super().__init__(prev, condition_func)
 
 
