@@ -5,35 +5,31 @@ import pytest
 import os
 import fake_yolox
 import numpy as np
+import math
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 resource_dir = os.path.join(current_dir, "..", "..", "resources/")
 video_path = os.path.join(resource_dir, "pedestrian_10s.mp4")
 
 
-class Vehicle(VObjBase):
+class Person(VObjBase):
 
     def __init__(self) -> None:
-        self.class_name = "car"
+        self.class_name = "person"
         self.object_detector = "fake_yolox"
         self.detector_kwargs = {"device": "cpu"}
         super().__init__()
 
     @vobj_property(inputs={"tlbr": 0})
-    def license_plate(self, values):
+    def center(self, values):
         tlbr = values["tlbr"]
         assert isinstance(tlbr, np.ndarray)
         assert len(tlbr) == 4
-        if tlbr[1] < 100:
-            return "ABC123"
-        else:
-            return "XYZ789"
+        return (tlbr[:2] + tlbr[2:]) / 2
 
     @vobj_property(inputs={"tlbr": 2})
     def velocity(self, values):
-        import math
         fps = 24.0
-        print(values)
         last_tlbr, tlbr = values["tlbr"]
         if last_tlbr is None or tlbr is None:
             return 0
@@ -44,21 +40,31 @@ class Vehicle(VObjBase):
         dcenter = (cur_center - last_center) / scale * fps
         return math.sqrt(sum(dcenter * dcenter))
 
+    @vobj_property(inputs={"velocity": 2})
+    def acceleration(self, values):
+        fps = 24.0
+        last_velocity, velocity = values["velocity"]
+        if last_velocity is None or velocity is None:
+            return 0
+        return (velocity - last_velocity) * fps
 
-class ListVehicle(QueryBase):
+
+class ListPerson(QueryBase):
 
     def __init__(self) -> None:
-        self.car = Vehicle()
+        self.person = Person()
         super().__init__()
 
     def frame_constraint(self):
-        return (self.car.score > 0.6) & (self.car.score < 0.7) & \
-            (self.car.velocity > 0)
-            # (self.car.license_plate == "ABC123") & \
-            # (self.car.velocity > 0)
+        return (self.person.score > 0.6) & (self.person.score < 0.7) & \
+            (self.person.velocity > 0) & (self.person.acceleration > 0)
 
     def frame_output(self):
-        return self.car.license_plate
+        return {
+            "center": self.person.center,
+            "velocity": self.person.velocity,
+            "acceleration": self.person.acceleration,
+        }
 
 
 def test_plan():
@@ -67,13 +73,16 @@ def test_plan():
     launch_args = {
         "video_path": video_path,
     }
-    root_plan_node = planer.parse(ListVehicle())
+    root_plan_node = planer.parse(ListPerson())
     planer.print_plan(root_plan_node)
     executor = Executor(root_plan_node, launch_args)
     result = executor.execute()
 
     for frame in result:
-        print(frame)
+        # todo: put in planner
+        print(frame.id)
+        for person_idx in frame.filtered_vobjs[0]["person"]:
+            print(frame.vobj_data["person"][person_idx])
 
 
 if __name__ == "__main__":

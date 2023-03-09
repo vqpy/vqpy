@@ -1,1 +1,1 @@
-from .vobj import VObjBase, stateful
+from .vobj import VObjBase, vobj_property

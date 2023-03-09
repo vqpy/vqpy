@@ -11,7 +11,7 @@ class VObjBase(ABC):
         self.cls = BuiltInProperty(self, "cls")
 
 
-def stateful(inputs: Dict[str, int]):
+def vobj_property(inputs: Dict[str, int]):
 
     def decorator(func: Callable):
         def create_vobj_property(self):
@@ -23,11 +23,11 @@ def stateful(inputs: Dict[str, int]):
 
 class MyVobj(VObjBase):
 
-    @stateful(inputs={})
+    @vobj_property(inputs={})
     def add_one(self, x):
         return 1 + x
 
-    @stateful(inputs={})
+    @vobj_property(inputs={})
     def add_two(self, x):
         return 2 + x
 
