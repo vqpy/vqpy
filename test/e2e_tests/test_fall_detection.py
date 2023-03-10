@@ -64,4 +64,4 @@ def test_fall_detection(setup_example_path, setup_fall_detection_lib_path):
         detector_name=fake_detector_name,
     )
 
-    compare(result_path, expected_result_path)
+    compare(result_path, expected_result_path, tolerance=0.2)

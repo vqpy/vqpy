@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Set, Callable
+from collections import defaultdict
 
 from vqpy.obj.vobj.infer import infer
 from vqpy.operator.video_reader import FrameStream
@@ -57,6 +58,10 @@ class VObjBase(VObjBaseInterface):
     """The VObject Base Class.
     The tracker is responsible to keep objects updated when the track is active
     """
+
+    # minimal history length of property values to keep, default value = 1
+    # used by property function decorators
+    hist_len = defaultdict(lambda: 1)
 
     def __init__(self, ctx: FrameStream):
         self._ctx = ctx
@@ -144,11 +149,13 @@ class VObjBase(VObjBaseInterface):
             else:
                 return None
 
-        if hasattr(self, '__record_' + attr) and \
-                not hasattr(self, '__state_' + attr):
-            raise ValueError(f"We don't support retrieve historical data from \
-                non-stateful properties. \
-                Please add @stateful() decorator to property {attr}.")
+        # disable stateful check, planner.register_deps responsible for finding
+        # minimal history length of property values to keep (cls.hist_len)
+        # if hasattr(self, '__record_' + attr) and \
+        #         not hasattr(self, '__state_' + attr):
+        #     raise ValueError(f"We don't support retrieve historical data \
+        #         from non-stateful properties. \
+        #         Please add @stateful() decorator to property {attr}.")
 
     def update(self, data: Optional[Dict]):
         """Update data this frame to object"""

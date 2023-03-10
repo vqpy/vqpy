@@ -33,10 +33,10 @@ def compare(result_path, expected_result_path, tolerance=0.1):
         expected = json.load(f)
 
     # allow some mismatch
-    assert abs(len(result) - len(expected)) < len(result) * tolerance, (
+    assert abs(len(result) - len(expected)) < len(expected) * tolerance, (
         f"result length error, {len(result)} present, expect {len(expected)},"
         f" difference {abs(len(result) - len(expected))} > tolerance"
-        f" {len(result)*tolerance}"
+        f" {len(expected)*tolerance}"
     )
 
     mismatch_cnt = 0
@@ -61,9 +61,10 @@ def compare(result_path, expected_result_path, tolerance=0.1):
             expected_it += 1
 
     mismatch_cnt += (len(result) - result_it) + (len(expected) - expected_it)
-    assert (
-        mismatch_cnt < len(result) * tolerance
-    ), f"mismatched {mismatch_cnt} frames > {len(result)*tolerance} tolerance"
+    assert mismatch_cnt < len(expected) * tolerance, (
+        f"mismatched {mismatch_cnt} frames >"
+        f" {len(expected)*tolerance} tolerance"
+    )
 
     if mismatch_cnt > 0:
         warnings.warn(

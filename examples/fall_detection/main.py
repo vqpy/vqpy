@@ -38,8 +38,7 @@ class Person(vqpy.VObjBase):
     pose_model = None
     action_model = None
 
-    @vqpy.property()
-    @vqpy.stateful(30)
+    @vqpy.stateless(inputs=['image'])
     def keypoints(self):
         # per-frame property, but tracker can return objects
         # not in the current frame
@@ -49,7 +48,7 @@ class Person(vqpy.VObjBase):
             return None
         return Person.pose_model.predict(image, torch.tensor(np.array([tlbr])))
 
-    @vqpy.property()
+    @vqpy.stateful(inputs={'keypoints': 30})
     def pose(self) -> str:
         keypoints_list = []
         for i in range(-self._track_length, 0):
