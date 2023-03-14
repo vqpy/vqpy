@@ -173,6 +173,86 @@ def test_stateful_projector(tracker):
     # test delete history
 
 
+def test_stateless_projector_image_video(object_detector):
+    # property function depend on image and video metadata
+    def image_fps_stateless(values):
+        image = values["image"]
+        fps = values["fps"]
+        assert fps == 24.0
+        if image is not None:
+            assert image.shape[2] == 3
+            return 1
+        return 0
+
+    person_vobj_filter = VObjFilter(
+        prev=object_detector,
+        condition_func="person",
+    )
+
+    projector = VObjProjector(
+        prev=person_vobj_filter,
+        property_name="image_fps_stateless",
+        property_func=image_fps_stateless,
+        dependencies={"image": 0, "fps": 0},
+        class_name="person",
+    )
+    num_image_cropped = 0
+    while projector.has_next():
+        frame = projector.next()
+        for vobj_data in frame.vobj_data["person"]:
+            assert "image" not in vobj_data
+            assert "fps" not in vobj_data
+            result = vobj_data["image_fps_stateless"]
+            if result == 1:
+                num_image_cropped += 1
+    assert projector._hist_buffer.empty
+    assert num_image_cropped > 0
+
+
+def test_stateful_projector_image_video(tracker):
+    # property function depend on image and video metadata
+    def image_fps_stateful(values):
+        last_2_images = values["image"]
+        assert len(last_2_images) == 2
+
+        fps = values["fps"]
+        assert fps == 24.0
+        for image in last_2_images:
+            if image is None:
+                return 0
+            else:
+                assert image.shape[2] == 3
+        return 1
+
+    person_vobj_filter = VObjFilter(
+        prev=tracker,
+        condition_func="person",
+    )
+    hist_len = 2
+
+    projector = VObjProjector(
+        prev=person_vobj_filter,
+        property_name="image_fps_stateful",
+        property_func=image_fps_stateful,
+        dependencies={"image": hist_len, "fps": 0},
+        class_name="person",
+    )
+    num_image_cropped = 0
+    while projector.has_next():
+        frame = projector.next()
+        for vobj in frame.vobj_data["person"]:
+            track_id = vobj.get("track_id")
+            if track_id:
+                if frame.id < hist_len - 1:
+                    assert vobj["image_fps_stateful"] is None
+                else:
+                    result = vobj["image_fps_stateful"]
+                    if result == 1:
+                        num_image_cropped += 1
+    assert not projector._hist_buffer.empty
+    assert num_image_cropped > 0
+
+
 def test_stateful_projector_dep_self():
     pass
 
