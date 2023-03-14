@@ -1,0 +1,2 @@
+class UnComputedProperty(object):
+    pass
