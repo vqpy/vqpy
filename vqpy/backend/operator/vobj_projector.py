@@ -3,6 +3,7 @@ from vqpy.backend.frame import Frame
 from typing import Callable, Dict, Any
 import pandas as pd
 import numpy as np
+from vqpy.utils.images import crop_image
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -66,10 +67,23 @@ class VObjProjector(Operator):
         hist_deps = []
         non_hist_deps = []
         for vobj_index in vobj_indexes:
-            vobj_data = frame.vobj_data[self.class_name][vobj_index]
+            vobj_data = frame.vobj_data[self.class_name][vobj_index].copy()
             if self._stateful and "track_id" not in vobj_data:
                 continue
             else:
+                # dependency of "image", which is the frame image cropped with
+                #  the vobj's bbox
+                if "image" in self.dependencies:
+                    assert "tlbr" in vobj_data, "vobj_data does not have tlbr."
+                    vobj_image = crop_image(frame.image, vobj_data["tlbr"])
+                    vobj_data["image"] = vobj_image
+
+                # dependency in video metadata
+                # including "frame_width", "frame_height", "fps", "n_frames"
+                for key in frame.video_metadata:
+                    if key in self.dependencies:
+                        vobj_data[key] = frame.video_metadata[key]
+
                 # sanity check: dependencies should be in vobj_data
                 assert all([dep_name in vobj_data for dep_name in
                             self.dependencies.keys()]), \

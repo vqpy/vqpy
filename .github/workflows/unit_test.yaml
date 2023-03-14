@@ -35,5 +35,4 @@ jobs:
       - name: unit tests
         shell: bash
         run: |
-          cd test/unit_tests
-          pytest
+          pytest test/unit_tests
