@@ -26,7 +26,7 @@ class Person(VObjBase):
         assert len(tlbr) == 4
         return (tlbr[:2] + tlbr[2:]) / 2
 
-    @vobj_property(inputs={"tlbr": 2})
+    @vobj_property(inputs={"tlbr": 1})
     def velocity(self, values):
         fps = 24.0
         last_tlbr, tlbr = values["tlbr"]
@@ -39,7 +39,7 @@ class Person(VObjBase):
         dcenter = (cur_center - last_center) / scale * fps
         return math.sqrt(sum(dcenter * dcenter))
 
-    @vobj_property(inputs={"velocity": 2})
+    @vobj_property(inputs={"velocity": 1})
     def acceleration(self, values):
         fps = 24.0
         last_velocity, velocity = values["velocity"]

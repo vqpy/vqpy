@@ -31,7 +31,8 @@ class VObjProjector(Operator):
         :param dependencies: a dict of the dependencies of the property.
             The key is the name of the dependency property and the value is
             the history length (a non-negative integer) of the dependency
-            property. If the value is 0, it means current frame.
+            property. If the value is 0, it means current frame. If the value
+            is 1, it means the last frame and the current frame.
         :param class_name: the name of the vobj class to compute the property.
         :param filter_index: the index of the filter.
         """
@@ -49,7 +50,7 @@ class VObjProjector(Operator):
                                        self.dependencies.items()
                                        if hist_len == 0}
         self._stateful = len(self._hist_dependencies) > 0
-        self._max_history_len = max(dependencies.values())
+        self._max_hist_len = max(dependencies.values())
         columns = ["track_id", "frame_id", "vobj_index"] + \
             list(self._hist_dependencies.keys())
         self._hist_buffer = pd.DataFrame(columns=columns)
@@ -118,7 +119,7 @@ class VObjProjector(Operator):
         # remove data that older than max history length
         cur_frame_id = hist_deps[0]["frame_id"]
         # frame_id starts from 0
-        oldest_frame_id = cur_frame_id + 1 - self._max_history_len
+        oldest_frame_id = cur_frame_id + 1 - (self._max_hist_len + 1)
         if oldest_frame_id >= 0:
             self._hist_buffer = self._hist_buffer[
                 self._hist_buffer["frame_id"] >= oldest_frame_id]
@@ -130,7 +131,7 @@ class VObjProjector(Operator):
                              hist_len):
         # todo: allow user to fill missing data with a default value
         # currently fill with None
-        hist_start = frame_id - hist_len + 1
+        hist_start = frame_id - hist_len
         # return None if there isn't enough history
         if hist_start < 0:
             return None, False
@@ -150,7 +151,8 @@ class VObjProjector(Operator):
         # fill missing frames with None
         hist_df = hist_df.replace(np.nan, None)
         hist_data = hist_df[dependency_name].tolist()
-        assert len(hist_data) == hist_len
+        # hist_data contains both history data and current frame data
+        assert len(hist_data) == hist_len + 1
 
         if dependency_name == self.property_name:
             hist_data = hist_data.append(None)
@@ -176,7 +178,7 @@ class VObjProjector(Operator):
                                                              frame_id=frame_id,
                                                              hist_len=hist_len)
                 if enough:
-                    assert len(dep_data) == hist_len
+                    assert len(dep_data) == hist_len + 1
                 all_enough = all_enough and enough
                 dep_data_dict[dependency_name] = dep_data
 
