@@ -173,7 +173,8 @@ class Compare(Predicate):
         self.compare_func = compare_func
 
     def __str__(self):
-        return f"Compare(prop={self.prop}, compare_func={self.compare_func.__name__})"
+        return f"Compare(prop={self.prop}\n "\
+            f"\tcompare_func={self.compare_func.__name__})"
 
     def get_vobjs(self):
         return self.prop.get_vobjs()
