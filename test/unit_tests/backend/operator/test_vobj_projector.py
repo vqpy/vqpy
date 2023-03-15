@@ -143,7 +143,7 @@ def test_stateful_projector(tracker):
         prev=tracker,
         condition_func="person",
     )
-    hist_len = 2
+    hist_len = 1
 
     projector = VObjProjector(
         prev=person_vobj_filter,
@@ -159,7 +159,7 @@ def test_stateful_projector(tracker):
             track_id = vobj.get("track_id")
             if track_id:
                 checked = True
-                if frame.id < hist_len - 1:
+                if frame.id < hist_len:
                     assert vobj["hist_tlbr"] is None
                 else:
                     assert vobj["hist_tlbr"] is not None
@@ -228,7 +228,7 @@ def test_stateful_projector_image_video(tracker):
         prev=tracker,
         condition_func="person",
     )
-    hist_len = 2
+    hist_len = 1
 
     projector = VObjProjector(
         prev=person_vobj_filter,
@@ -240,10 +240,11 @@ def test_stateful_projector_image_video(tracker):
     num_image_cropped = 0
     while projector.has_next():
         frame = projector.next()
+
         for vobj in frame.vobj_data["person"]:
             track_id = vobj.get("track_id")
             if track_id:
-                if frame.id < hist_len - 1:
+                if frame.id < hist_len:
                     assert vobj["image_fps_stateful"] is None
                 else:
                     result = vobj["image_fps_stateful"]

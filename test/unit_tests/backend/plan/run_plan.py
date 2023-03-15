@@ -30,7 +30,7 @@ class Vehicle(VObjBase):
         else:
             return "XYZ789"
 
-    @vobj_property(inputs={"tlbr": 2})
+    @vobj_property(inputs={"tlbr": 1})
     def velocity(self, values):
         fps = 24.0
         last_tlbr, tlbr = values["tlbr"]
