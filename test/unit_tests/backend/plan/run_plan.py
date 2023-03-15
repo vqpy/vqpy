@@ -51,7 +51,7 @@ class ListVehicle(QueryBase):
 
     def frame_constraint(self):
         return (self.car.score > 0.6) & (self.car.score < 0.7) & \
-            (self.car.license_plate == "ABC123")
+            (self.car.license_plate.cmp(lambda x: x.startswith("ABC")))
 
     def frame_output(self):
         return self.car.license_plate
