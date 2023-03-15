@@ -125,20 +125,20 @@ class TrackerNode(AbstractPlanNode):
                  class_name: str,
                  filter_index: Optional[int] = None,
                  tracker_name: str = "byte",
-                 **tracker_kwargs):
+                 ):
         self.class_name = class_name
         self.filter_index = filter_index
         self.tracker_name = tracker_name
-        self.tracker_kwargs = tracker_kwargs
         super().__init__()
 
     def to_operator(self, launch_args: dict):
+        # fps is for byte tracker
         return Tracker(
             prev=self.prev.to_operator(launch_args),
             class_name=self.class_name,
             filter_index=self.filter_index,
             tracker_name=self.tracker_name,
-            **self.tracker_kwargs
+            fps=launch_args["fps"],
         )
 
     def __str__(self):
@@ -228,8 +228,7 @@ class Planner:
         vobj = list(vobjs)[0]
         class_name = vobj.class_name
         return input_node.set_next(
-            TrackerNode(class_name=class_name,
-                        fps=24.0)
+            TrackerNode(class_name=class_name)
         )
 
     def _create_pre_filter_projector(self, query_obj: QueryBase, input_node):
@@ -275,11 +274,22 @@ class Planner:
         return output_node
 
 
+def add_video_metadata(launch_args: dict):
+    assert "video_path" in launch_args
+    video_path = launch_args["video_path"]
+    video_reader = VideoReader(video_path=video_path)
+    video_metadata = video_reader.get_metadata()
+    launch_args.update(video_metadata)
+    video_reader.close()
+    return launch_args
+
+
 class Executor:
 
-    def __init__(self, root_plan_node, lanuch_args):
+    def __init__(self, root_plan_node, launch_args):
         self.root_plan_node = root_plan_node
-        self.root_operator = root_plan_node.to_operator(lanuch_args)
+        self._launch_args = add_video_metadata(launch_args)
+        self.root_operator = root_plan_node.to_operator(self._launch_args)
 
     def execute(self):
         result = []
