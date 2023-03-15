@@ -94,7 +94,7 @@ class IsInstance(Predicate):
         return self.vobj.class_name
 
 
-class Literal(Predicate):
+class LiteralPredicate(Predicate):
     def __init__(self, left_prop, right_prop):
         self.left_prop = left_prop
         self.right_prop = right_prop
@@ -138,7 +138,7 @@ class Literal(Predicate):
         raise NotImplementedError
 
 
-class Equal(Literal):
+class Equal(LiteralPredicate):
 
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
@@ -151,7 +151,7 @@ class Equal(Literal):
         return condition_function
 
 
-class GreaterThan(Literal):
+class GreaterThan(LiteralPredicate):
 
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
@@ -165,4 +165,38 @@ class GreaterThan(Literal):
 
         return condition_function
 
-# todo, add `compare` predicate for UDFs
+
+class Compare(Predicate):
+
+    def __init__(self, prop, compare_func):
+        self.prop = prop
+        self.compare_func = compare_func
+
+    def __str__(self):
+        return f"Compare(prop={self.prop}, compare_func={self.compare_func.__name__})"
+
+    def get_vobjs(self):
+        return self.prop.get_vobjs()
+
+    def get_vobj_properties(self):
+        return [self.prop]
+
+    def _get_prop_value(self, vobj_data):
+        if self.prop.is_vobj_property() and self.prop.stateful:
+            if self.prop.name in vobj_data:
+                return vobj_data[self.prop.name]
+            else:
+                return UnComputedProperty()
+        else:
+            return vobj_data[self.prop.name]
+
+    def generate_condition_function(self):
+        def condition_function(vobj_data: dict):
+            prop_value = self._get_prop_value(vobj_data)
+
+            if isinstance(prop_value, UnComputedProperty):
+                return False
+
+            return self.compare_func(prop_value)
+
+        return condition_function

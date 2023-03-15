@@ -1,4 +1,4 @@
-from vqpy.frontend.vobj.predicates import Equal, GreaterThan
+from vqpy.frontend.vobj.predicates import Equal, GreaterThan, Compare
 from typing import Dict, Callable
 from abc import ABC
 
@@ -24,6 +24,24 @@ class Property(ABC):
         if not isinstance(other, Property):
             other = Literal(other)
         return GreaterThan(other, self)
+
+    def __ge__(self, other):
+        if not isinstance(other, Property):
+            other = Literal(other)
+        return Equal(self, other) | GreaterThan(self, other)
+
+    def __le__(self, other):
+        if not isinstance(other, Property):
+            other = Literal(other)
+        return Equal(self, other) | GreaterThan(other, self)
+
+    def __ne__(self, other):
+        if not isinstance(other, Property):
+            other = Literal(other)
+        return ~Equal(self, other)
+
+    def cmp(self, func: Callable):
+        return Compare(self, func)
 
     def is_literal(self):
         return False
