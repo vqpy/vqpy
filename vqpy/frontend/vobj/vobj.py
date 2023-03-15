@@ -10,6 +10,13 @@ class VObjBase(ABC):
         self.score = BuiltInProperty(self, "score")
         self.cls = BuiltInProperty(self, "cls")
 
+    def get_builtin_property_names(self):
+        return {p for p in dir(self)
+                if isinstance(getattr(self, p), BuiltInProperty)}
+
+    def get_property(self, name):
+        return getattr(self, name)
+
 
 def vobj_property(inputs: Dict[str, int]):
 

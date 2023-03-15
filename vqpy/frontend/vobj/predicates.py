@@ -3,7 +3,6 @@ from vqpy.frontend.vobj.common import UnComputedProperty
 
 
 class Predicate(ABC):
-
     def __and__(self, other):
         return And(self, other)
 
@@ -23,15 +22,16 @@ class Predicate(ABC):
 
 
 class BinaryPredicate(Predicate):
-
     def __init__(self, lp: Predicate, rp: Predicate) -> Predicate:
         self.left_pred = lp
         self.right_pred = rp
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}\n "\
-            f"\t(left={self.left_pred}, \n" \
+        return (
+            f"{self.__class__.__name__}\n "
+            f"\t(left={self.left_pred}, \n"
             f"\tright={self.right_pred})"
+        )
 
     def get_vobjs(self):
         return self.left_pred.get_vobjs() | self.right_pred.get_vobjs()
@@ -45,7 +45,6 @@ class BinaryPredicate(Predicate):
 
 
 class And(BinaryPredicate):
-
     def generate_condition_function(self):
         l_f = self.left_pred.generate_condition_function()
         r_f = self.right_pred.generate_condition_function()
@@ -62,7 +61,6 @@ class Or(BinaryPredicate):
 
 
 class Not(Predicate):
-
     def __init__(self, p: Predicate) -> Predicate:
         self.pred = p
 
@@ -74,7 +72,6 @@ class Not(Predicate):
 
 
 class IsInstance(Predicate):
-
     def __init__(self, vobj):
         self.vobj = vobj
 
@@ -100,22 +97,35 @@ class LiteralPredicate(Predicate):
         self.right_prop = right_prop
 
     def __str__(self):
-        return f"{self.__class__.__name__}\n"\
-            f"\t\t(left={self.left_prop},\n" \
+        return (
+            f"{self.__class__.__name__}\n"
+            f"\t\t(left={self.left_prop},\n"
             f"\t\tright={self.right_prop})"
+        )
 
     def get_vobjs(self):
         return self.left_prop.get_vobjs() | self.right_prop.get_vobjs()
 
     def get_vobj_properties(self):
+        vobj_properties = Literal._get_dep_properties(self.left_prop)
+        right_vobj_props = Literal._get_dep_properties(self.right_prop)
+        for prop in right_vobj_props:
+            if all([prop.func != vp.func for vp in vobj_properties]):
+                vobj_properties.append(prop)
+        return vobj_properties
+
+    @staticmethod
+    def _get_dep_properties(prop):
         vobj_properties = []
-        if self.left_prop.is_vobj_property():
-            vobj_properties.append(self.left_prop)
-        # remove duplicates if the same function is used
-        if self.right_prop.is_vobj_property():
-            if all([self.right_prop.func != vprop.func
-                    for vprop in vobj_properties]):
-                vobj_properties.append(self.right_prop)
+        if prop.is_vobj_property():
+            all_dep_names = prop.inputs.keys()
+            built_in_names = prop.vobj.get_builtin_property_names()
+            vobj_dep_names = all_dep_names - built_in_names
+            for name in vobj_dep_names:
+                p = prop.vobj.get_property(name)
+                vobj_properties.extend(Literal._get_dep_properties(p))
+            vobj_properties.append(prop)
+
         return vobj_properties
 
     def _get_prop_values(self, vobj_data):
@@ -129,6 +139,7 @@ class LiteralPredicate(Predicate):
                     return UnComputedProperty()
             else:
                 return vobj_data[prop.name]
+
         l_value = get_value(self.left_prop)
         r_value = get_value(self.right_prop)
         return l_value, r_value
@@ -143,8 +154,9 @@ class Equal(LiteralPredicate):
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
             l_value, r_value = self._get_prop_values(vobj_data)
-            if isinstance(l_value, UnComputedProperty)\
-                    or isinstance(r_value, UnComputedProperty):
+            if isinstance(l_value, UnComputedProperty) or isinstance(
+                r_value, UnComputedProperty
+            ):
                 return False
             return l_value == r_value
 
@@ -157,8 +169,9 @@ class GreaterThan(LiteralPredicate):
         def condition_function(vobj_data: dict):
             l_value, r_value = self._get_prop_values(vobj_data)
 
-            if isinstance(l_value, UnComputedProperty)\
-                    or isinstance(r_value, UnComputedProperty):
+            if isinstance(l_value, UnComputedProperty) or isinstance(
+                r_value, UnComputedProperty
+            ):
                 return False
 
             return l_value > r_value
