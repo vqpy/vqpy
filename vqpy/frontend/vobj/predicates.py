@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from vqpy.frontend.vobj.common import UnComputedProperty
+from vqpy.frontend.vobj.common import UnComputedProperty, get_dep_properties
 
 
 class Predicate(ABC):
@@ -107,25 +107,11 @@ class LiteralPredicate(Predicate):
         return self.left_prop.get_vobjs() | self.right_prop.get_vobjs()
 
     def get_vobj_properties(self):
-        vobj_properties = Literal._get_dep_properties(self.left_prop)
-        right_vobj_props = Literal._get_dep_properties(self.right_prop)
+        vobj_properties = get_dep_properties(self.left_prop)
+        right_vobj_props = get_dep_properties(self.right_prop)
         for prop in right_vobj_props:
             if all([prop.func != vp.func for vp in vobj_properties]):
                 vobj_properties.append(prop)
-        return vobj_properties
-
-    @staticmethod
-    def _get_dep_properties(prop):
-        vobj_properties = []
-        if prop.is_vobj_property():
-            all_dep_names = prop.inputs.keys()
-            built_in_names = prop.vobj.get_builtin_property_names()
-            vobj_dep_names = all_dep_names - built_in_names
-            for name in vobj_dep_names:
-                p = prop.vobj.get_property(name)
-                vobj_properties.extend(Literal._get_dep_properties(p))
-            vobj_properties.append(prop)
-
         return vobj_properties
 
     def _get_prop_values(self, vobj_data):
@@ -193,7 +179,7 @@ class Compare(Predicate):
         return self.prop.get_vobjs()
 
     def get_vobj_properties(self):
-        return [self.prop]
+        return get_dep_properties(self.prop)
 
     def _get_prop_value(self, vobj_data):
         if self.prop.is_vobj_property() and self.prop.stateful:
