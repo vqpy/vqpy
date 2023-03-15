@@ -2,7 +2,7 @@ from vqpy.backend.plan import Planner, Executor
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
 import os
-import fake_yolox # noqa F401
+import fake_yolox  # noqa F401
 import numpy as np
 import math
 
@@ -12,7 +12,6 @@ video_path = os.path.join(resource_dir, "pedestrian_10s.mp4")
 
 
 class Person(VObjBase):
-
     def __init__(self) -> None:
         self.class_name = "person"
         self.object_detector = "fake_yolox"
@@ -49,13 +48,15 @@ class Person(VObjBase):
 
 
 class ListPerson(QueryBase):
-
     def __init__(self) -> None:
         self.person = Person()
 
     def frame_constraint(self):
-        return (self.person.score > 0.6) & (self.person.score < 0.7) & \
-            (self.person.velocity > 0) & (self.person.acceleration > 0)
+        return (
+            (self.person.score > 0.6)
+            & (self.person.score < 0.7)
+            & (self.person.acceleration > 0)
+        )
 
     def frame_output(self):
         return {
@@ -66,7 +67,6 @@ class ListPerson(QueryBase):
 
 
 def test_plan():
-
     planner = Planner()
     launch_args = {
         "video_path": video_path,
