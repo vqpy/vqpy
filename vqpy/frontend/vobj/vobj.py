@@ -9,6 +9,11 @@ class VObjBase(ABC):
         self.tlbr = BuiltInProperty(self, "tlbr")
         self.score = BuiltInProperty(self, "score")
         self.cls = BuiltInProperty(self, "cls")
+        self.image = BuiltInProperty(self, "image")
+        self.fps = BuiltInProperty(self, "fps")
+        self.frame_width = BuiltInProperty(self, "frame_width")
+        self.frame_height = BuiltInProperty(self, "frame_height")
+        self.n_frames = BuiltInProperty(self, "n_frames")
 
     def get_builtin_property_names(self):
         return {p for p in dir(self)
