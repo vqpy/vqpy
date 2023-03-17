@@ -48,7 +48,7 @@ class Person(VObjBase):
         bottom_centers = values["bottom_center"]
         in_region = np.all(
             [
-                bottom_center != None
+                bottom_center is not None
                 and vqpy.query.utils.within_regions(REGIONS)(bottom_center)
                 for bottom_center in bottom_centers
             ]
@@ -61,7 +61,7 @@ class People_loitering_query(QueryBase):
         self.person = Person()
 
     def frame_constraint(self):
-        return self.person.in_region == True
+        return self.person.in_region == True  # noqa: E712
 
     def frame_output(self):
         return {

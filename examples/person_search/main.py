@@ -80,7 +80,9 @@ class PersonSearch(QueryBase):
         super().__init__()
 
     def frame_constraint(self):
-        return self.person.candidate.cmp(lambda x: x != None and x[1] >= 0.97)
+        return self.person.candidate.cmp(
+            lambda x: x is not None and x[1] >= 0.97
+        )
 
     def frame_output(self):
         return {

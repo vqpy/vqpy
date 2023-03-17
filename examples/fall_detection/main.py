@@ -8,7 +8,6 @@ from vqpy.frontend.query import QueryBase
 import torch
 import numpy as np
 import argparse
-import json
 
 # importing pose detection models
 sys.path.append(
