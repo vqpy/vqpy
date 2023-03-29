@@ -29,7 +29,7 @@ def make_parser():
         "--model_dir",
         default=None,
         help=(
-            "folder containing pretrained model                "
+            "folder containing pretrained model"
             " fast_res50_256x192.pth and tsstg-model.pth"
         ),
     )
@@ -51,11 +51,17 @@ class Person(VObjBase):
         tlbr = values["tlbr"]
         return (tlbr[:2] + tlbr[2:]) / 2
 
-    @vobj_property(inputs={"tlbr": 0, "image": 0})
+    @vobj_property(
+        inputs={"tlbr": 0, "image": 0, "frame_width": 0, "frame_height": 0}
+    )
     def keypoints(self, values):
         image = values["image"]
         tlbr = values["tlbr"]
-        return Person.pose_model.predict(image, torch.tensor(np.array([tlbr])))
+        frame_width = int(values["frame_width"])
+        frame_height = int(values["frame_height"])
+        return Person.pose_model.predict(
+            image, torch.tensor(np.array([tlbr])), frame_width, frame_height
+        )
 
     @vobj_property(
         inputs={"keypoints": 30 - 1, "frame_width": 0, "frame_height": 0}
@@ -67,7 +73,7 @@ class Person(VObjBase):
         if any(keypoints is None for keypoints in keypoints_list):
             return "unknown"
         pts = np.array(keypoints_list, dtype=np.float32)
-        out = Person.action_model.predict(pts, [frame_height, frame_width])
+        out = Person.action_model.predict(pts, [frame_width, frame_height])
         action_name = Person.action_model.class_names[out[0].argmax()]
         return action_name
 
