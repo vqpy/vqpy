@@ -163,7 +163,9 @@ class VObjFilterNode(AbstractPlanNode):
             prev=self.prev.to_operator(lauch_args),
             condition_func=self.predicate.generate_condition_function(),
             filter_index=self.filter_index
+
         )
+
 
     def __str__(self):
         return f"VObjFilterNode(predicate={self.predicate}, \n" \
@@ -201,8 +203,11 @@ class Planner:
         output_node = self._create_tracker_node(query_obj, output_node)
         output_node = self._create_vobj_class_filter_node(query_obj,
                                                           output_node)
-        output_node = self._create_pre_filter_projector(query_obj, output_node)
+        output_node, map = self._create_pre_filter_projector(query_obj,
+                                                             output_node)
         output_node = self._create_frame_filter_node(query_obj, output_node)
+        output_node = self._create_frame_output_projector(query_obj,
+                                                          output_node, map)
         return output_node
 
     def _create_object_detector_node(self, query_obj: QueryBase, input_node):
@@ -233,7 +238,10 @@ class Planner:
 
     def _create_pre_filter_projector(self, query_obj: QueryBase, input_node):
         frame_constraints = query_obj.frame_constraint()
+
         node = input_node
+
+        vobj_properties_map = dict()
 
         if isinstance(frame_constraints, Predicate):
             vobjs = frame_constraints.get_vobjs()
@@ -251,8 +259,9 @@ class Planner:
                     filter_index=0
                 )
                 node = node.set_next(projector_node)
+            vobj_properties_map[vobj] = vobj_properties
 
-        return node
+        return node, vobj_properties_map
 
     def _create_vobj_class_filter_node(self, query_obj: QueryBase, input_node):
         frame_constraints = query_obj.frame_constraint()
@@ -272,6 +281,30 @@ class Planner:
             VObjFilterNode(predicate=predicate, filter_index=0))
         output_node = output_node.set_next(VObjFrameFilterNode(filter_index=0))
         return output_node
+
+    def _create_frame_output_projector(self, query_vobj: QueryBase,
+                                       input_node,
+                                       vobj_properties_map: dict):
+        existing_vobj_properties = vobj_properties_map.copy()
+        frame_output = query_vobj.frame_output()
+        for prop in frame_output.values():
+            vobj = prop.get_vobjs()
+            assert len(vobj) == 1, "Only support one vobj for vobj_property."
+            vobj = list(vobj)[0]
+            existing_properties = existing_vobj_properties[vobj]
+            if all([prop.func != ep.func for ep in existing_properties]):
+                projector_node = ProjectorNode(
+                    class_name=vobj.class_name,
+                    projection_field=ProjectionField(
+                        field_name=prop.name,
+                        field_func=prop,
+                        dependent_fields=prop.inputs,
+                    ),
+                    filter_index=0
+                )
+                input_node = input_node.set_next(projector_node)
+                existing_properties.append(prop)
+        return input_node
 
 
 def add_video_metadata(launch_args: dict):
