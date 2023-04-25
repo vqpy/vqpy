@@ -166,7 +166,6 @@ class VObjFilterNode(AbstractPlanNode):
 
         )
 
-
     def __str__(self):
         return f"VObjFilterNode(predicate={self.predicate}, \n" \
                f"\tfilter_index={self.filter_index}), \n" \
