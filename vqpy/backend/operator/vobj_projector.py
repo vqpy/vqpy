@@ -96,7 +96,11 @@ class VObjProjector(Operator):
                            for dep_name in self._non_hist_dependencies.keys()}
                 cur_dep.update(
                     {"vobj_index": vobj_index})
-                non_hist_deps.append(cur_dep)
+
+                non_hist_deps = pd.concat([non_hist_deps,
+                                          pd.DataFrame([cur_dep])],
+                                          ignore_index=True)
+                # non_hist_deps.append(cur_dep)
 
                 # dependency data to be saved as history
                 if self._stateful:
@@ -107,7 +111,10 @@ class VObjProjector(Operator):
                             "track_id": vobj_data["track_id"],
                             "frame_id": frame.id})
 
-                    hist_deps.append(hist_dep)
+                    # hist_deps.append(hist_dep)
+                    hist_deps = pd.concat([hist_deps,
+                                           pd.DataFrame([hist_dep])],
+                                          ignore_index=True)
 
         # sanity check
         if not self._stateful:
