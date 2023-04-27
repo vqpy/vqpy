@@ -96,6 +96,7 @@ class VObjProjector(Operator):
                            for dep_name in self._non_hist_dependencies.keys()}
                 cur_dep.update(
                     {"vobj_index": vobj_index})
+
                 non_hist_deps.append(cur_dep)
 
                 # dependency data to be saved as history
@@ -108,14 +109,16 @@ class VObjProjector(Operator):
                             "frame_id": frame.id})
 
                     hist_deps.append(hist_dep)
-
         # sanity check
         if not self._stateful:
             assert not hist_deps, "stateful_deps should be empty"
         return non_hist_deps, hist_deps
 
     def _update_hist_buffer(self, hist_deps):
-        self._hist_buffer = self._hist_buffer.append(hist_deps)
+        # self._hist_buffer = self._hist_buffer.append(hist_deps)
+        self._hist_buffer = pd.concat([self._hist_buffer,
+                                       pd.DataFrame.from_dict(hist_deps)])
+
         # remove data that older than max history length
         cur_frame_id = hist_deps[0]["frame_id"]
         # frame_id starts from 0
