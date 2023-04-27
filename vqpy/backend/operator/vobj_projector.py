@@ -116,8 +116,9 @@ class VObjProjector(Operator):
 
     def _update_hist_buffer(self, hist_deps):
         # self._hist_buffer = self._hist_buffer.append(hist_deps)
-        self._hist_buffer = pd.concat([self._hist_buffer, hist_deps],
-                                      ignore_index=True)
+        self._hist_buffer = pd.concat([self._hist_buffer,
+                                       pd.DataFrame.from_dict(hist_deps)])
+
         # remove data that older than max history length
         cur_frame_id = hist_deps[0]["frame_id"]
         # frame_id starts from 0
