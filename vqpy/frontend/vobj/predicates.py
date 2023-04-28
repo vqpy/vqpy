@@ -1,8 +1,17 @@
+"""
+Predicate is the result of a boolean condition related to a vqpy property.
+This module supports the boolean opeartions between predicates.
+Basic functions of Predicate:
+    get_vobjs(): return the list of vobj instances related to this predicate.
+    get_vobj_properties(): return all properties
+"""
+
 from abc import ABC, abstractmethod
 from vqpy.frontend.vobj.common import UnComputedProperty, get_dep_properties
 
 
 class Predicate(ABC):
+    # Base class for all select condition
     def __and__(self, other):
         return And(self, other)
 
@@ -22,6 +31,7 @@ class Predicate(ABC):
 
 
 class BinaryPredicate(Predicate):
+    # Base class for boolean operator between predicates
     def __init__(self, lp: Predicate, rp: Predicate) -> Predicate:
         self.left_pred = lp
         self.right_pred = rp
@@ -45,6 +55,7 @@ class BinaryPredicate(Predicate):
 
 
 class And(BinaryPredicate):
+    # And operator
     def generate_condition_function(self):
         l_f = self.left_pred.generate_condition_function()
         r_f = self.right_pred.generate_condition_function()
@@ -53,6 +64,7 @@ class And(BinaryPredicate):
 
 
 class Or(BinaryPredicate):
+    # Or operator
     def generate_condition_function(self):
         l_f = self.left_pred.generate_condition_function()
         r_f = self.right_pred.generate_condition_function()
@@ -61,6 +73,7 @@ class Or(BinaryPredicate):
 
 
 class Not(Predicate):
+    # Not operator
     def __init__(self, p: Predicate) -> Predicate:
         self.pred = p
 
@@ -72,6 +85,7 @@ class Not(Predicate):
 
 
 class IsInstance(Predicate):
+    # Class isinstance operator
     def __init__(self, vobj):
         self.vobj = vobj
 
@@ -92,6 +106,7 @@ class IsInstance(Predicate):
 
 
 class LiteralPredicate(Predicate):
+    # Base class for lowest level operator
     def __init__(self, left_prop, right_prop):
         self.left_prop = left_prop
         self.right_prop = right_prop
@@ -136,7 +151,7 @@ class LiteralPredicate(Predicate):
 
 
 class Equal(LiteralPredicate):
-
+    # Lowest level equal operator
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
             l_value, r_value = self._get_prop_values(vobj_data)
@@ -150,7 +165,7 @@ class Equal(LiteralPredicate):
 
 
 class GreaterThan(LiteralPredicate):
-
+    # Lowest level greater than operator
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
             l_value, r_value = self._get_prop_values(vobj_data)
@@ -166,7 +181,7 @@ class GreaterThan(LiteralPredicate):
 
 
 class Compare(Predicate):
-
+    # Lowest level compare operator
     def __init__(self, prop, compare_func):
         self.prop = prop
         self.compare_func = compare_func

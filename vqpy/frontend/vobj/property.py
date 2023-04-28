@@ -1,3 +1,13 @@
+"""
+Property is the base class of all vobj properties.
+This module supports the properties related to vobjs.
+Basic functions of Property:
+    get_vobjs(): return the vobjs related to this property
+    binary_ops: return the desiring Predicate value.
+    cmp(func: Callable): return func(self) as a Predicate value.
+TODO: support cross-vobj property.
+"""
+
 from vqpy.frontend.vobj.predicates import Equal, GreaterThan, Compare
 from typing import Dict, Callable
 from abc import ABC
