@@ -8,7 +8,7 @@ from vqpy.operator.detector.models.onnx.faster_rcnn import FasterRCNNDdetector
 from vqpy.operator.detector.models.torch.yolox import YOLOXDetector
 from vqpy.operator.detector.base import DetectorBase
 import os
-from typing import Optional
+from typing import Optional, Tuple
 from loguru import logger
 import torch.hub
 
@@ -55,7 +55,7 @@ register("yolov4", Yolov4Detector, yolov4_path, None)
 def setup_detector(cls_names,
                    detector_name: Optional[str] = None,
                    detector_args: Optional[dict] = dict()
-                   ) -> (str, DetectorBase):
+                   ) -> Tuple[str, DetectorBase]:
     """setup a detector for video analytics
     cls_names: the detection class types of the required detector
     """
