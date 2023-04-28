@@ -4,10 +4,12 @@ from vqpy.backend.operator.vobj_filter import VObjFilter
 from vqpy.backend.operator.frame_filter import VObjFrameFilter
 from vqpy.backend.operator.tracker import Tracker
 from vqpy.backend.operator.vobj_projector import VObjProjector
+from vqpy.backend.operator.output_formatter import FrameOutputFormatter
 from vqpy.frontend.query import QueryBase
 from vqpy.frontend.vobj.predicates import Predicate, IsInstance
+from vqpy.frontend.vobj.property import Property
 from abc import abstractmethod
-from typing import Set, Union, Optional, Dict, Callable, Any
+from typing import Set, Union, Optional, Dict, Callable, Any, List
 
 
 class AbstractPlanNode:
@@ -189,6 +191,29 @@ class VObjFrameFilterNode(AbstractPlanNode):
             f"\tnext={self.next.__class__.__name__})"
 
 
+class FrameOutputNode(AbstractPlanNode):
+
+    def __init__(self,
+                 filter_index_to_class_name_to_property_names:
+                 Dict[int, Dict[str, List[str]]],
+                 filter_index_to_vobj_name: Dict[int, str]
+                 ):
+        self.props_mapping = filter_index_to_class_name_to_property_names
+        self.vobj_names_mapping = filter_index_to_vobj_name
+        super().__init__()
+
+    def to_operator(self, lauch_args: dict):
+        return FrameOutputFormatter(
+            prev=self.prev.to_operator(lauch_args),
+            filter_index_to_class_name_to_property_names=self.props_mapping,
+            filter_index_to_vobj_name=self.vobj_names_mapping)
+
+    def __str__(self):
+        return f"VObjFrameOutputNode(props_mapping={self.props_mapping}), \n"\
+            f"\tprev={self.prev.__class__.__name__}), \n" \
+            f"\tnext={self.next.__class__.__name__})"
+
+
 class Planner:
 
     def print_plan(self, node: AbstractPlanNode = None):
@@ -207,6 +232,8 @@ class Planner:
         output_node = self._create_frame_filter_node(query_obj, output_node)
         output_node = self._create_frame_output_projector(query_obj,
                                                           output_node, map)
+        output_node = self._create_frame_output_formatter(query_obj,
+                                                          output_node)
         return output_node
 
     def _create_object_detector_node(self, query_obj: QueryBase, input_node):
@@ -286,7 +313,9 @@ class Planner:
                                        vobj_properties_map: dict):
         existing_vobj_properties = vobj_properties_map.copy()
         frame_output = query_vobj.frame_output()
-        for prop in frame_output.values():
+        if isinstance(frame_output, Property):
+            frame_output = [frame_output]
+        for prop in frame_output:
             vobj = prop.get_vobjs()
             assert len(vobj) == 1, "Only support one vobj for vobj_property."
             vobj = list(vobj)[0]
@@ -304,6 +333,31 @@ class Planner:
                 input_node = input_node.set_next(projector_node)
                 existing_properties.append(prop)
         return input_node
+
+    def _create_frame_output_formatter(self, query_vobj: QueryBase,
+                                       input_node):
+        frame_output = query_vobj.frame_output()
+        if isinstance(frame_output, Property):
+            frame_output = [frame_output]
+        property_mappings = dict()
+        vobj_name_mappings = dict()
+
+        # todo: support multiple vobjs
+        filter_index = 0
+        vobj = frame_output[0].get_vobjs()
+        assert len(vobj) == 1, "Only support one vobj for vobj_property."
+        vobj = list(vobj)[0]
+        class_name = vobj.class_name
+        name = vobj.name
+        vobj_name_mappings[filter_index] = name
+        property_mappings[filter_index] = {
+            class_name: [prop.name for prop in frame_output]
+        }
+        frame_output_formatter = FrameOutputNode(
+            filter_index_to_class_name_to_property_names=property_mappings,
+            filter_index_to_vobj_name=vobj_name_mappings
+        )
+        return input_node.set_next(frame_output_formatter)
 
 
 def add_video_metadata(launch_args: dict):
@@ -324,8 +378,6 @@ class Executor:
         self.root_operator = root_plan_node.to_operator(self._launch_args)
 
     def execute(self):
-        result = []
         while self.root_operator.has_next():
-            frame = self.root_operator.next()
-            result.append(frame)
-        return result
+            result = self.root_operator.next()
+            yield result
