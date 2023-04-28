@@ -59,11 +59,11 @@ class ListPerson(QueryBase):
         )
 
     def frame_output(self):
-        return {
-            "center": self.person.center,
-            "velocity": self.person.velocity,
-            "acceleration": self.person.acceleration,
-        }
+        return (
+            self.person.center,
+            self.person.velocity,
+            self.person.acceleration,
+        )
 
 
 def test_plan():
@@ -75,12 +75,8 @@ def test_plan():
     planner.print_plan(root_plan_node)
     executor = Executor(root_plan_node, launch_args)
     result = executor.execute()
-
-    for frame in result:
-        # todo: put in planner
-        print(frame.id)
-        for person_idx in frame.filtered_vobjs[0]["person"]:
-            print(frame.vobj_data["person"][person_idx])
+    for res in result:
+        print(res)
 
 
 if __name__ == "__main__":

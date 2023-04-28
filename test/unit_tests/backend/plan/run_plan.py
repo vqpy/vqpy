@@ -68,11 +68,8 @@ def test_plan():
     executor = Executor(root_plan_node, launch_args)
     result = executor.execute()
 
-    for frame in result:
-        # todo: put in planner
-        print(frame.id)
-        for person_idx in frame.filtered_vobjs[0]["car"]:
-            print(frame.vobj_data["car"][person_idx])
+    for res in result:
+        print(res)
 
 
 if __name__ == "__main__":
