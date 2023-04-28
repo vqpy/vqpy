@@ -58,7 +58,7 @@ def postprocess(detections, image_size):
             xy_grid = np.expand_dims(np.stack(xy_grid, axis=-1), axis=2)
 
             xy_grid = np.tile(np.expand_dims(xy_grid, axis=0), [1, 1, 1, 3, 1])
-            xy_grid = xy_grid.astype(np.float)
+            xy_grid = xy_grid.astype(np.float_)
 
             pred_xy = ((special.expit(conv_raw_dxdy) * XYSCALE[i]) -
                        0.5 * (XYSCALE[i] - 1) + xy_grid) * STRIDES[i]
