@@ -20,6 +20,9 @@ if not os.path.exists(DEFAULT_DETECTOR_WEIGHTS_DIR):
 
 vqpy_detectors = {}
 
+# Important TODO: import the model only when the model is used
+# Otherwise we have to clone yolox model to support it
+
 
 def register(detector_name,
              detector_type,
@@ -57,17 +60,17 @@ def setup_detector(cls_names,
     cls_names: the detection class types of the required detector
     """
     if detector_name:
+        detector_name = detector_name.lower()
         if detector_name not in vqpy_detectors:
             raise ValueError(f"Detector name of {detector_name} hasn't been"
                              f"registered to VQPy")
         detector_type, weights_path, url = vqpy_detectors[detector_name]
-
     else:
         # TODO: add automatic detector selection interface here
         for detector_name in vqpy_detectors:
             # Optional TODO: add ambiguous class match here
             detector_type, weights_path, url = vqpy_detectors[detector_name]
-            if cls_names == detector_type.cls_names:
+            if detector_type.cls_names.issuperset(cls_names):
                 print(f"Detector {detector_name} has been selected!")
                 break
     logger.info(f"Detector {detector_name} is chosen!")
