@@ -14,6 +14,8 @@ class VObjBase(ABC):
         self.frame_width = BuiltInProperty(self, "frame_width")
         self.frame_height = BuiltInProperty(self, "frame_height")
         self.n_frames = BuiltInProperty(self, "n_frames")
+        self.track_id = BuiltInProperty(self, "track_id")
+
         self.name = name or self.__class__.__name__
 
     def get_builtin_property_names(self):
