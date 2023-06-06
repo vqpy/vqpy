@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from vqpy.frontend.vobj.common import UnComputedProperty, get_dep_properties
+from vqpy.common.property_type import InvalidProperty, UnComputedProperty
+from vqpy.frontend.vobj.common import get_dep_properties
 
 
 class Predicate(ABC):
@@ -118,6 +119,8 @@ class LiteralPredicate(Predicate):
         def get_value(prop):
             if prop.is_literal():
                 return prop.value
+            # vobjs that are not correctly tracked will not
+            #  contain the stateful property.
             elif prop.is_vobj_property() and prop.stateful:
                 if prop.name in vobj_data:
                     return vobj_data[prop.name]
@@ -144,6 +147,10 @@ class Equal(LiteralPredicate):
                 r_value, UnComputedProperty
             ):
                 return False
+            if isinstance(l_value, InvalidProperty) or isinstance(
+                r_value, InvalidProperty
+            ):
+                return False
             return l_value == r_value
 
         return condition_function
@@ -157,6 +164,10 @@ class GreaterThan(LiteralPredicate):
 
             if isinstance(l_value, UnComputedProperty) or isinstance(
                 r_value, UnComputedProperty
+            ):
+                return False
+            if isinstance(l_value, InvalidProperty) or isinstance(
+                r_value, InvalidProperty
             ):
                 return False
 
@@ -195,6 +206,9 @@ class Compare(Predicate):
             prop_value = self._get_prop_value(vobj_data)
 
             if isinstance(prop_value, UnComputedProperty):
+                return False
+
+            if isinstance(prop_value, InvalidProperty):
                 return False
 
             return self.compare_func(prop_value)

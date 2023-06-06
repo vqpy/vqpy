@@ -1,7 +1,3 @@
-class UnComputedProperty(object):
-    pass
-
-
 def get_dep_properties(prop):
     vobj_properties = []
     if prop.is_vobj_property():
