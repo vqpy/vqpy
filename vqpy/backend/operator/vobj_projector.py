@@ -4,6 +4,7 @@ from typing import Callable, Dict, Any
 import pandas as pd
 import numpy as np
 from vqpy.utils.images import crop_image
+from vqpy.common import InvalidProperty
 
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -91,7 +92,7 @@ class VObjProjector(Operator):
                     "vobj_data does not have all dependencies. Keys of "
                 f"vobj_data: {vobj_data.keys()}. Keys of dependencies: "
                 f"{self.dependencies.keys()}"
-                # dependency data as current frame depenedency
+                # dependency data as current frame dependency
                 cur_dep = {dep_name: vobj_data[dep_name]
                            for dep_name in self._non_hist_dependencies.keys()}
                 cur_dep.update(
@@ -162,13 +163,12 @@ class VObjProjector(Operator):
         return hist_data, True
 
     def _compute_property(self, non_hist_data, hist_data, frame):
-        # Todo: allow user to fill property without enough history with a
-        # default value. Currently fill with None
         for i, cur_dep in enumerate(non_hist_data):
             vobj_index = cur_dep["vobj_index"]
 
             dep_data_dict = dict()
             all_enough = True
+            all_valid = True
             for dependency_name, hist_len in self._hist_dependencies.items():
                 hist_dep = hist_data[i]
                 assert hist_dep["vobj_index"] == vobj_index
@@ -182,19 +182,27 @@ class VObjProjector(Operator):
                                                              hist_len=hist_len)
                 if enough:
                     assert len(dep_data) == hist_len + 1
+                    valid = all([not isinstance(d, InvalidProperty)
+                                 for d in dep_data])
+                    all_valid = all_valid and valid
                 all_enough = all_enough and enough
                 dep_data_dict[dependency_name] = dep_data
 
             for dependency_name in self._non_hist_dependencies:
                 assert dependency_name in cur_dep, \
                     f"dependency {dependency_name} is not in cur_dep"
-                dep_data_dict[dependency_name] = cur_dep[dependency_name]
+                dep_data = cur_dep[dependency_name]
+                valid = not isinstance(dep_data, InvalidProperty)
+                all_valid = all_valid and valid
+                dep_data_dict[dependency_name] = dep_data
 
             # compute property
-            if all_enough:
+            if all_enough and all_valid:
                 property_value = self.property_func(dep_data_dict)
             else:
-                property_value = None
+                # if not enough history or invalid data, set property to
+                # InvalidProperty
+                property_value = InvalidProperty()
             # update frame vobj_data with computed property value for
             # corresponding vobj
             frame.vobj_data[self.class_name][vobj_index][self.property_name] =\
