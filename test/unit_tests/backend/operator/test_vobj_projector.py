@@ -3,7 +3,7 @@ from vqpy.backend.operator.object_detector import ObjectDetector
 from vqpy.backend.operator.video_reader import VideoReader
 from vqpy.backend.operator.vobj_filter import VObjFilter
 from vqpy.backend.operator.tracker import Tracker
-
+from vqpy.common import InvalidProperty
 
 import pytest
 import os
@@ -54,13 +54,12 @@ def dep_tlbr_score(values):
     return tlbr_score
 
 
-def hist_tlbr(values):
-    last_2_tlbrs = values["tlbr"]
-    assert len(last_2_tlbrs) == 2
-    for tlbr in last_2_tlbrs:
-        if tlbr is None:
-            return 0
-    return last_2_tlbrs[0][0] - last_2_tlbrs[1][0]
+def hist_2_scores(values):
+    last_2_score = values["score"]
+    assert len(last_2_score) == 2
+    if last_2_score[0] is None or last_2_score[1] is None:
+        return 0
+    return last_2_score
 
 
 def hist_tlbr_score(values):
@@ -147,9 +146,9 @@ def test_stateful_projector(tracker):
 
     projector = VObjProjector(
         prev=person_vobj_filter,
-        property_name="hist_tlbr",
-        property_func=hist_tlbr,
-        dependencies={"tlbr": hist_len},
+        property_name="hist_scores",
+        property_func=hist_2_scores,
+        dependencies={"score": hist_len},
         class_name="person",
     )
     checked = False
@@ -160,13 +159,14 @@ def test_stateful_projector(tracker):
             if track_id:
                 checked = True
                 if frame.id < hist_len:
-                    assert vobj["hist_tlbr"] is None
+                    assert isinstance(vobj["hist_scores"], InvalidProperty)
                 else:
-                    assert vobj["hist_tlbr"] is not None
-                    # hist_buffer = projector._hist_buffer
-                    # row = (hist_buffer["track_id"] == track_id) & \
-                    #     (hist_buffer["frame_id"] == frame.id)
-                    # assert hist_buffer.loc[row, "tlbr"] == vobj["tlbr"]
+                    assert not isinstance(vobj["hist_scores"], InvalidProperty)
+                    hist_buffer = projector._hist_buffer
+                    row = (hist_buffer["track_id"] == track_id) & \
+                        (hist_buffer["frame_id"] == frame.id)
+                    assert hist_buffer.loc[row, "score"].values[0] == \
+                        vobj["score"]
     assert not projector._hist_buffer.empty
     assert checked
 
@@ -179,10 +179,8 @@ def test_stateless_projector_image_video(object_detector):
         image = values["image"]
         fps = values["fps"]
         assert fps == 24.0
-        if image is not None:
-            assert image.shape[2] == 3
-            return 1
-        return 0
+        assert image.shape[2] == 3
+        return 1
 
     person_vobj_filter = VObjFilter(
         prev=object_detector,
@@ -245,7 +243,8 @@ def test_stateful_projector_image_video(tracker):
             track_id = vobj.get("track_id")
             if track_id:
                 if frame.id < hist_len:
-                    assert vobj["image_fps_stateful"] is None
+                    assert isinstance(vobj["image_fps_stateful"],
+                                      InvalidProperty)
                 else:
                     result = vobj["image_fps_stateful"]
                     if result == 1:

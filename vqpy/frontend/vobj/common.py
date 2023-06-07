@@ -5,6 +5,8 @@ def get_dep_properties(prop):
         built_in_names = prop.vobj.get_builtin_property_names()
         vobj_dep_names = all_dep_names - built_in_names
         for name in vobj_dep_names:
+            if name == prop.name:
+                continue
             p = prop.vobj.get_property(name)
             vobj_properties.extend(get_dep_properties(p))
         vobj_properties.append(prop)
