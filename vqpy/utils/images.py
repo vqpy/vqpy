@@ -1,4 +1,5 @@
 import numpy as np
+from vqpy.common.property_type import InvalidProperty
 
 
 def tlbr_to_xyah(tlbr):
@@ -31,4 +32,4 @@ def crop_image(img, tlbr, ext=0):
         maxx = int(min(maxx + w * ext / 2, img.shape[1]))
         maxy = int(min(maxy + h * ext / 2, img.shape[0]))
         return img[miny:maxy+1, minx:maxx+1, :]
-    return None
+    return InvalidProperty()
