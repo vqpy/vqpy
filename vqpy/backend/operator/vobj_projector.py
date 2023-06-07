@@ -50,6 +50,7 @@ class VObjProjector(Operator):
                                        for name, hist_len in
                                        self.dependencies.items()
                                        if hist_len == 0}
+        self._self_dep = self.property_name in self._hist_dependencies
         self._stateful = len(self._hist_dependencies) > 0
         self._max_hist_len = max(dependencies.values())
         columns = ["track_id", "frame_id", "vobj_index"] + \
@@ -87,8 +88,9 @@ class VObjProjector(Operator):
                         vobj_data[key] = frame.video_metadata[key]
 
                 # sanity check: dependencies should be in vobj_data
-                assert all([dep_name in vobj_data for dep_name in
-                            self.dependencies.keys()]), \
+                assert all([dep_name in vobj_data
+                            for dep_name in self.dependencies.keys()
+                            if not dep_name == self.property_name]), \
                     "vobj_data does not have all dependencies. Keys of "
                 f"vobj_data: {vobj_data.keys()}. Keys of dependencies: "
                 f"{self.dependencies.keys()}"
@@ -103,7 +105,8 @@ class VObjProjector(Operator):
                 # dependency data to be saved as history
                 if self._stateful:
                     hist_dep = {dep_name: vobj_data[dep_name]
-                                for dep_name in self._hist_dependencies.keys()}
+                                for dep_name in self._hist_dependencies.keys()
+                                if not dep_name == self.property_name}
                     hist_dep.update(
                         {"vobj_index": vobj_index,
                             "track_id": vobj_data["track_id"],
@@ -139,13 +142,8 @@ class VObjProjector(Operator):
         # return None if there isn't enough history
         if hist_start < 0:
             return None, False
-        # if dependency is the property itself, get history data from
-        # hist_start to hist_end-1, and append None to the end as current
-        # frame data.
-        if dependency_name == self.property_name:
-            hist_end = frame_id - 1
-        else:
-            hist_end = frame_id
+
+        hist_end = frame_id - 1
         # get dependency data from hist buffer
         row = (self._hist_buffer["track_id"] == track_id) & \
               (self._hist_buffer["frame_id"] >= hist_start) & \
@@ -155,14 +153,16 @@ class VObjProjector(Operator):
         # fill missing frames with None
         hist_df = hist_df.replace(np.nan, None)
         hist_data = hist_df[dependency_name].tolist()
-        # hist_data contains both history data and current frame data
-        assert len(hist_data) == hist_len + 1
 
-        if dependency_name == self.property_name:
-            hist_data = hist_data.append(None)
+        # hist_data contains history data
+        assert len(hist_data) == hist_len
+
         return hist_data, True
 
     def _compute_property(self, non_hist_data, hist_data, frame):
+        # Todo: allow user to fill property without enough history with a
+        # default value. Currently fill with None
+        output_hist_data = hist_data.copy()
         for i, cur_dep in enumerate(non_hist_data):
             vobj_index = cur_dep["vobj_index"]
 
@@ -170,10 +170,11 @@ class VObjProjector(Operator):
             all_enough = True
             all_valid = True
             for dependency_name, hist_len in self._hist_dependencies.items():
-                hist_dep = hist_data[i]
+                hist_dep = output_hist_data[i]
                 assert hist_dep["vobj_index"] == vobj_index
-                assert dependency_name in hist_dep, \
-                    f"dependency {dependency_name} is not in hist_dep"
+                if dependency_name != self.property_name:
+                    assert dependency_name in hist_dep, \
+                        f"dependency {dependency_name} is not in hist_dep"
                 track_id = hist_dep["track_id"]
                 frame_id = hist_dep["frame_id"]
                 dep_data, enough = self._get_hist_dependency(dependency_name,
@@ -181,11 +182,19 @@ class VObjProjector(Operator):
                                                              frame_id=frame_id,
                                                              hist_len=hist_len)
                 if enough:
-                    assert len(dep_data) == hist_len + 1
+                    # add current frame dependency data
+                    if dependency_name != self.property_name:
+                        dep_data.append(hist_dep[dependency_name])
+                    else:
+                        dep_data.append(None)
+                    assert len(dep_data) == hist_len + 1, "length of " \
+                        f"dependency data {dependency_name} {len(dep_data)} is not " \
+                        f'equal to hist_len + 1 {hist_len + 1}'
                     valid = all([not isinstance(d, InvalidProperty)
                                  for d in dep_data])
                     all_valid = all_valid and valid
                 all_enough = all_enough and enough
+
                 dep_data_dict[dependency_name] = dep_data
 
             for dependency_name in self._non_hist_dependencies:
@@ -205,18 +214,24 @@ class VObjProjector(Operator):
                 property_value = InvalidProperty()
             # update frame vobj_data with computed property value for
             # corresponding vobj
-            frame.vobj_data[self.class_name][vobj_index][self.property_name] =\
-                property_value
-        return frame
+            vobj_data = frame.vobj_data[self.class_name][vobj_index]
+            vobj_data[self.property_name] = property_value
+
+            # todo: copy vobj_data to avoid modifying original data
+            if self._self_dep:
+                hist_dep = {self.property_name: property_value}
+
+        return frame, output_hist_data
 
     def next(self) -> Frame:
         if self.prev.has_next():
             frame = self.prev.next()
             non_hist_data, hist_data = self._get_cur_frame_dependencies(frame)
+            frame, output_hist_data = self._compute_property(non_hist_data,
+                                                             hist_data,
+                                                             frame=frame)
             if self._stateful and hist_data:
-                self._update_hist_buffer(hist_deps=hist_data)
-            frame = self._compute_property(non_hist_data, hist_data,
-                                           frame=frame)
+                self._update_hist_buffer(hist_deps=output_hist_data)
         return frame
 
 # TODO: ADD CrossVobjProjector
