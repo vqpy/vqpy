@@ -187,9 +187,7 @@ class VObjProjector(Operator):
                         dep_data.append(hist_dep[dependency_name])
                     else:
                         dep_data.append(None)
-                    assert len(dep_data) == hist_len + 1, "length of " \
-                        f"dependency data {dependency_name} {len(dep_data)} is not " \
-                        f'equal to hist_len + 1 {hist_len + 1}'
+                    assert len(dep_data) == hist_len + 1
                     valid = all([not isinstance(d, InvalidProperty)
                                  for d in dep_data])
                     all_valid = all_valid and valid
