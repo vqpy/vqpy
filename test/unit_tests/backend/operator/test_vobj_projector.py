@@ -45,10 +45,21 @@ def tracker(video_reader, object_detector):
     return tracker
 
 
-def tlbr_score(values):
-    tlbr = values["tlbr"]  # noqa: F841
-    score = values["score"]
-    return score > 0.5
+@pytest.fixture
+def stateless_filter(object_detector):
+    person_vobj_filter = VObjFilter(
+        prev=object_detector,
+        condition_func="person",
+    )
+    return person_vobj_filter
+
+@pytest.fixture
+def stateful_filter(tracker):
+    person_vobj_filter = VObjFilter(
+        prev=tracker,
+        condition_func="person",
+    )
+    return person_vobj_filter
 
 
 def dep_tlbr_score(values):
@@ -56,38 +67,15 @@ def dep_tlbr_score(values):
     return tlbr_score
 
 
-def hist_2_scores(values):
-    last_2_score = values["score"]
-    assert len(last_2_score) == 2
-    if last_2_score[0] is None or last_2_score[1] is None:
-        return 0
-    return last_2_score
-
-
-def hist_tlbr_score(values):
-    last_5_tlbrs = values["last_5_tlbrs"]
-    cur_score = values["cur_score"]
-    assert len(last_5_tlbrs) == 5
-    return cur_score - 0.5
-
-
-def dep_self(values):
-    last_5_dep_selfs = values["dep_self"]
-    assert len(last_5_dep_selfs) == 5
-    assert last_5_dep_selfs[-1] is None
-    assert all([dep_self == 1 for dep_self in last_5_dep_selfs[:-1]])
-    return 1
-
-
-def test_stateless_projector(object_detector):
+def test_stateless_projector(stateless_filter):
     # test projector with no history
-    person_vobj_filter = VObjFilter(
-        prev=object_detector,
-        condition_func="person",
-    )
+    def tlbr_score(values):
+        tlbr = values["tlbr"]  # noqa: F841
+        score = values["score"]
+        return score > 0.5
 
     projector = VObjProjector(
-        prev=person_vobj_filter,
+        prev=stateless_filter,
         property_name="score_gt_0.5",
         property_func=tlbr_score,
         dependencies={"tlbr": 0, "score": 0},
@@ -101,13 +89,9 @@ def test_stateless_projector(object_detector):
     assert projector._hist_buffer.empty
 
 
-def test_projector_dep_non_computed(object_detector):
-    person_vobj_filter = VObjFilter(
-        prev=object_detector,
-        condition_func="person",
-    )
+def test_projector_dep_non_computed(stateless_filter):
     projector = VObjProjector(
-        prev=person_vobj_filter,
+        prev=stateless_filter,
         property_name="dep_tlbr_score",
         property_func=dep_tlbr_score,
         dependencies={"tlbr_score": 0},
@@ -119,13 +103,10 @@ def test_projector_dep_non_computed(object_detector):
             projector.next()
 
 
-def test_projector_non_filter_index(object_detector):
-    person_vobj_filter = VObjFilter(
-        prev=object_detector,
-        condition_func="person",
-    )
+def test_projector_non_filter_index(stateless_filter):
+
     projector = VObjProjector(
-        prev=person_vobj_filter,
+        prev=stateless_filter,
         property_name="dep_tlbr_score",
         property_func=dep_tlbr_score,
         dependencies={"tlbr_score": 0},
@@ -138,7 +119,7 @@ def test_projector_non_filter_index(object_detector):
             projector.next()
 
 
-def test_stateful_projector(tracker):
+def test_stateful_projector(stateful_filter):
     # test projector with history
 
     def hist_2_scores(values):
@@ -148,14 +129,10 @@ def test_stateful_projector(tracker):
             return 0
         return last_2_score
 
-    person_vobj_filter = VObjFilter(
-        prev=tracker,
-        condition_func="person",
-    )
     hist_len = 1
 
     projector = VObjProjector(
-        prev=person_vobj_filter,
+        prev=stateful_filter,
         property_name="hist_scores",
         property_func=hist_2_scores,
         dependencies={"score": hist_len},
@@ -197,7 +174,7 @@ def test_stateful_projector(tracker):
     # test delete history
 
 
-def test_stateless_projector_image_video(object_detector):
+def test_stateless_projector_image_video(stateless_filter):
     # property function depend on image and video metadata
     def image_fps_stateless(values):
         image = values["image"]
@@ -206,13 +183,8 @@ def test_stateless_projector_image_video(object_detector):
         assert image.shape[2] == 3
         return 1
 
-    person_vobj_filter = VObjFilter(
-        prev=object_detector,
-        condition_func="person",
-    )
-
     projector = VObjProjector(
-        prev=person_vobj_filter,
+        prev=stateless_filter,
         property_name="image_fps_stateless",
         property_func=image_fps_stateless,
         dependencies={"image": 0, "fps": 0},
@@ -231,7 +203,7 @@ def test_stateless_projector_image_video(object_detector):
     assert num_image_cropped > 0
 
 
-def test_stateful_projector_image_video(tracker):
+def test_stateful_projector_image_video(stateful_filter):
     # property function depend on image and video metadata
     def image_fps_stateful(values):
         last_2_images = values["image"]
@@ -246,14 +218,10 @@ def test_stateful_projector_image_video(tracker):
                 assert image.shape[2] == 3
         return 1
 
-    person_vobj_filter = VObjFilter(
-        prev=tracker,
-        condition_func="person",
-    )
     hist_len = 1
 
     projector = VObjProjector(
-        prev=person_vobj_filter,
+        prev=stateful_filter,
         property_name="image_fps_stateful",
         property_func=image_fps_stateful,
         dependencies={"image": hist_len, "fps": 0},
@@ -277,7 +245,7 @@ def test_stateful_projector_image_video(tracker):
     assert num_image_cropped > 0
 
 
-def test_stateful_projector_dep_self(tracker):
+def test_stateful_projector_dep_self(stateful_filter):
 
     def self_dep(values):
         # only depend on last self value
@@ -288,15 +256,9 @@ def test_stateful_projector_dep_self(tracker):
         else:
             return 0
 
-    # test projector with history
-    person_vobj_filter = VObjFilter(
-        prev=tracker,
-        condition_func="person",
-    )
-
     hist_len = 2
     projector = VObjProjector(
-        prev=person_vobj_filter,
+        prev=stateful_filter,
         property_name="self_dep",
         property_func=self_dep,
         dependencies={"self_dep": hist_len},
@@ -328,8 +290,13 @@ def test_stateful_projector_dep_self(tracker):
     assert checked
 
 
-def test_stateful_projector_multi_deps():
-    pass
+# def test_stateful_projector_multi_deps():
+
+#     def hist_tlbr_score(values):
+#         last_5_tlbrs = values["last_5_tlbrs"]
+#         cur_score = values["cur_score"]
+#         assert len(last_5_tlbrs) == 5
+#         return cur_score - 0.5
 
 
 def test_projector_multi_index():
@@ -338,5 +305,3 @@ def test_projector_multi_index():
 
 def test_graph():
     pass
-
-# TODO: test property with video metadata and frame image dependencies
