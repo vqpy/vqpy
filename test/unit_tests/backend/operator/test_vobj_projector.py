@@ -53,6 +53,7 @@ def stateless_filter(object_detector):
     )
     return person_vobj_filter
 
+
 @pytest.fixture
 def stateful_filter(tracker):
     person_vobj_filter = VObjFilter(
