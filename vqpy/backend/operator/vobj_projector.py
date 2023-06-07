@@ -205,21 +205,28 @@ class VObjProjector(Operator):
                 all_valid = all_valid and valid
                 dep_data_dict[dependency_name] = dep_data
 
-            # compute property
+            # compute property only when there is enough history and all
+            # dependency data are valid
             if all_enough and all_valid:
                 property_value = self.property_func(dep_data_dict)
+            elif self._self_dep:
+                # if not enough history or invalid data, set property that
+                # depends on itself to None to avoid infinite loop
+                property_value = None
             else:
                 # if not enough history or invalid data, set property to
                 # InvalidProperty
                 property_value = InvalidProperty()
+
             # update frame vobj_data with computed property value for
             # corresponding vobj
             vobj_data = frame.vobj_data[self.class_name][vobj_index]
             vobj_data[self.property_name] = property_value
 
-            # todo: copy vobj_data to avoid modifying original data
+            # update output_hist_data with computed self dependent property
+            # value
             if self._self_dep:
-                hist_dep = {self.property_name: property_value}
+                hist_dep[self.property_name] = property_value
 
         return frame, output_hist_data
 

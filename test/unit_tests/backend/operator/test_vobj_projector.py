@@ -4,6 +4,8 @@ from vqpy.backend.operator.video_reader import VideoReader
 from vqpy.backend.operator.vobj_filter import VObjFilter
 from vqpy.backend.operator.tracker import Tracker
 from vqpy.common import InvalidProperty
+from collections import defaultdict
+
 
 import pytest
 import os
@@ -138,6 +140,14 @@ def test_projector_non_filter_index(object_detector):
 
 def test_stateful_projector(tracker):
     # test projector with history
+
+    def hist_2_scores(values):
+        last_2_score = values["score"]
+        assert len(last_2_score) == 2
+        if last_2_score[0] is None or last_2_score[1] is None:
+            return 0
+        return last_2_score
+
     person_vobj_filter = VObjFilter(
         prev=tracker,
         condition_func="person",
@@ -152,6 +162,8 @@ def test_stateful_projector(tracker):
         class_name="person",
     )
     checked = False
+    result = defaultdict(list)
+
     while projector.has_next():
         frame = projector.next()
         for vobj in frame.vobj_data["person"]:
@@ -167,6 +179,18 @@ def test_stateful_projector(tracker):
                         (hist_buffer["frame_id"] == frame.id)
                     assert hist_buffer.loc[row, "score"].values[0] == \
                         vobj["score"]
+                    data = {"frame_id": frame.id,
+                            "hist_scores": vobj["hist_scores"]}
+                    result[track_id].append(data)
+
+    for vobj_data in result.items():
+        last_data = None
+        for data in vobj_data:
+            if last_data is not None and \
+                    last_data["frame_id"] + 1 == data["frame_id"]:
+                assert data["hist_scores"][0] == last_data["hist_scores"][1]
+                last_data = data
+
     assert not projector._hist_buffer.empty
     assert checked
 
@@ -253,8 +277,55 @@ def test_stateful_projector_image_video(tracker):
     assert num_image_cropped > 0
 
 
-def test_stateful_projector_dep_self():
-    pass
+def test_stateful_projector_dep_self(tracker):
+
+    def self_dep(values):
+        # only depend on last self value
+        last2_value, last_value, this_value = values["self_dep"]
+        assert this_value is None
+        if last_value is not None:
+            return last_value + 1
+        else:
+            return 0
+
+    # test projector with history
+    person_vobj_filter = VObjFilter(
+        prev=tracker,
+        condition_func="person",
+    )
+
+    hist_len = 2
+    projector = VObjProjector(
+        prev=person_vobj_filter,
+        property_name="self_dep",
+        property_func=self_dep,
+        dependencies={"self_dep": hist_len},
+        class_name="person",
+    )
+    checked = False
+    result = defaultdict(list)
+
+    while projector.has_next():
+        frame = projector.next()
+        for vobj in frame.vobj_data["person"]:
+            track_id = vobj.get("track_id")
+            if track_id:
+                if frame.id < hist_len:
+                    assert vobj["self_dep"] is None
+                else:
+                    data = {"frame_id": frame.id, "self_dep": vobj["self_dep"]}
+                    result[track_id].append(data)
+                    assert vobj["self_dep"] is not None
+    for vobj_data in result.values():
+        last_data = None
+        for data in vobj_data:
+            if last_data is not None and \
+                    last_data["frame_id"] + 1 == data["frame_id"]:
+                assert data["self_dep"] == last_data["self_dep"] + 1
+                checked = True
+            last_data = data
+            assert not projector._hist_buffer.empty
+    assert checked
 
 
 def test_stateful_projector_multi_deps():
