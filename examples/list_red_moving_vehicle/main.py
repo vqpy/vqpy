@@ -94,7 +94,7 @@ def run(query: QueryBase, video_path, save_file_path=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path", help="path to video file", 
+    parser.add_argument("--path", help="path to video file",
                         default="./license-10s.mp4")
     parser.add_argument("--save_folder", help="path to save query result")
     args = parser.parse_args()

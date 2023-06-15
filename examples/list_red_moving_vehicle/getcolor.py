@@ -50,4 +50,4 @@ def get_color(image):
 
 @vqpy.vqpy_func_logger(['image'], ['major_color_rgb'], [], required_length=1)
 def get_image_color(obj, image: Optional[np.ndarray]) -> str:
-    return [get_color\]
+    return [get_color]
