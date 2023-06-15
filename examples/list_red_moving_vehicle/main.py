@@ -24,6 +24,10 @@ class Car(VObjBase):
 
     @vobj_property(inputs={"image": 0, "license_plate": 2})
     def license_plate(self, values):
+        """
+        Note that the built in openalpr model is not very accurate.
+        You can change the model to a better one.
+        """
         from vqpy.property_lib.vehicle.models.openalpr import GetLP
         image = values["image"]
         last_license_plate = values["license_plate"][-2]
