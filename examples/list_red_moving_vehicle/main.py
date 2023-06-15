@@ -1,11 +1,9 @@
 from vqpy.backend.plan import Planner, Executor
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
-import os
 import math
 import json
 import argparse
-import numpy as np
 from getcolor import get_color
 
 
@@ -96,7 +94,8 @@ def run(query: QueryBase, video_path, save_file_path=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path", help="path to video file", default="./license-10s.mp4")
+    parser.add_argument("--path", help="path to video file", 
+                        default="./license-10s.mp4")
     parser.add_argument("--save_folder", help="path to save query result")
     args = parser.parse_args()
     run(FindAmberAlertCar(), args.path, args.save_folder)

@@ -46,7 +46,6 @@ class ListRedMovingVehicle(ListMovingVehicle):
     """The class obtaining all red moving vehicles"""
     @staticmethod
     def setting() -> vqpy.VObjConstraint:
-        import webcolors
 
         def rgb_is_red(color):
             color = np.asarray(color)
