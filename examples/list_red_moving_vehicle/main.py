@@ -5,18 +5,8 @@ import os
 import math
 import json
 import argparse
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-resource_dir = os.path.join(current_dir, "..", "..", "resources/")
-video_path = os.path.join(resource_dir, "pedestrian_10s.mp4")
-
-
-def get_image_color(image):
-    return "red"
-
-
-def get_license_plate(image):
-    return "123456"
+import numpy as np
+from getcolor import get_color
 
 
 class Car(VObjBase):
@@ -29,13 +19,18 @@ class Car(VObjBase):
     @vobj_property(inputs={"image": 0})
     def color(self, values):
         image = values["image"]
-        color = get_image_color(image)
+        color = get_color(image)
         return color
-    
-    @vobj_property(inputs={"image": 0})
+
+    @vobj_property(inputs={"image": 0, "license_plate": 2})
     def license_plate(self, values):
+        from vqpy.property_lib.vehicle.models.openalpr import GetLP
         image = values["image"]
-        license_plate = get_license_plate(image)
+        last_license_plate = values["license_plate"][-2]
+        if last_license_plate is None:
+            license_plate = GetLP(image)
+        else:
+            license_plate = last_license_plate
         return license_plate
 
     @vobj_property(inputs={"tlbr": 1})
@@ -57,16 +52,27 @@ class ListSpeedingCar(QueryBase):
         self.car = Car()
 
     def frame_constraint(self):
-        return self.car.velocity > 0.1
+        return (self.car.score > 0.6) \
+               & (self.car.velocity > 1.0)
 
     def frame_output(self):
         return (
             self.car.track_id,
-            self.car.license_plate
+            self.car.color,
         )
 
 
-def run(query: QueryBase, video_path, save=False, save_file_path=None):
+class FindAmberAlertCar(ListSpeedingCar):
+    def frame_constraint(self):
+        return super().frame_constraint() \
+               & (self.car.color.cmp(lambda color: "red" in color))
+
+    def frame_output(self):
+        return (self.car.track_id,
+                self.car.license_plate)
+
+
+def run(query: QueryBase, video_path, save_file_path=None):
     planner = Planner()
     launch_args = {
         "video_path": video_path,
@@ -75,7 +81,7 @@ def run(query: QueryBase, video_path, save=False, save_file_path=None):
     planner.print_plan(root_plan_node)
     executor = Executor(root_plan_node, launch_args)
     result = executor.execute()
-    if save:
+    if save_file_path:
         with open(save_file_path, "w") as f:
             for res in result:
                 json.dump(res, f)
@@ -86,6 +92,7 @@ def run(query: QueryBase, video_path, save=False, save_file_path=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path", help="path to video file")
+    parser.add_argument("--path", help="path to video file", default="./license-10s.mp4")
+    parser.add_argument("--save_folder", help="path to save query result")
     args = parser.parse_args()
-    run(ListSpeedingCar(), args.path)
+    run(FindAmberAlertCar(), args.path, args.save_folder)

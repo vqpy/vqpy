@@ -4,10 +4,10 @@ import cv2
 import vqpy
 
 
-@vqpy.vqpy_func_logger(['image'], ['major_color_rgb'], [], required_length=1)
-def get_image_color(obj, image: Optional[np.ndarray]) -> str:
+def get_color(image):
     import webcolors
     from colordetect import ColorDetect
+    import cv2
 
     class BindedColorDetect(ColorDetect):
         def _find_unique_colors(self, cluster, centroids) -> dict:
@@ -28,7 +28,7 @@ def get_image_color(obj, image: Optional[np.ndarray]) -> str:
             return dict(colors)
 
     if image is None:
-        return [None]
+        return None
 
     maximum_width = 24
     ratio = max(maximum_width / image.shape[0], maximum_width / image.shape[1])
@@ -36,6 +36,7 @@ def get_image_color(obj, image: Optional[np.ndarray]) -> str:
         size = (int(image.shape[0] * ratio + 0.5),
                 int(image.shape[1] * ratio + 0.5))
         image = cv2.resize(image, size, interpolation=cv2.INTER_LINEAR)
+
     detector = BindedColorDetect(image)
     result = detector.get_color_count()
     bestrgb, bestp = None, 0
@@ -45,4 +46,9 @@ def get_image_color(obj, image: Optional[np.ndarray]) -> str:
             percent /= 5
         if percent > bestp:
             bestrgb, bestp = rgb, percent
-    return [bestrgb]
+    return webcolors.rgb_to_name(bestrgb)
+
+
+@vqpy.vqpy_func_logger(['image'], ['major_color_rgb'], [], required_length=1)
+def get_image_color(obj, image: Optional[np.ndarray]) -> str:
+    return [get_color(image)]

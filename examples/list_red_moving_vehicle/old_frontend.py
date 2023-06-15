@@ -54,7 +54,7 @@ class ListRedMovingVehicle(ListMovingVehicle):
 
         select_cons = {'track_id': None,
                        'license_plate': None,
-                       'major_color_rgb': webcolors.rgb_to_name}
+                       'major_color_rgb': None}
         filter_cons = {'major_color_rgb': rgb_is_red}
         return vqpy.VObjConstraint(select_cons=select_cons,
                                    filter_cons=filter_cons,
