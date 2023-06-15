@@ -7,7 +7,7 @@ from vqpy.backend.operator.vobj_projector import VObjProjector
 from vqpy.backend.operator.output_formatter import FrameOutputFormatter
 from vqpy.frontend.query import QueryBase
 from vqpy.frontend.vobj.predicates import Predicate, IsInstance
-from vqpy.frontend.vobj.property import Property
+from vqpy.frontend.vobj.property import Property, BuiltInProperty
 from abc import abstractmethod
 from typing import Set, Union, Optional, Dict, Callable, Any, List
 
@@ -320,18 +320,19 @@ class Planner:
             assert len(vobj) == 1, "Only support one vobj for vobj_property."
             vobj = list(vobj)[0]
             existing_properties = existing_vobj_properties[vobj]
-            if all([prop.func != ep.func for ep in existing_properties]):
-                projector_node = ProjectorNode(
-                    class_name=vobj.class_name,
-                    projection_field=ProjectionField(
-                        field_name=prop.name,
-                        field_func=prop,
-                        dependent_fields=prop.inputs,
-                    ),
-                    filter_index=0
-                )
-                input_node = input_node.set_next(projector_node)
-                existing_properties.append(prop)
+            if not isinstance(prop, BuiltInProperty):
+                if all([prop.func != ep.func for ep in existing_properties]):
+                    projector_node = ProjectorNode(
+                        class_name=vobj.class_name,
+                        projection_field=ProjectionField(
+                            field_name=prop.name,
+                            field_func=prop,
+                            dependent_fields=prop.inputs,
+                        ),
+                        filter_index=0
+                    )
+                    input_node = input_node.set_next(projector_node)
+                    existing_properties.append(prop)
         return input_node
 
     def _create_frame_output_formatter(self, query_vobj: QueryBase,
