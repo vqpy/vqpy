@@ -1,5 +1,11 @@
 import argparse
 import vqpy
+from typing import List, Tuple
+import numpy as np
+
+from vqpy.backend.plan import Planner, Executor
+from vqpy.frontend.vobj import VObjBase, vobj_property
+from vqpy.frontend.query import QueryBase
 
 
 def make_parser():
@@ -13,43 +19,66 @@ def make_parser():
     return parser
 
 
-class Person(vqpy.VObjBase):
-    pass
+REGION = [(550, 550), (1162, 400), (1720, 720), (1430, 1072), (600, 1073)]
+REGIONS = [REGION]
 
 
-class People_loitering_query(vqpy.QueryBase):
-    @staticmethod
-    def setting() -> vqpy.VObjConstraint:
-        REGION = [
-            (550, 550), (1162, 400), (1720, 720), (1430, 1072), (600, 1073)
+class Person(VObjBase):
+    def __init__(self) -> None:
+        self.class_name = "person"
+        self.object_detector = "yolox"
+        self.detector_kwargs = {"device": "gpu"}
+        super().__init__()
+
+    @vobj_property(inputs={"tlbr": 0})
+    def bottom_center(self, values) -> List[Tuple[int, int]]:
+        tlbr = values["tlbr"]
+        x = (tlbr[0] + tlbr[2]) / 2
+        y = tlbr[3]
+        return [(x, y)]
+
+    @vobj_property(inputs={"tlbr": 0})
+    def center(self, values):
+        tlbr = values["tlbr"]
+        return (tlbr[:2] + tlbr[2:]) / 2
+
+    # TODO: continuing not yet supported, workaround
+    @vobj_property(inputs={"bottom_center": 9})
+    def in_region(self, values):
+        bottom_centers = values["bottom_center"]
+        in_region = np.all(
+            [
+                bottom_center is not None
+                and vqpy.query.utils.within_regions(REGIONS)(bottom_center)
+                for bottom_center in bottom_centers
             ]
-        REGIONS = [REGION]
-
-        filter_cons = {
-            "__class__": lambda x: x == Person,
-            "bottom_center": vqpy.query.continuing(
-                condition=vqpy.query.utils.within_regions(REGIONS),
-                duration=10, name="in_roi"
-            ),
-        }
-        select_cons = {
-            "track_id": None,
-            "coordinate": lambda x: str(x),  # convert to string for
-                                             # JSON serialization
-            # name in vqpy.continuing + '_periods' can be used in select_cons.
-            "in_roi_periods": None,
-        }
-        return vqpy.VObjConstraint(
-            filter_cons, select_cons, filename="loitering"
         )
+        return in_region
+
+
+class People_loitering_query(QueryBase):
+    def __init__(self) -> None:
+        self.person = Person()
+
+    def frame_constraint(self):
+        return self.person.in_region == True  # noqa: E712
+
+    def frame_output(self):
+        return {
+            "center": self.person.center,
+        }
 
 
 if __name__ == "__main__":
     args = make_parser().parse_args()
-    vqpy.launch(
-        cls_name=vqpy.COCO_CLASSES,
-        cls_type={"person": Person},
-        tasks=[People_loitering_query()],
-        video_path=args.path,
-        save_folder=args.save_folder,
-    )
+    planner = Planner()
+    launch_args = {"video_path": args.path}
+    root_plan_node = planner.parse(People_loitering_query())
+    planner.print_plan(root_plan_node)
+    executor = Executor(root_plan_node, launch_args)
+    result = executor.execute()
+
+    for frame in result:
+        print(frame.id)
+        for person_idx in frame.filtered_vobjs[0]["person"]:
+            print(frame.vobj_data["person"][person_idx])
