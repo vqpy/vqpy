@@ -1,8 +1,7 @@
-from vqpy.backend.plan import Planner, Executor
+import vqpy
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
 import math
-import json
 import argparse
 from getcolor import get_color
 
@@ -74,28 +73,15 @@ class FindAmberAlertCar(ListSpeedingCar):
                 self.car.license_plate)
 
 
-def run(query: QueryBase, video_path, save_file_path=None):
-    planner = Planner()
-    launch_args = {
-        "video_path": video_path,
-    }
-    root_plan_node = planner.parse(query)
-    planner.print_plan(root_plan_node)
-    executor = Executor(root_plan_node, launch_args)
-    result = executor.execute()
-    if save_file_path:
-        with open(save_file_path, "w") as f:
-            for res in result:
-                json.dump(res, f)
-    else:
-        for res in result:
-            print(res)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", help="path to video file",
                         default="./license-10s.mp4")
     parser.add_argument("--save_folder", help="path to save query result")
     args = parser.parse_args()
-    run(FindAmberAlertCar(), args.path, args.save_folder)
+    query_executor = vqpy.init(
+        video_path=args.path,
+        query_obj=FindAmberAlertCar(),
+        verbose=True,
+    )
+    vqpy.run(query_executor, args.save_folder)
