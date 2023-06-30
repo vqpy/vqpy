@@ -14,29 +14,53 @@ The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harr
 
 <details><summary>Show installation details</summary>
 <p>
+
+### Conda
+
 VQPy is developed and tested on Linux. Therefore we highly recomand you to try VQPy on Linux, to avoid encountering some unknown errors.
 
 You can follow the steps below to install VQPy.
 
-### Step 0: prepare environment
+#### Step 0: install conda
 We recommend using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) to prepare the Python environment as follows:
 ```shell
 conda create -n vqpy python=3.8  # "vqpy" is conda environment name, you can use any name you like.
 conda activate vqpy
 ```
 
-### Step 1: install VQPy
+#### Step 1: install VQPy
 We haven't publish vqpy to pypi yet. You can use the commands below to install VQPy from Github.
 ```shell
 pip install torch torchvision numpy==1.23.5 cython
 pip install 'vqpy @ git+https://github.com/vqpy/vqpy.git'
 ```
 
-### Step 2: test installation
+#### Step 2: test installation
 You can test whether vqpy has been successfully installed with
 ```python
 import vqpy
 from vqpy import query
+```
+
+### Docker
+
+You can also try run vqpy in a Docker container by following the below steps.
+
+#### Step 0: prerequisites
+You need to have docker installed on your system (you can download Docker [here](https://www.docker.com/get-started/))
+
+You also need to clone the VQPy code repository into your local (since we need to build a docker image).
+
+#### Step 1: Build the Docker image
+Navigate to the directory containing the Dockerfile and use the docker build command to build your Docker image. Replace vqpy_image with the name you want to give to your Docker image.
+```shell
+docker build -t vqpy_image .
+```
+
+#### Step 2: Run the docker container
+After building the image, you can run the container with the docker run command. This command creates a new Docker container from the Docker image and starts it. Replace vqpy_container with the name you want to give to your Docker container.
+```shell
+docker run -it --name vqpy_container vqpy_image /bin/bash
 ```
 </p>
 </details>
