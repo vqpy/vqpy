@@ -26,7 +26,6 @@ setuptools.setup(
                       "torchvision",
                       "loguru",
                       "tqdm",
-                      "onnxruntime",
                       "shapely",
                       "scipy",
                       "scikit-learn==1.1.2",

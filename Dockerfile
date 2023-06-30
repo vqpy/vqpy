@@ -22,24 +22,6 @@ WORKDIR /vqpy
 
 ENV FORCE_CUDA="1"
 
-# # Use Ubuntu 20.04 as base image
-# FROM ubuntu:20.04
-
-# # Install prerequisites
-# RUN apt-get update && \
-#     apt-get install ffmpeg libsm6 libxext6  -y && \
-#     apt-get install -y wget git build-essential && \
-#     apt-get clean && \
-#     rm -rf /var/lib/apt/lists/*
-
-# # Set the working directory in the container
-# WORKDIR /app
-
-# Download and Install Miniconda
-# RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-#     bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda && \
-#     rm Miniconda3-latest-Linux-x86_64.sh
-
 # Add conda to PATH
 ENV PATH="/opt/conda/bin:${PATH}"
 
@@ -55,15 +37,3 @@ RUN pip install -r requirements.txt
 
 # Install VQPy from Github
 RUN pip install 'vqpy @ git+https://github.com/vqpy/vqpy.git'
-
-# # Clone the vqpy repository
-# RUN git clone https://github.com/vqpy/vqpy.git
-
-# # Change directory to vqpy
-# WORKDIR /app/vqpy
-
-# # Install vqpy in editable mode
-# RUN pip install -e .
-
-# Run the command to start your application
-# CMD ["your-command-to-start-the-application"]
