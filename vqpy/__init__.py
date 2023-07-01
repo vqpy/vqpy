@@ -76,3 +76,54 @@ def launch(cls_name,
     tracker.reset()
 
     logger.info("Done!")
+
+
+def init(
+        video_path: str,
+        query_obj,
+        verbose: bool = True,
+):
+    """
+    Args:
+        video_path: the path of the video to query on.
+        query_obj: the query object to apply.
+        verbose: whether to print the progress. Default: True.
+    """
+    from vqpy.backend.plan import Planner, Executor
+    planner = Planner()
+    launch_args = {"video_path": video_path,
+                   "query_name": query_obj.__class__.__name__,
+                   }
+    root_plan_node = planner.parse(query_obj)
+    if verbose:
+        planner.print_plan(root_plan_node)
+    executor = Executor(root_plan_node, launch_args)
+    return executor
+
+
+def run(executor,
+        save_folder: str = None,
+        ):
+    """
+    Args:
+        executor: the executor to run the query.
+        save_folder: the folder to save query result.
+            If None, will print to stdout. Default: None.
+            If not None, will save to json file with the name of
+            {query_name}.json in the save_folder.
+    """
+
+    result = executor.execute()
+    if save_folder:
+        os.makedirs(save_folder, exist_ok=True)
+        filename = executor.launch_args["query_name"] + ".json"
+        save_path = os.path.join(save_folder, filename)
+        print(f"Saving result to {save_path}")
+        with open(save_path, "w") as f:
+            for res in result:
+                json.dump(res, f, cls=utils.NumpyEncoder)
+        print(f"Done! Result saved to {save_path}")
+    else:
+        for res in result:
+            print(res)
+    return result
