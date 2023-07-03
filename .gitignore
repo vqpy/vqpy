@@ -168,3 +168,7 @@ cython_debug/
 lpdetect/
 weights/
 YOLOX/
+
+# VQPy logs
+logs/
+*.json

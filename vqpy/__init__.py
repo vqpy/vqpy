@@ -89,7 +89,7 @@ def init(
         query_obj: the query object to apply.
         verbose: whether to print the progress. Default: True.
     """
-    from vqpy.backend.plan import Planner, Executor
+    from vqpy.backend import Planner, Executor
     planner = Planner()
     launch_args = {"video_path": video_path,
                    "query_name": query_obj.__class__.__name__,
