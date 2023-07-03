@@ -1,6 +1,7 @@
 from vqpy.backend.operator.vobj_filter import VObjFilter
 from vqpy.backend.plan_nodes.base import AbstractPlanNode
-from vqpy.frontend.vobj.predicates import Predicate
+from vqpy.frontend.vobj.predicates import Predicate, IsInstance
+from vqpy.frontend.query import QueryBase
 
 
 class VObjFilterNode(AbstractPlanNode):
@@ -25,3 +26,23 @@ class VObjFilterNode(AbstractPlanNode):
                f"\tfilter_index={self.filter_index}), \n" \
                f"\tprev={self.prev.__class__.__name__}), \n"\
                f"\tnext={self.next.__class__.__name__})"
+
+
+def create_vobj_class_filter_node(query_obj: QueryBase, input_node):
+    frame_constraints = query_obj.frame_constraint()
+    node = input_node
+
+    vobjs = frame_constraints.get_vobjs()
+    assert len(vobjs) == 1, "Only support one vobj in the predicate"
+    vobj = list(vobjs)[0]
+    node = node.set_next(
+        VObjFilterNode(predicate=IsInstance(vobj), filter_index=0))
+    return node
+
+
+def create_vobj_filter_node(query_obj: QueryBase, input_node):
+    predicate = query_obj.frame_constraint()
+
+    output_node = input_node.set_next(
+        VObjFilterNode(predicate=predicate, filter_index=0))
+    return output_node

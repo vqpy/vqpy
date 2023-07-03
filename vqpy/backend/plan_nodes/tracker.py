@@ -1,6 +1,8 @@
 from vqpy.backend.operator.tracker import Tracker
 from vqpy.backend.plan_nodes.base import AbstractPlanNode
 
+from vqpy.frontend.query import QueryBase
+from vqpy.frontend.vobj.predicates import Predicate
 
 from typing import Optional
 
@@ -33,3 +35,15 @@ class TrackerNode(AbstractPlanNode):
             f"\ttracker_name={self.tracker_name}), \n" \
             f"\tprev={self.prev.__class__.__name__}), \n"\
             f"\tnext={self.next.__class__.__name__})"
+
+
+def create_tracker_node(query_obj: QueryBase, input_node):
+    frame_constraints = query_obj.frame_constraint()
+    assert isinstance(frame_constraints, Predicate)
+    vobjs = frame_constraints.get_vobjs()
+    assert len(vobjs) == 1, "Only support one vobj in the predicate"
+    vobj = list(vobjs)[0]
+    class_name = vobj.class_name
+    return input_node.set_next(
+        TrackerNode(class_name=class_name)
+    )
