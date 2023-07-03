@@ -1,6 +1,7 @@
 from vqpy.backend.operator.video_reader import VideoReader
 from vqpy.backend.plan_nodes.frame_filter import create_frame_filter_node
-from vqpy.backend.plan_nodes.output_formatter import create_frame_output_formatter
+from vqpy.backend.plan_nodes.output_formatter import \
+    create_frame_output_formatter
 from vqpy.backend.plan_nodes.tracker import create_tracker_node
 from vqpy.backend.plan_nodes.vobj_filter import (
     create_vobj_class_filter_node,
