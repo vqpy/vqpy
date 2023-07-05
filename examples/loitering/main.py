@@ -21,21 +21,26 @@ class People_loitering_query(vqpy.QueryBase):
     @staticmethod
     def setting() -> vqpy.VObjConstraint:
         REGION = [
-            (550, 550), (1162, 400), (1720, 720), (1430, 1072), (600, 1073)
-            ]
+            (550, 550),
+            (1162, 400),
+            (1720, 720),
+            (1430, 1072),
+            (600, 1073),
+        ]
         REGIONS = [REGION]
 
         filter_cons = {
             "__class__": lambda x: x == Person,
             "bottom_center": vqpy.query.continuing(
                 condition=vqpy.query.utils.within_regions(REGIONS),
-                duration=10, name="in_roi"
+                duration=10,
+                name="in_roi",
             ),
         }
         select_cons = {
             "track_id": None,
             "coordinate": lambda x: str(x),  # convert to string for
-                                             # JSON serialization
+            # JSON serialization
             # name in vqpy.continuing + '_periods' can be used in select_cons.
             "in_roi_periods": None,
         }
