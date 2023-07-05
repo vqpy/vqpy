@@ -2,6 +2,7 @@ import argparse
 import vqpy
 from typing import List, Tuple
 import numpy as np
+import ast
 
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
@@ -9,18 +10,22 @@ from vqpy.frontend.query import QueryBase
 
 def make_parser():
     parser = argparse.ArgumentParser("VQPy Demo!")
-    parser.add_argument("--path", help="path to video",
-                        default="./loitering.mp4")
+    parser.add_argument(
+        "--path", help="path to video", default="./loitering.mp4"
+    )
     parser.add_argument(
         "--save_folder",
         default=None,
         help="the folder to save the final result",
     )
+    parser.add_argument(
+        "--polygon",
+        default=(
+            "[(550, 550), (1162, 400), (1720, 720), (1430, 1072), (600, 1073)]"
+        ),
+        help="polygon to define the region of interest",
+    )
     return parser
-
-
-REGION = [(550, 550), (1162, 400), (1720, 720), (1430, 1072), (600, 1073)]
-REGIONS = [REGION]
 
 
 class Person(VObjBase):
@@ -64,13 +69,13 @@ class People_loitering_query(QueryBase):
         return self.person.in_region == True  # noqa: E712
 
     def frame_output(self):
-        return (
-            self.person.center,
-        )
+        return (self.person.center, self.person.tlbr)
 
 
 if __name__ == "__main__":
     args = make_parser().parse_args()
+    REGIONS = [ast.literal_eval(args.polygon)]
+
     query_executor = vqpy.init(
         video_path=args.path,
         query_obj=People_loitering_query(),
