@@ -1,3 +1,4 @@
+from typing import Dict
 from vqpy.backend.executor import Executor
 from vqpy.backend.planner import Planner
 from vqpy.frontend.vobj import VObjBase, vobj_property
@@ -6,6 +7,7 @@ import os
 import fake_yolox  # noqa F401
 import numpy as np
 import math
+import vqpy
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 resource_dir = os.path.join(current_dir, "..", "..", "resources/")
@@ -80,5 +82,42 @@ def test_plan():
         print(res)
 
 
+def test_customize_video_reader():
+    from vqpy.backend.operator import CustomizedVideoReader
+    import cv2
+
+    class MyVideoReader(CustomizedVideoReader):
+        def __init__(self, video_path: str) -> None:
+            self.video_path = video_path
+            self.frame_id = -1
+            self._cap = cv2.VideoCapture(video_path)
+            super().__init__()
+
+        def get_metadata(self) -> Dict:
+            return {
+                "fps": 24,
+            }
+
+        def has_next(self) -> bool:
+            return self.frame_id + 1 < 200
+
+        def _next(self):
+            self.frame_id += 1
+            image = self._cap.read()[1]
+            return {
+                "image": image,
+                "frame_id": self.frame_id,
+            }
+
+    video_reader = MyVideoReader(video_path=video_path)
+    executor = vqpy.init(
+        ListPerson(), custom_video_reader=video_reader, verbose=False
+    )
+    result = vqpy.run(executor)
+    return result
+
+
 if __name__ == "__main__":
     test_plan()
+    print("test_plan passed")
+    test_customize_video_reader()
