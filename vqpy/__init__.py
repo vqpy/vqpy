@@ -23,14 +23,15 @@ from . import query  # noqa: F401
 from vqpy.backend.operator import CustomizedVideoReader
 
 
-def launch(cls_name,
-           cls_type: Dict[str, VObjBase],
-           tasks: List[QueryBase],
-           video_path: str,
-           save_folder: str = None,
-           save_freq: int = 10,
-           detector_name: str = "yolox",
-           ):
+def launch(
+    cls_name,
+    cls_type: Dict[str, VObjBase],
+    tasks: List[QueryBase],
+    video_path: str,
+    save_folder: str = None,
+    save_freq: int = 10,
+    detector_name: str = "yolox",
+):
     """Launch the VQPy tasks with specific setting.
     Args:
         cls_name: the detector classification result classes.
@@ -46,8 +47,9 @@ def launch(cls_name,
                   video_path={video_path}, save_folder={save_folder}")
     video_name = os.path.basename(video_path).split(".")[0]
     stream = FrameStream(video_path)
-    detector_name, detector = setup_detector(cls_name,
-                                             detector_name=detector_name)
+    detector_name, detector = setup_detector(
+        cls_name, detector_name=detector_name
+    )
     # Now tracking is always performed by track each class separately
     frame = Frame(stream)
     tracker = MultiTracker(setup_ground_tracker, cls_name, cls_type)
@@ -69,7 +71,7 @@ def launch(cls_name,
                 task_name = task.get_setting().filename
                 filename = f"{video_name}_{task_name}_{detector_name}.json"
                 save_path = os.path.join(save_folder, filename)
-                with open(save_path, 'w') as f:
+                with open(save_path, "w") as f:
                     json.dump(task.vqpy_getdata(), f)
             tag += stream.n_frames
 
@@ -80,11 +82,10 @@ def launch(cls_name,
 
 
 def init(
-        query_obj,
-        video_path: str = None,
-        custom_video_reader: CustomizedVideoReader = None,
-        verbose: bool = True,
-
+    query_obj,
+    video_path: str = None,
+    custom_video_reader: CustomizedVideoReader = None,
+    verbose: bool = True,
 ):
     """
     Args:
@@ -100,30 +101,40 @@ def init(
     # input check
     if custom_video_reader is None:
         if video_path is None:
-            raise ValueError("video_path must be provided if custom_video_reader is \
-                              None")
+            raise ValueError(
+                "video_path must be provided if custom_video_reader is"
+                "None"
+            )
         if not os.path.exists(video_path):
             raise ValueError(f"video_path {video_path} does not exist")
     else:
         if not isinstance(custom_video_reader, CustomizedVideoReader):
-            raise ValueError(f"custom_video_reader must be an instance of \
-                              CustomizedVideoReader, got {type(custom_video_reader)}")
+            raise ValueError(
+                "custom_video_reader must be an instance of"
+                "CustomizedVideoReader, got"
+                f" {type(custom_video_reader)}"
+            )
 
     planner = Planner()
-    launch_args = {"video_path": video_path,
-                   "query_name": query_obj.__class__.__name__,
-                   }
-    root_plan_node = planner.parse(query_obj, custom_video_reader=custom_video_reader)
+    launch_args = {
+        "video_path": video_path,
+        "query_name": query_obj.__class__.__name__,
+    }
+    root_plan_node = planner.parse(
+        query_obj, custom_video_reader=custom_video_reader
+    )
     if verbose:
         planner.print_plan(root_plan_node)
-    executor = Executor(root_plan_node, launch_args,
-                        custom_video_reader=custom_video_reader)
+    executor = Executor(
+        root_plan_node, launch_args, custom_video_reader=custom_video_reader
+    )
     return executor
 
 
-def run(executor,
-        save_folder: str = None,
-        ):
+def run(
+    executor,
+    save_folder: str = None,
+):
     """
     Args:
         executor: the executor to run the query.

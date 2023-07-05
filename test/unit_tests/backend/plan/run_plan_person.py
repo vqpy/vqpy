@@ -110,7 +110,9 @@ def test_customize_video_reader():
             }
 
     video_reader = MyVideoReader(video_path=video_path)
-    executor = vqpy.init(ListPerson(), custom_video_reader=video_reader, verbose=False)
+    executor = vqpy.init(
+        ListPerson(), custom_video_reader=video_reader, verbose=False
+    )
     result = vqpy.run(executor)
     return result
 

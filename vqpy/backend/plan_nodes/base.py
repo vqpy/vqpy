@@ -34,5 +34,5 @@ class AbstractPlanNode:
 
     def __str__(self):
         return f"PlanNode({self.__class__.__name__},\n" \
-                f"\tprev={self.prev.__class__.__name__},\n" \
-                f"\tnext={self.next.__class__.__name__})"
+               f"\tprev={self.prev.__class__.__name__},\n" \
+               f"\tnext={self.next.__class__.__name__})"

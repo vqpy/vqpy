@@ -1,5 +1,5 @@
-from .cust_video_reader import create_customized_video_reader_node
+from .cust_video_reader import create_cust_video_reader_node
 
 __all__ = [
-    "create_customized_video_reader_node"
+    "create_cust_video_reader_node"
 ]
