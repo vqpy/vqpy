@@ -8,7 +8,8 @@ class FrameOutputFormatter(Operator):
                  prev: Operator,
                  filter_index_to_class_name_to_property_names:
                  Dict[int, Dict[str, List[str]]],
-                 filter_index_to_vobj_name: Dict[int, str]
+                 filter_index_to_vobj_name: Dict[int, str],
+                 other_frame_fields: List[str] = None
                  ):
         """
         Output Formatter for the frame_output function in the QueryBase class.
@@ -29,6 +30,20 @@ class FrameOutputFormatter(Operator):
         self.prev = prev
         self.properties_mapping = filter_index_to_class_name_to_property_names
         self.vobj_names_mapping = filter_index_to_vobj_name
+        self.other_frame_fields = self._check_input(other_frame_fields)
+
+    def _check_input(other_frame_fields):
+        if other_frame_fields is None:
+            other_frame_fields = []
+        elif isinstance(other_frame_fields, str):
+            other_frame_fields = [other_frame_fields]
+        else:
+            if not isinstance(other_frame_fields, list):
+                raise TypeError("other_frame_fields must be a list of strings.")
+            if not isinstance(other_frame_fields[0], str):
+                raise TypeError("other_frame_fields must be a list of strings.")
+            other_frame_fields = other_frame_fields
+        return other_frame_fields
 
     def next(self) -> Frame:
         """
@@ -39,12 +54,17 @@ class FrameOutputFormatter(Operator):
                 "person": [{"center": float}, ...],
                 "car1": [{"bbox": float, "velocity": float}, ...],
                 "car2": [{"bbox": float}, ...]
+                other_frame_fields: ...
             }
         """
         output = dict()
         if self.prev.has_next():
             frame = self.prev.next()
             output["frame_id"] = frame.id
+            for field in self.other_frame_fields:
+                if field not in frame.kwargs:
+                    raise ValueError(f"Field {field} not in frame args.")
+                output[field] = frame.kwargs[field]
             for filter_index, class2props in self.properties_mapping.items():
                 vobj_name = self.vobj_names_mapping[filter_index]
                 output[vobj_name] = []

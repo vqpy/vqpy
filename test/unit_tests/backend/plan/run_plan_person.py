@@ -102,16 +102,20 @@ def test_customize_video_reader():
             return self.frame_id + 1 < 200
 
         def _next(self):
+            def random_id():
+                return np.random.randint(0, 100000).tostring()
             self.frame_id += 1
             image = self._cap.read()[1]
             return {
                 "image": image,
                 "frame_id": self.frame_id,
+                "ref_id": random_id(),
             }
 
     video_reader = MyVideoReader(video_path=video_path)
     executor = vqpy.init(
-        ListPerson(), custom_video_reader=video_reader, verbose=False
+        ListPerson(), custom_video_reader=video_reader, verbose=False,
+        additonal_frame_fields=["ref_id"]
     )
     result = vqpy.run(executor)
     return result

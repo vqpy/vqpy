@@ -7,10 +7,12 @@ class Frame:
     def __init__(self,
                  video_metadata: Dict,
                  id: int,
-                 image: numpy.ndarray):
+                 image: numpy.ndarray,
+                 **kwargs):
         self._video_metadata = video_metadata
         self._id = id
         self._image = image
+        self._kwargs = kwargs
         # vobj_data is a dictionary of detected vobjs of interested class,
         # where the key is the class name and the value is a list of vobjs.
         # Each vobj is a dictionary of properties,
@@ -33,11 +35,17 @@ class Frame:
 
     @property
     def id(self):
+        if not type(self._id) == int:
+            raise TypeError("Frame id must be an integer.")
         return self._id
 
     @property
     def image(self):
         return self._image
+
+    @property
+    def kwargs(self):
+        return self._kwargs
 
     def __repr__(self) -> str:
         return f"Frame(id={self.id}, video_metadata={self.video_metadata},\

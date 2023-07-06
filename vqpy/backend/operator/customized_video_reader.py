@@ -39,6 +39,5 @@ class CustomizedVideoReader(Operator):
 
         return Frame(
             video_metadata=self.metadata,
-            id=result["frame_id"],
-            image=result["image"],
+            **result,
         )
