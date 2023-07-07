@@ -137,6 +137,7 @@ def init(
 def run(
     executor,
     save_folder: str = None,
+    print_result: bool = True,
 ):
     """
     Args:
@@ -145,6 +146,7 @@ def run(
             If None, will print to stdout. Default: None.
             If not None, will save to json file with the name of
             {query_name}.json in the save_folder.
+        print_result: whether to print the result. Default: True.
     """
 
     result = executor.execute()
@@ -156,8 +158,10 @@ def run(
         with open(save_path, "w") as f:
             for res in result:
                 json.dump(res, f, cls=utils.NumpyEncoder)
+                if print_result:
+                    print(res)
         print(f"Done! Result saved to {save_path}")
-    else:
+    elif print_result:
         for res in result:
             print(res)
     return result

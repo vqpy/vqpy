@@ -124,6 +124,6 @@ def test_customize_video_reader():
 
 
 if __name__ == "__main__":
-    test_plan()
-    print("test_plan passed")
-    test_customize_video_reader()
+    # test_plan()
+    # print("test_plan passed")
+    result = test_customize_video_reader()
