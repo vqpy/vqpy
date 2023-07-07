@@ -85,6 +85,7 @@ def init(
     query_obj,
     video_path: str = None,
     custom_video_reader: CustomizedVideoReader = None,
+    additional_frame_fields: List[str] = None,
     verbose: bool = True,
 ):
     """
@@ -94,6 +95,7 @@ def init(
         custom_video_reader: the custom video reader to use. If not None, will
             ignore video_path. Default: None. Note that fps must be provided
             if custom_video_reader is not None.
+        additional_frame_fields: the additional frame fields to output.
         verbose: whether to print the progress. Default: True.
     """
     from vqpy.backend import Planner, Executor
@@ -121,7 +123,8 @@ def init(
         "query_name": query_obj.__class__.__name__,
     }
     root_plan_node = planner.parse(
-        query_obj, custom_video_reader=custom_video_reader
+        query_obj, custom_video_reader=custom_video_reader,
+        additional_frame_fields=additional_frame_fields
     )
     if verbose:
         planner.print_plan(root_plan_node)

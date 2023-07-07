@@ -11,17 +11,20 @@ class FrameOutputNode(AbstractPlanNode):
     def __init__(self,
                  filter_index_to_class_name_to_property_names:
                  Dict[int, Dict[str, List[str]]],
-                 filter_index_to_vobj_name: Dict[int, str]
+                 filter_index_to_vobj_name: Dict[int, str],
+                 additional_frame_fields: List[str] = None
                  ):
         self.props_mapping = filter_index_to_class_name_to_property_names
         self.vobj_names_mapping = filter_index_to_vobj_name
+        self.additional_frame_fields = additional_frame_fields
         super().__init__()
 
     def to_operator(self, lauch_args: dict):
         return FrameOutputFormatter(
             prev=self.prev.to_operator(lauch_args),
             filter_index_to_class_name_to_property_names=self.props_mapping,
-            filter_index_to_vobj_name=self.vobj_names_mapping)
+            filter_index_to_vobj_name=self.vobj_names_mapping,
+            other_frame_fields=self.additional_frame_fields)
 
     def __str__(self):
         return f"VObjFrameOutputNode(props_mapping={self.props_mapping}), \n"\
@@ -30,7 +33,8 @@ class FrameOutputNode(AbstractPlanNode):
 
 
 def create_frame_output_formatter(query_vobj: QueryBase,
-                                  input_node):
+                                  input_node,
+                                  additional_frame_fields: List[str] = None):
     frame_output = query_vobj.frame_output()
     if isinstance(frame_output, Property):
         frame_output = [frame_output]
@@ -50,6 +54,7 @@ def create_frame_output_formatter(query_vobj: QueryBase,
     }
     frame_output_formatter = FrameOutputNode(
         filter_index_to_class_name_to_property_names=property_mappings,
-        filter_index_to_vobj_name=vobj_name_mappings
+        filter_index_to_vobj_name=vobj_name_mappings,
+        additional_frame_fields=additional_frame_fields
     )
     return input_node.set_next(frame_output_formatter)

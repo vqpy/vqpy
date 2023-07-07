@@ -102,16 +102,22 @@ def test_customize_video_reader():
             return self.frame_id + 1 < 200
 
         def _next(self):
+            def timestamp_id():
+                import datetime
+                return datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+
             self.frame_id += 1
             image = self._cap.read()[1]
             return {
                 "image": image,
                 "frame_id": self.frame_id,
+                "ref_id": timestamp_id(),
             }
 
     video_reader = MyVideoReader(video_path=video_path)
     executor = vqpy.init(
-        ListPerson(), custom_video_reader=video_reader, verbose=False
+        ListPerson(), custom_video_reader=video_reader, verbose=False,
+        additional_frame_fields=["ref_id"]
     )
     result = vqpy.run(executor)
     return result
