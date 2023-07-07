@@ -4,13 +4,15 @@ from typing import Dict, List
 
 
 class FrameOutputFormatter(Operator):
-    def __init__(self,
-                 prev: Operator,
-                 filter_index_to_class_name_to_property_names:
-                 Dict[int, Dict[str, List[str]]],
-                 filter_index_to_vobj_name: Dict[int, str],
-                 other_frame_fields: List[str] = None
-                 ):
+    def __init__(
+        self,
+        prev: Operator,
+        filter_index_to_class_name_to_property_names: Dict[
+            int, Dict[str, List[str]]
+        ],
+        filter_index_to_vobj_name: Dict[int, str],
+        other_frame_fields: List[str] = None,
+    ):
         """
         Output Formatter for the frame_output function in the QueryBase class.
         For example, if the frame_output function is:
@@ -30,8 +32,11 @@ class FrameOutputFormatter(Operator):
         self.prev = prev
         self.properties_mapping = filter_index_to_class_name_to_property_names
         self.vobj_names_mapping = filter_index_to_vobj_name
-        self.other_frame_fields = self._check_input(other_frame_fields)
+        self.other_frame_fields = FrameOutputFormatter._check_input(
+            other_frame_fields
+        )
 
+    @staticmethod
     def _check_input(other_frame_fields):
         if other_frame_fields is None:
             other_frame_fields = []
@@ -39,9 +44,13 @@ class FrameOutputFormatter(Operator):
             other_frame_fields = [other_frame_fields]
         else:
             if not isinstance(other_frame_fields, list):
-                raise TypeError("other_frame_fields must be a list of strings.")
+                raise TypeError(
+                    "other_frame_fields must be a list of strings."
+                )
             if not isinstance(other_frame_fields[0], str):
-                raise TypeError("other_frame_fields must be a list of strings.")
+                raise TypeError(
+                    "other_frame_fields must be a list of strings."
+                )
             other_frame_fields = other_frame_fields
         return other_frame_fields
 
