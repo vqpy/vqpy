@@ -86,6 +86,7 @@ def init(
     video_path: str = None,
     custom_video_reader: CustomizedVideoReader = None,
     additional_frame_fields: List[str] = None,
+    output_per_frame_results: bool = False,
     verbose: bool = True,
 ):
     """
@@ -96,6 +97,11 @@ def init(
             ignore video_path. Default: None. Note that fps must be provided
             if custom_video_reader is not None.
         additional_frame_fields: the additional frame fields to output.
+        output_per_frame_results: whether to output per frame results. Default:
+            False, which only output the frames containing the objects that
+            meet the query constraints. If True, will output all frames, where
+            frames without objects that meet the query constraints will have
+            results as an empty list.
         verbose: whether to print the progress. Default: True.
     """
     from vqpy.backend import Planner, Executor
@@ -124,7 +130,8 @@ def init(
     }
     root_plan_node = planner.parse(
         query_obj, custom_video_reader=custom_video_reader,
-        additional_frame_fields=additional_frame_fields
+        additional_frame_fields=additional_frame_fields,
+        output_per_frame_results=output_per_frame_results,
     )
     if verbose:
         planner.print_plan(root_plan_node)
@@ -137,7 +144,7 @@ def init(
 def run(
     executor,
     save_folder: str = None,
-    print_result: bool = True,
+    print_results: bool = True,
 ):
     """
     Args:
@@ -158,10 +165,10 @@ def run(
         with open(save_path, "w") as f:
             for res in result:
                 json.dump(res, f, cls=utils.NumpyEncoder)
-                if print_result:
+                if print_results:
                     print(res)
         print(f"Done! Result saved to {save_path}")
-    elif print_result:
+    elif print_results:
         for res in result:
             print(res)
     return result

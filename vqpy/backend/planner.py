@@ -30,6 +30,7 @@ class Planner:
         query_obj: QueryBase,
         custom_video_reader: CustomizedVideoReader = None,
         additional_frame_fields: list = None,
+        output_per_frame_results: bool = False,
     ):
         if custom_video_reader is not None:
             input_node = create_cust_video_reader_node(custom_video_reader)
@@ -40,7 +41,10 @@ class Planner:
         output_node = create_vobj_class_filter_node(query_obj, output_node)
         output_node, map = create_pre_filter_projector(query_obj, output_node)
         output_node = create_vobj_filter_node(query_obj, output_node)
-        output_node = create_frame_filter_node(query_obj, output_node)
+        if not output_per_frame_results:
+            # Todo: add bypass to output formatter when
+            # output_per_frame_results is True.
+            output_node = create_frame_filter_node(query_obj, output_node)
         output_node = create_frame_output_projector(
             query_obj, output_node, map
         )
