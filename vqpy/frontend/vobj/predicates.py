@@ -71,6 +71,10 @@ class Not(Predicate):
     def get_vobj_properties(self):
         return self.pred.get_vobj_properties()
 
+    def generate_condition_function(self):
+        f = self.pred.generate_condition_function()
+        return lambda vobj_data: not f(vobj_data)
+
 
 class IsInstance(Predicate):
     def __init__(self, vobj):
@@ -139,7 +143,6 @@ class LiteralPredicate(Predicate):
 
 
 class Equal(LiteralPredicate):
-
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
             l_value, r_value = self._get_prop_values(vobj_data)
@@ -157,7 +160,6 @@ class Equal(LiteralPredicate):
 
 
 class GreaterThan(LiteralPredicate):
-
     def generate_condition_function(self):
         def condition_function(vobj_data: dict):
             l_value, r_value = self._get_prop_values(vobj_data)
@@ -177,14 +179,15 @@ class GreaterThan(LiteralPredicate):
 
 
 class Compare(Predicate):
-
     def __init__(self, prop, compare_func):
         self.prop = prop
         self.compare_func = compare_func
 
     def __str__(self):
-        return f"Compare(prop={self.prop}\n "\
+        return (
+            f"Compare(prop={self.prop}\n "
             f"\tcompare_func={self.compare_func.__name__})"
+        )
 
     def get_vobjs(self):
         return self.prop.get_vobjs()
