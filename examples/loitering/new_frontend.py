@@ -1,7 +1,6 @@
 import argparse
 import vqpy
 from typing import List, Tuple
-import numpy as np
 import ast
 
 from vqpy.frontend.vobj import VObjBase, vobj_property
