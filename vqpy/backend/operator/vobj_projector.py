@@ -91,9 +91,10 @@ class VObjProjector(Operator):
                 assert all([dep_name in vobj_data
                             for dep_name in self.dependencies.keys()
                             if not dep_name == self.property_name]), \
-                    "vobj_data does not have all dependencies. Keys of "
-                f"vobj_data: {vobj_data.keys()}. Keys of dependencies: "
-                f"{self.dependencies.keys()}"
+                    "vobj_data does not have all dependencies for " \
+                    f"property {self.property_name}. Key and value of " \
+                    f"vobj_data: {vobj_data}. Keys of dependencies: " \
+                    f"{self.dependencies.keys()}"
                 # dependency data as current frame dependency
                 cur_dep = {dep_name: vobj_data[dep_name]
                            for dep_name in self._non_hist_dependencies.keys()}
