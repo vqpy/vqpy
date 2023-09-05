@@ -51,7 +51,7 @@ class VObjProjector(Operator):
                                        self.dependencies.items()
                                        if hist_len == 0}
         self._self_dep = self.property_name in self._hist_dependencies
-        self._stateful = len(self._hist_dependencies) > 0
+        self._dep_on_hist = len(self._hist_dependencies) > 0
         self._max_hist_len = max(dependencies.values())
         columns = ["track_id", "frame_id", "vobj_index"] + \
             list(self._hist_dependencies.keys())
@@ -71,7 +71,7 @@ class VObjProjector(Operator):
         non_hist_deps = []
         for vobj_index in vobj_indexes:
             vobj_data = frame.vobj_data[self.class_name][vobj_index].copy()
-            if self._stateful and "track_id" not in vobj_data:
+            if self._dep_on_hist and "track_id" not in vobj_data:
                 continue
             else:
                 # dependency of "image", which is the frame image cropped with
@@ -104,7 +104,7 @@ class VObjProjector(Operator):
                 non_hist_deps.append(cur_dep)
 
                 # dependency data to be saved as history
-                if self._stateful:
+                if self._dep_on_hist:
                     hist_dep = {dep_name: vobj_data[dep_name]
                                 for dep_name in self._hist_dependencies.keys()
                                 if not dep_name == self.property_name}
@@ -115,8 +115,8 @@ class VObjProjector(Operator):
 
                     hist_deps.append(hist_dep)
         # sanity check
-        if not self._stateful:
-            assert not hist_deps, "stateful_deps should be empty"
+        if not self._dep_on_hist:
+            assert not hist_deps, "hist_deps should be empty"
         return non_hist_deps, hist_deps
 
     def _update_hist_buffer(self, hist_deps):
@@ -236,7 +236,7 @@ class VObjProjector(Operator):
             frame, output_hist_data = self._compute_property(non_hist_data,
                                                              hist_data,
                                                              frame=frame)
-            if self._stateful and hist_data:
+            if self._dep_on_hist and hist_data:
                 self._update_hist_buffer(hist_deps=output_hist_data)
         return frame
 
