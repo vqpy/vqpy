@@ -35,7 +35,7 @@ class Frame:
 
     @property
     def id(self):
-        if not type(self._id) == int:
+        if not isinstance(self._id, int):
             raise TypeError("Frame id must be an integer.")
         return self._id
 

@@ -109,7 +109,7 @@ class VObjConstraint(VObjConstraintInterface):
                     # skip filters about "__class__" since we already used it
                     # to only include VObjs of the desired type
                     continue
-                if type(func) == continuing:
+                if isinstance(func, continuing):
                     # patch work to support vqpy.utils.continuing since
                     # VObj and the property name need to be passed as arguments
                     ok = func(obj, property_name)

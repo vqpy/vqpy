@@ -69,7 +69,7 @@ class ListPerson(QueryBase):
             (self.person.score > 0.6)
             & (self.person.score < 0.7)
             & (self.person.acceleration > 0)
-            | (self.person.over_speed == True) # noqa: E712
+            | (self.person.over_speed == True)  # noqa: E712
         )
 
     def frame_output(self):
