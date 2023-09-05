@@ -49,6 +49,16 @@ class Person(VObjBase):
             return 0
         return (velocity - last_velocity) * fps
 
+    @vobj_property(inputs={"over_speed": 3, "velocity": 0})
+    def over_speed(self, values):
+        over_speed_values = values["over_speed"][:-1]
+        this_velocity = values["velocity"]
+        if all([x is None for x in over_speed_values]) and this_velocity > 0.6:
+            return True
+        if this_velocity > 0.6 and any(over_speed_values):
+            return True
+        return False
+
 
 class ListPerson(QueryBase):
     def __init__(self) -> None:
@@ -59,6 +69,7 @@ class ListPerson(QueryBase):
             (self.person.score > 0.6)
             & (self.person.score < 0.7)
             & (self.person.acceleration > 0)
+            | (self.person.over_speed == True)
         )
 
     def frame_output(self):
@@ -66,6 +77,7 @@ class ListPerson(QueryBase):
             self.person.center,
             self.person.velocity,
             self.person.acceleration,
+            self.person.over_speed,
         )
 
 
@@ -124,6 +136,6 @@ def test_customize_video_reader():
 
 
 if __name__ == "__main__":
-    # test_plan()
-    # print("test_plan passed")
-    result = test_customize_video_reader()
+    test_plan()
+    print("test_plan passed")
+    # result = test_customize_video_reader()
