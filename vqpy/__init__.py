@@ -21,6 +21,7 @@ from vqpy.operator.video_reader import FrameStream
 from . import utils  # noqa: F401
 from . import query  # noqa: F401
 from vqpy.backend.operator import CustomizedVideoReader
+from datetime import datetime
 
 
 def launch(
@@ -159,7 +160,8 @@ def run(
     result = executor.execute()
     if save_folder:
         os.makedirs(save_folder, exist_ok=True)
-        filename = executor.launch_args["query_name"] + ".json"
+        time = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = executor.launch_args["query_name"] + "_" + time + ".json"
         save_path = os.path.join(save_folder, filename)
         print(f"Saving result to {save_path}")
         with open(save_path, "w") as f:
