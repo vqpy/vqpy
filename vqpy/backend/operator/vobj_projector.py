@@ -16,6 +16,7 @@ class VObjProjector(Operator):
                  property_name: str,
                  property_func: Callable[[Dict], Any],
                  dependencies: Dict[str, int],
+                 is_stateful: bool,
                  class_name: str,
                  filter_index: int = 0,
                  ):
@@ -34,6 +35,9 @@ class VObjProjector(Operator):
             the history length (a non-negative integer) of the dependency
             property. If the value is 0, it means current frame. If the value
             is 1, it means the last frame and the current frame.
+        :param is_stateful: whether the property is stateful. A property is considered
+            stateful if it depends on the history of the vobj, either directly or
+            indirectly.
         :param class_name: the name of the vobj class to compute the property.
         :param filter_index: the index of the filter.
         """
@@ -42,6 +46,7 @@ class VObjProjector(Operator):
         self.dependencies = dependencies
         self.filter_index = filter_index
         self.class_name = class_name
+        self.is_stateful = is_stateful
         self._hist_dependencies = {name: hist_len
                                    for name, hist_len in
                                    self.dependencies.items()
@@ -71,7 +76,7 @@ class VObjProjector(Operator):
         non_hist_deps = []
         for vobj_index in vobj_indexes:
             vobj_data = frame.vobj_data[self.class_name][vobj_index].copy()
-            if self._dep_on_hist and "track_id" not in vobj_data:
+            if self.is_stateful and "track_id" not in vobj_data:
                 continue
             else:
                 # dependency of "image", which is the frame image cropped with

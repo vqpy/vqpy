@@ -11,10 +11,12 @@ class ProjectionField:
     def __init__(self,
                  field_name: str,
                  field_func: Callable[[Dict], Any],
-                 dependent_fields: Dict[str, int]):
+                 dependent_fields: Dict[str, int],
+                 is_stateful: bool):
         self.field_name = field_name
         self.field_func = field_func
         self.dependent_fields = dependent_fields
+        self.is_stateful = is_stateful
 
 
 class ProjectorNode(AbstractPlanNode):
@@ -34,6 +36,7 @@ class ProjectorNode(AbstractPlanNode):
             property_name=self.projection_field.field_name,
             property_func=self.projection_field.field_func,
             dependencies=self.projection_field.dependent_fields,
+            is_stateful=self.projection_field.is_stateful,
             class_name=self.class_name,
             filter_index=self.filter_index
         )
@@ -43,6 +46,7 @@ class ProjectorNode(AbstractPlanNode):
                 f"\tproperty_name={self.projection_field.field_name}, \n" \
                 f"\tfilter_index={self.filter_index}), \n" \
                 f"\tdependencies={self.projection_field.dependent_fields}),\n"\
+                f"\tis_stateful={self.projection_field.is_stateful}), \n" \
                 f"\tprev={self.prev.__class__.__name__}), \n"\
                 f"\text={self.next.__class__.__name__})"
 
@@ -66,6 +70,7 @@ def create_pre_filter_projector(query_obj: QueryBase, input_node):
                     field_name=p.name,
                     field_func=p,
                     dependent_fields=p.inputs,
+                    is_stateful=p.stateful
                 ),
                 filter_index=0
             )
@@ -95,6 +100,7 @@ def create_frame_output_projector(query_vobj: QueryBase,
                         field_name=prop.name,
                         field_func=prop,
                         dependent_fields=prop.inputs,
+                        is_stateful=prop.stateful
                     ),
                     filter_index=0
                 )
