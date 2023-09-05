@@ -80,7 +80,18 @@ class VobjProperty(Property):
         self.inputs = inputs
         self.func = func
         self.name = func.__name__
-        self.stateful = any([hist_len > 0 for hist_len in inputs.values()])
+        self.stateful = self._stateful()
+
+    def _stateful(self):
+        self_stateful = any([hist_len > 0 for hist_len in self.inputs.values()])
+        if self_stateful:
+            return True
+        # if any of it's dependencies are stateful, then it is stateful
+        for prop_name in self.inputs.keys():
+            prop = self.vobj.get_property(prop_name)
+            if prop.is_vobj_property() and prop.stateful:
+                return True
+        return False
 
     def __call__(self, *args, **kwargs):
         return self.func(self.vobj, *args, **kwargs)
