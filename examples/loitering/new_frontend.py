@@ -6,9 +6,14 @@ import ast
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
 
-NO_RISK = 0
-WARNING = 1
-ALARM = 2
+NO_RISK = "no_risk"
+WARNING = "warning"
+ALARM = "alarm"
+
+TIME_WARNING = 4
+TIME_ALARM = 10
+
+TOLERANCE = 10
 
 
 def make_parser():
@@ -50,20 +55,61 @@ class Person(VObjBase):
         tlbr = values["tlbr"]
         return (tlbr[:2] + tlbr[2:]) / 2
 
-    # TODO: continuing not yet supported, workaround
-    @vobj_property(inputs={"bottom_center": 150})
-    def in_region(self, values):
-        bottom_centers = values["bottom_center"]
-
-        def point_in_region(x):
-            return x is not None and \
-                vqpy.query.utils.within_regions(REGIONS)(x)
-        nframes_warning = 60
-        if all(list(map(point_in_region, bottom_centers))):
+    @vobj_property(inputs={"in_region_time": 0})
+    def loitering(self, values):
+        cur_in_region_time = values["in_region_time"]
+        if cur_in_region_time >= TIME_ALARM:
             return ALARM
-        if all(list(map(point_in_region, bottom_centers[-nframes_warning:]))):
+        if cur_in_region_time >= TIME_WARNING:
             return WARNING
         return NO_RISK
+
+    @vobj_property(inputs={"in_region_frames": 0, "fps": 0, "in_region": 0})
+    def in_region_time(self, values):
+        cur_in_region_frames = values["in_region_frames"]
+        fps = values["fps"]
+        if not values["in_region"]:
+            return 0
+        return round(cur_in_region_frames / fps, 2)
+
+    @vobj_property(
+        inputs={"in_region": TOLERANCE, "in_region_frames": TOLERANCE}
+    )
+    def in_region_frames(self, values):
+        """
+        Return the number of frames that the person is in region continuously.
+        If the person is out of region for longer than TOLERANCE, return 0.
+        If the person is out of region cur frame and within TORLERANCE,
+          the in_region_frames is the same as that of last frame.
+        If the person is untracked and tracked again within in TORLENCE frames,
+          the time is accumulated. Otherwise, the in_region_frames is 0.
+        """
+        in_region_values = values["in_region"]
+        # Get the last valid in_region_frames. If person is lost and tracked
+        # again, the in_region_frames for lost frames are None.
+        last_valid_in_region_frames = 0
+        for value in reversed(values["in_region_frames"]):
+            if value is not None:
+                last_valid_in_region_frames = value
+                break
+        this_in_region = in_region_values[-1]
+        if this_in_region:
+            return last_valid_in_region_frames + 1
+        else:
+            # The person is out of region for longer than TOLERANCE frames
+            if last_valid_in_region_frames == in_region_values[0]:
+                return 0
+            else:
+                return last_valid_in_region_frames
+
+    @vobj_property(inputs={"bottom_center": 0})
+    def in_region(self, values):
+        bottom_center = values["bottom_center"]
+        if bottom_center is not None and vqpy.query.utils.within_regions(
+            REGIONS
+        )(bottom_center):
+            return True
+        return False
 
 
 class People_loitering_query(QueryBase):
@@ -71,12 +117,16 @@ class People_loitering_query(QueryBase):
         self.person = Person()
 
     def frame_constraint(self):
-        return (self.person.in_region == ALARM) | (
-            self.person.in_region == WARNING
-        )
+        return self.person.in_region_time > 0
 
     def frame_output(self):
-        return (self.person.center, self.person.tlbr, self.person.in_region)
+        return (
+            self.person.track_id,
+            self.person.center,
+            self.person.tlbr,
+            self.person.loitering,
+            self.person.in_region_time,
+        )
 
 
 if __name__ == "__main__":
@@ -89,5 +139,6 @@ if __name__ == "__main__":
         video_path=args.path,
         query_obj=People_loitering_query(),
         verbose=True,
+        output_per_frame_results=True,
     )
     vqpy.run(query_executor, save_folder=args.save_folder)
