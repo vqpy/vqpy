@@ -10,9 +10,6 @@ NO_RISK = "no_risk"
 WARNING = "warning"
 ALARM = "alarm"
 
-TIME_WARNING = 4
-TIME_ALARM = 10
-
 TOLERANCE = 10
 
 
@@ -32,6 +29,16 @@ def make_parser():
             "[(360, 367), (773, 267), (1143, 480), (951, 715), (399, 715)]"
         ),
         help="polygon to define the region of interest",
+    )
+    parser.add_argument(
+        "--time_warning",
+        default=4,
+        help="time to trigger warning",
+    )
+    parser.add_argument(
+        "--time_alarm",
+        default=10,
+        help="time to trigger alarm",
     )
     return parser
 
@@ -134,6 +141,8 @@ if __name__ == "__main__":
     # Note that the loitering.mp4 is of shape 1274*720, therefore the polygon
     # points differs from that in the old example, with shape of 1920*1080.
     REGIONS = [ast.literal_eval(args.polygon)]
+    TIME_WARNING = args.time_warning
+    TIME_ALARM = args.time_alarm
 
     query_executor = vqpy.init(
         video_path=args.path,
