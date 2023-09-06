@@ -7,22 +7,26 @@ from vqpy.frontend.vobj.property import Property, BuiltInProperty
 
 
 class ProjectionField:
-
-    def __init__(self,
-                 field_name: str,
-                 field_func: Callable[[Dict], Any],
-                 dependent_fields: Dict[str, int]):
+    def __init__(
+        self,
+        field_name: str,
+        field_func: Callable[[Dict], Any],
+        dependent_fields: Dict[str, int],
+        is_stateful: bool,
+    ):
         self.field_name = field_name
         self.field_func = field_func
         self.dependent_fields = dependent_fields
+        self.is_stateful = is_stateful
 
 
 class ProjectorNode(AbstractPlanNode):
-
-    def __init__(self,
-                 class_name: str,
-                 projection_field: ProjectionField,
-                 filter_index: int):
+    def __init__(
+        self,
+        class_name: str,
+        projection_field: ProjectionField,
+        filter_index: int,
+    ):
         self.class_name = class_name
         self.projection_field = projection_field
         self.filter_index = filter_index
@@ -34,17 +38,21 @@ class ProjectorNode(AbstractPlanNode):
             property_name=self.projection_field.field_name,
             property_func=self.projection_field.field_func,
             dependencies=self.projection_field.dependent_fields,
+            is_stateful=self.projection_field.is_stateful,
             class_name=self.class_name,
-            filter_index=self.filter_index
+            filter_index=self.filter_index,
         )
 
     def __str__(self):
-        return f"ProjectorNode(class_name={self.class_name}, \n" \
-                f"\tproperty_name={self.projection_field.field_name}, \n" \
-                f"\tfilter_index={self.filter_index}), \n" \
-                f"\tdependencies={self.projection_field.dependent_fields}),\n"\
-                f"\tprev={self.prev.__class__.__name__}), \n"\
-                f"\text={self.next.__class__.__name__})"
+        return (
+            f"ProjectorNode(class_name={self.class_name}, \n"
+            f"\tproperty_name={self.projection_field.field_name}, \n"
+            f"\tfilter_index={self.filter_index}), \n"
+            f"\tdependencies={self.projection_field.dependent_fields}),\n"
+            f"\tis_stateful={self.projection_field.is_stateful}), \n"
+            f"\tprev={self.prev.__class__.__name__}), \n"
+            f"\text={self.next.__class__.__name__})"
+        )
 
 
 def create_pre_filter_projector(query_obj: QueryBase, input_node):
@@ -66,8 +74,9 @@ def create_pre_filter_projector(query_obj: QueryBase, input_node):
                     field_name=p.name,
                     field_func=p,
                     dependent_fields=p.inputs,
+                    is_stateful=p.stateful,
                 ),
-                filter_index=0
+                filter_index=0,
             )
             node = node.set_next(projector_node)
         vobj_properties_map[vobj] = vobj_properties
@@ -75,9 +84,9 @@ def create_pre_filter_projector(query_obj: QueryBase, input_node):
     return node, vobj_properties_map
 
 
-def create_frame_output_projector(query_vobj: QueryBase,
-                                  input_node,
-                                  vobj_properties_map: dict):
+def create_frame_output_projector(
+    query_vobj: QueryBase, input_node, vobj_properties_map: dict
+):
     existing_vobj_properties = vobj_properties_map.copy()
     frame_output = query_vobj.frame_output()
     if isinstance(frame_output, Property):
@@ -95,8 +104,9 @@ def create_frame_output_projector(query_vobj: QueryBase,
                         field_name=prop.name,
                         field_func=prop,
                         dependent_fields=prop.inputs,
+                        is_stateful=prop.stateful,
                     ),
-                    filter_index=0
+                    filter_index=0,
                 )
                 input_node = input_node.set_next(projector_node)
                 existing_properties.append(prop)

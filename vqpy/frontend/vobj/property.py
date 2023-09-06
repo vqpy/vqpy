@@ -4,12 +4,10 @@ from abc import ABC
 
 
 class Property(ABC):
-
     def get_vobjs(self):
         return set()
 
     def __eq__(self, other):
-
         if not isinstance(other, Property):
             other = Literal(other)
 
@@ -51,7 +49,6 @@ class Property(ABC):
 
 
 class BuiltInProperty(Property):
-
     def __init__(self, vobj, name: str) -> None:
         self.vobj = vobj
         self.name = name
@@ -62,7 +59,6 @@ class BuiltInProperty(Property):
 
 
 class Literal(Property):
-
     def __init__(self, value):
         self.value = value
 
@@ -74,20 +70,34 @@ class Literal(Property):
 
 
 class VobjProperty(Property):
-
     def __init__(self, vobj, inputs: Dict[str, int], func: Callable):
         self.vobj = vobj
         self.inputs = inputs
         self.func = func
         self.name = func.__name__
-        self.stateful = any([hist_len > 0 for hist_len in inputs.values()])
+        self.stateful = self._stateful()
+
+    def _stateful(self):
+        self_stateful = any(
+            [hist_len > 0 for hist_len in self.inputs.values()]
+        )
+        if self_stateful:
+            return True
+        # if any of it's dependencies are stateful, then it is stateful
+        for prop_name in self.inputs.keys():
+            prop = self.vobj.get_property(prop_name)
+            if prop.is_vobj_property() and prop.stateful:
+                return True
+        return False
 
     def __call__(self, *args, **kwargs):
         return self.func(self.vobj, *args, **kwargs)
 
     def __str__(self):
-        return f"VObjProp(vobj={self.vobj.__class__.__name__},\n" \
-             f"\t\tinputs={self.inputs}, Prop={self.name})"
+        return (
+            f"VObjProp(vobj={self.vobj.__class__.__name__},\n"
+            f"\t\tinputs={self.inputs}, Prop={self.name})"
+        )
 
     def get_vobjs(self):
         return {self.vobj}
