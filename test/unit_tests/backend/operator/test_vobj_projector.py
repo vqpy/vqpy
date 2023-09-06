@@ -80,6 +80,7 @@ def test_stateless_projector(stateless_filter):
         property_name="score_gt_0.5",
         property_func=tlbr_score,
         dependencies={"tlbr": 0, "score": 0},
+        is_stateful=False,
         class_name="person",
     )
     while projector.has_next():
@@ -96,6 +97,7 @@ def test_projector_dep_non_computed(stateless_filter):
         property_name="dep_tlbr_score",
         property_func=dep_tlbr_score,
         dependencies={"tlbr_score": 0},
+        is_stateful=False,
         class_name="person",
     )
 
@@ -111,6 +113,7 @@ def test_projector_non_filter_index(stateless_filter):
         property_name="dep_tlbr_score",
         property_func=dep_tlbr_score,
         dependencies={"tlbr_score": 0},
+        is_stateful=False,
         class_name="person",
         filter_index=1,
     )
@@ -137,6 +140,7 @@ def test_stateful_projector(stateful_filter):
         property_name="hist_scores",
         property_func=hist_2_scores,
         dependencies={"score": hist_len},
+        is_stateful=True,
         class_name="person",
     )
     checked = False
@@ -189,6 +193,7 @@ def test_stateless_projector_image_video(stateless_filter):
         property_name="image_fps_stateless",
         property_func=image_fps_stateless,
         dependencies={"image": 0, "fps": 0},
+        is_stateful=False,
         class_name="person",
     )
     num_image_cropped = 0
@@ -226,6 +231,7 @@ def test_stateful_projector_image_video(stateful_filter):
         property_name="image_fps_stateful",
         property_func=image_fps_stateful,
         dependencies={"image": hist_len, "fps": 0},
+        is_stateful=True,
         class_name="person",
     )
     num_image_cropped = 0
@@ -263,6 +269,7 @@ def test_stateful_projector_dep_self(stateful_filter):
         property_name="self_dep",
         property_func=self_dep,
         dependencies={"self_dep": hist_len},
+        is_stateful=True,
         class_name="person",
     )
     checked = False
