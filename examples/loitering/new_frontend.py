@@ -32,12 +32,14 @@ def make_parser():
     )
     parser.add_argument(
         "--time_warning",
-        default=4,
+        default=4.0,
+        type=float,
         help="time to trigger warning",
     )
     parser.add_argument(
         "--time_alarm",
-        default=10,
+        default=10.0,
+        type=float,
         help="time to trigger alarm",
     )
     return parser
