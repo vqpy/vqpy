@@ -9,7 +9,12 @@ from vqpy.operator.detector.base import DetectorBase  # noqa: F401
 from vqpy.query.base import QueryBase
 from vqpy.operator.tracker.base import GroundTrackerBase  # noqa: F401
 from vqpy.operator.detector import setup_detector
-from vqpy.obj.vobj.wrappers import property, stateful, postproc, cross_vobj_property  # noqa: F401,E501
+from vqpy.obj.vobj.wrappers import (  # noqa: F401,E501
+    property,
+    stateful,
+    postproc,
+    cross_vobj_property,
+)
 from vqpy.property_lib.wrappers import vqpy_func_logger  # noqa: F401
 from vqpy.operator.tracker.multiclass_tracker import MultiTracker
 from vqpy.obj.vobj.base import VObjBase
@@ -44,8 +49,10 @@ def launch(
         detector_model_dir: the directory for all pretrained detectors.
         detector_name: the specific detector name you desire to use.
     """
-    logger.info(f"VQPy Launch I/O Setting: \
-                  video_path={video_path}, save_folder={save_folder}")
+    logger.info(
+        f"VQPy Launch I/O Setting: video_path={video_path},"
+        f" save_folder={save_folder}"
+    )
     video_name = os.path.basename(video_path).split(".")[0]
     stream = FrameStream(video_path)
     detector_name, detector = setup_detector(
@@ -111,8 +118,7 @@ def init(
     if custom_video_reader is None:
         if video_path is None:
             raise ValueError(
-                "video_path must be provided if custom_video_reader is"
-                "None"
+                "video_path must be provided if custom_video_reader is None"
             )
         if not os.path.exists(video_path):
             raise ValueError(f"video_path {video_path} does not exist")
@@ -130,7 +136,8 @@ def init(
         "query_name": query_obj.__class__.__name__,
     }
     root_plan_node = planner.parse(
-        query_obj, custom_video_reader=custom_video_reader,
+        query_obj,
+        custom_video_reader=custom_video_reader,
         additional_frame_fields=additional_frame_fields,
         output_per_frame_results=output_per_frame_results,
     )
@@ -164,11 +171,26 @@ def run(
         filename = executor.launch_args["query_name"] + "_" + time + ".json"
         save_path = os.path.join(save_folder, filename)
         print(f"Saving result to {save_path}")
+        import time
+
+        start_time = time.time()
+        iteration_time = []
+        i = 0
         with open(save_path, "w") as f:
             for res in result:
                 json.dump(res, f, cls=utils.NumpyEncoder)
+                f.write("\n")
                 if print_results:
                     print(res)
+                i += 1
+                this_time = time.time()
+                if i > 10:
+                    iteration_time.append(this_time - start_time)
+                start_time = this_time
+        print(
+            "Average iteration time:"
+            f" {sum(iteration_time) / len(iteration_time)}"
+        )
         print(f"Done! Result saved to {save_path}")
     elif print_results:
         for res in result:

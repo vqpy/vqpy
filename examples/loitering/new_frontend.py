@@ -121,7 +121,7 @@ class Person(VObjBase):
         return False
 
 
-class People_loitering_query(QueryBase):
+class Loitering(QueryBase):
     def __init__(self) -> None:
         self.person = Person()
 
@@ -148,7 +148,7 @@ if __name__ == "__main__":
 
     query_executor = vqpy.init(
         video_path=args.path,
-        query_obj=People_loitering_query(),
+        query_obj=Loitering(),
         verbose=True,
         output_per_frame_results=True,
     )
