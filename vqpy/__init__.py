@@ -9,12 +9,12 @@ from vqpy.operator.detector.base import DetectorBase  # noqa: F401
 from vqpy.query.base import QueryBase
 from vqpy.operator.tracker.base import GroundTrackerBase  # noqa: F401
 from vqpy.operator.detector import setup_detector
-from vqpy.obj.vobj.wrappers import (
+from vqpy.obj.vobj.wrappers import (  # noqa: F401,E501
     property,
     stateful,
     postproc,
     cross_vobj_property,
-)  # noqa: F401,E501
+)
 from vqpy.property_lib.wrappers import vqpy_func_logger  # noqa: F401
 from vqpy.operator.tracker.multiclass_tracker import MultiTracker
 from vqpy.obj.vobj.base import VObjBase
@@ -50,7 +50,7 @@ def launch(
         detector_name: the specific detector name you desire to use.
     """
     logger.info(
-        f"VQPy Launch I/O Setting:                   video_path={video_path},"
+        f"VQPy Launch I/O Setting: video_path={video_path},"
         f" save_folder={save_folder}"
     )
     video_name = os.path.basename(video_path).split(".")[0]
@@ -118,7 +118,7 @@ def init(
     if custom_video_reader is None:
         if video_path is None:
             raise ValueError(
-                "video_path must be provided if custom_video_reader isNone"
+                "video_path must be provided if custom_video_reader is None"
             )
         if not os.path.exists(video_path):
             raise ValueError(f"video_path {video_path} does not exist")
