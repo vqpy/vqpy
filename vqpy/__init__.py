@@ -164,11 +164,22 @@ def run(
         filename = executor.launch_args["query_name"] + "_" + time + ".json"
         save_path = os.path.join(save_folder, filename)
         print(f"Saving result to {save_path}")
+        import time
+        start_time = time.time()
+        iteration_time = []
+        i = 0
         with open(save_path, "w") as f:
             for res in result:
                 json.dump(res, f, cls=utils.NumpyEncoder)
+                f.write('\n')
                 if print_results:
                     print(res)
+                i += 1
+                this_time = time.time()
+                if i > 10:
+                    iteration_time.append(this_time - start_time)
+                start_time = this_time
+        print(f"Average iteration time: {sum(iteration_time) / len(iteration_time)}")
         print(f"Done! Result saved to {save_path}")
     elif print_results:
         for res in result:
