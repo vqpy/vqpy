@@ -8,7 +8,6 @@
 - [Person Search](examples/person_search): retrieve the target person in videos.
 - [People Counting](examples/people_counting): count the number of people heading different directions.
 - [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages. [video](https://www.kaggle.com/datasets/szahid405/baggage?select=baggage.mp4)
-- [Queue Analysis](examples/queue_analysis): analysis the max/min/average waiting time in a queue. [video]()
 - [Queue Analysis](examples/queue_analysis): analysis the max/min/average waiting time in a queue. [video](https://www.youtube.com/watch?v=KMJS66jBtVQ)
 
 ## Run Examples
