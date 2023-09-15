@@ -71,7 +71,7 @@ docker run -it --name vqpy_container vqpy_image /bin/bash
 ## Overview
 Below is an architecture graph which describes the VQPy framework.
 <p align="center">
-  <img src="docs/resources/architecture.png" width="700" title="architecture">
+  <img src="docs/resources/Architecture.png" width="900" title="architecture">
 </p>
 
 In the frontend, we provide interfaces for users to declare their query, i.e `VObj` and `Query`.
