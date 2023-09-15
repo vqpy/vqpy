@@ -9,11 +9,9 @@ VQPy is a Python-based video analytics library, designed to address two major is
 
 Building on the insight of object orientation, VQPy solves these problems by presenting a <b> video-object-oriented</b> view to analytics developers.  VQPy allows a complex query to be expressed with a very small number of lines of code. VQPy supports query sharing and composition---finding a red car can build on an existing query that finds a general car; monitoring traffic for a city can build on car monitoring queries built for individual districts and intersections, thereby significantly simplifying development and deployment. VQPy allows different objects and relations to be registered with different trackers and detectors,  connecting different fragments of a pipeline naturally with object-oriented constructs such as inheritance and encapsulation. 
 
-VQPy is now part of Cisco's [DeepVision platform](https://research.cisco.com/research-projects/deep-vision) which is deployed world-wide to support complex queries over customer videos.
-
 Please check out our examples below for details. 
 
-The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harryxu)'s group at UCLA, and has evovled over the time into a community effort, involving folks from both academia and industry. 
+The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harryxu)'s group at UCLA, and has evovled over the time into a community effort, involving folks from both academia and industry. VQPy is now part of Cisco's [DeepVision platform](https://research.cisco.com/research-projects/deep-vision) which is deployed world-wide to support complex queries over customer videos.
 
 ## Installation
 
@@ -73,7 +71,7 @@ docker run -it --name vqpy_container vqpy_image /bin/bash
 ## Overview
 Below is an architecture graph which describes the VQPy framework.
 <p align="center">
-  <img src="docs/resources/architecture.png" width="700" title="architecture">
+  <img src="docs/resources/Architecture.png" width="800" title="architecture">
 </p>
 
 In the frontend, we provide interfaces for users to declare their query, i.e `VObj` and `Query`.
