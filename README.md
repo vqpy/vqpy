@@ -169,8 +169,8 @@ We also support customizing components (e.g. detector) to build the end to end q
 
 We have included several real-world video analytics examples for demonstrating VQPy.
 
-- [People Loitering](examples/loitering): Detects and sends alerts when individuals loiter in designated areas beyond set time thresholds. ([DeepVision Demo](examples/loitering/loitering-vqpy-DV-demo.mov))
-- [Queue Analysis](examples/queue_analysis/): Analyze queue metrics such as the number of people waiting, average/min/max waiting times, etc. ([DeepVision Demo](examples/queue_analysis/vqpy-DeepVision.mov))
+- [People Loitering](examples/loitering): Detects and sends alerts when individuals loiter in designated areas beyond set time thresholds. ([DeepVision Demo](examples/loitering/loitering-vqpy-DV-demo.mp4))
+- [Queue Analysis](examples/queue_analysis/): Analyze queue metrics such as the number of people waiting, average/min/max waiting times, etc. ([DeepVision Demo](examples/queue_analysis/vqpy-DeepVision.mp4))
 - [Fall Detection](examples/fall_detection): Recognize fallen people in a video.
 - [List red moving vehicle](examples/list_red_moving_vehicle): show the license plates of red moving vehicles.
 - [People Counting](examples/people_counting): count the number of people heading different directions.
