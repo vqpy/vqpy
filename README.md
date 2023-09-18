@@ -1,4 +1,4 @@
-# VQPy : An Object-Oriented Approach to Modern Video Analytics
+# VQPy: An Object-Oriented Approach to Modern Video Analytics
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-brightgreen.svg)](https://github.com/uclasystem/VQPy/blob/main/LICENSE)
 
@@ -11,7 +11,7 @@ Building on the insight of object orientation, VQPy solves these problems by pre
 
 Please check out our examples below for details. 
 
-The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harryxu)'s group at UCLA, and has evovled over the time into a community effort, involving folks from both academia and industry. VQPy is now part of Cisco's [DeepVision platform](https://research.cisco.com/research-projects/deep-vision) which is deployed world-wide to support complex queries over customer videos.
+The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harryxu)'s group at UCLA, and has evolved over time into a community effort, involving folks from both academia and industry. VQPy is now part of Cisco's [DeepVision platform](https://research.cisco.com/research-projects/deep-vision) which is deployed world-wide to support complex queries over customer videos.
 
 ## Installation
 
@@ -20,26 +20,26 @@ The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harr
 
 ### Conda
 
-VQPy is developed and tested on Linux. Therefore we highly recomand you to try VQPy on Linux, to avoid encountering some unknown errors.
+VQPy is developed and tested on Linux. Therefore we highly recommend you to try VQPy on Linux, to avoid encountering some unknown errors.
 
 You can follow the steps below to install VQPy.
 
 #### Step 0: install conda
 We recommend using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) to prepare the Python environment as follows:
 ```shell
-conda create -n vqpy python=3.8  # "vqpy" is conda environment name, you can use any name you like.
+conda create -n vqpy python=3.8  # "vqpy" is the conda environment name, you can use any name you like.
 conda activate vqpy
 ```
 
 #### Step 1: install VQPy
-We haven't publish vqpy to pypi yet. You can use the commands below to install VQPy from Github.
+We haven't published VQPy to Pypi yet. You can use the commands below to install VQPy from Github.
 ```shell
 pip install torch torchvision numpy==1.23.5 cython
 pip install 'vqpy @ git+https://github.com/vqpy/vqpy.git'
 ```
 
 #### Step 2: test installation
-You can test whether vqpy has been successfully installed with
+You can test whether VQPy has been successfully installed with
 ```python
 import vqpy
 from vqpy import query
@@ -47,10 +47,10 @@ from vqpy import query
 
 ### Docker
 
-You can also try run vqpy in a Docker container by following the below steps.
+You can also try running VQPy in a Docker container by following the below steps.
 
 #### Step 0: prerequisites
-You need to have docker installed on your system (you can download Docker [here](https://www.docker.com/get-started/))
+You need to have Docker installed on your system (you can download Docker [here](https://www.docker.com/get-started/))
 
 You also need to clone the VQPy code repository into your local (since we need to build a docker image).
 
@@ -69,14 +69,14 @@ docker run -it --name vqpy_container vqpy_image /bin/bash
 </details>
 
 ## Overview
-Below is an architecture graph which describes the VQPy framework.
+Below is an architecture graph that describes the VQPy framework.
 <p align="center">
   <img src="docs/resources/Architecture.png" width="800" title="architecture">
 </p>
 
-VQPy's frontend is an object-oriented language that allows users to express their video queries in a natural way. VQPy extend Python's object-oriented programming with a set of video query specific constructs, including `VObj`, `Relation` and `Query`.
+VQPy's frontend is an object-oriented language that allows users to express their video queries in a natural way. VQPy extends Python's object-oriented programming with a set of video query-specific constructs, including `VObj`, `Relation`, and `Query`.
 
-VQPy's backend framework is an extensible optimization framework, that allows users to easily register their own models and functions, and automatically selects the best plan to execute the query, within user specified budget (e.g. accuracy, inference time, .etc).
+VQPy's backend framework is an extensible optimization framework, that allows users to easily register their own models and functions, and automatically selects the best plan to execute the query, within user user-specified budget (e.g. accuracy, inference time, etc.).
 
 VQPy also provides a library containing rich models and property functions that help save users' efforts to build queries.
 
@@ -88,11 +88,11 @@ In order to declare a query on a video object with VQPy, users need to extend tw
 
 #### Step 1. Define a `VObj`
 
-Users can define their own objects of interest, as well as the properties in the objects they hope to query on, with a `VObj` class. 
+Users can define their own objects of interest, as well as the properties in the objects they hope to query, with a `VObj` class. 
 
 To define a `VObj` class, users are required to inherit the `VObjBase` class. To define a property of the `VObj`, users can decorate the property with a `@vqpy_property` decorator, with the dependencies of the property as the `inputs` argument. The `inputs` argument is a dictionary of property names and the history lengths of the properties. 
 
-Below example shows how to declare an object of interest `Vehicle` with a property `velocity` that is calculated based on the this and last frame's `tlbr` property of the `Vehicle` object, and a property `license_plate` that is calculated based on the current frame's `image` property of the `Vehicle` object.
+The below example shows how to declare an object of interest `Vehicle` with a property `velocity` that is calculated based on the this and last frame's `tlbr` property of the `Vehicle` object, and a property `license_plate` that is calculated based on the current frame's `image` property of the `Vehicle` object.
 
 ```python
 from vqpy.frontend.vobj import VObjBase, vobj_property
@@ -106,16 +106,16 @@ class Vehicle(VObjBase):
 
     @vobj_property(inputs={"image": 0})
     def license_plate(self, image):
-        # infer license plate with vqpy built-in openalpr model
-        return self.infer('license_plate', {'license_plate': 'openalpr'})
+        # inference license_plate based on the car image
+        pass
 ```
 
 
 #### Step 2. Define a `Query`
 
-Users can define video query with a `Query` class that inherites the `QueryBase` class. VQPy introduces two methods for user to express the query logic, i.e. `frame_constraint` and `frame_output`, where users can define the constraints and outputs of the query on frame respectively.
+Users can define video query with a `Query` class that inherits the `QueryBase` class. VQPy introduces two methods for users to express the query logic, i.e. `frame_constraint` and `frame_output`, where users can define the constraints and outputs of the query on frame respectively.
 
-Below example shows how to declare a query that lists the license plates of vehicles that are moving faster than 60 km/h.
+The below example shows how to declare a query that lists the license plates of vehicles that are moving faster than 60 km/h.
 
 ```python
 from vqpy.frontend.query import QueryBase
@@ -151,9 +151,9 @@ vqpy.run(query_executor)
 ```
 
 ### How to write a video query with inheritance?
-VQPy supports both inheritance for `VObj` and `Query`. Users can define a `VObj` or `Query` by inheriting from an existing `VObj` or `Query` class, and easily reuse the properties and logic defined in the parent class.
+VQPy supports both inheritances for `VObj` and `Query`. Users can define a `VObj` or `Query` by inheriting from an existing `VObj` or `Query` class, and easily reuse the properties and logic defined in the parent class.
 
-Below example shows how to define a `Car` `VObj` that inherits from the `Vehicle` `VObj` defined in the previous example, with a `make` property. And both the properties defined in the parent `Vehicle` class and the `make` property defined in the `Car` class can be used in queries on the `Car` `VObj`.
+The below example shows how to define a `Car` `VObj` that inherits from the `Vehicle` `VObj` defined in the previous example, with a `make` property. And both the properties defined in the parent `Vehicle` class and the `make` property defined in the `Car` class can be used in queries on the `Car` `VObj`.
 
 ```python
 class Car(Vehicle):
@@ -194,17 +194,17 @@ We have included several real-world video analytics examples for demonstrating V
 - [Queue Analysis](examples/queue_analysis/): Analyze queue metrics such as the number of people waiting, average/min/max waiting times, etc. ([DeepVision Demo](examples/queue_analysis/demo.assets/vqpy-DeepVision.gif))
 - [Fall Detection](examples/fall_detection): Recognize fallen people in a video.
 - [List red moving vehicle](examples/list_red_moving_vehicle): show the license plates of red moving vehicles.
-- [People Counting](examples/people_counting): count the number of people heading different directions.
+- [People Counting](examples/people_counting): count the number of people heading in different directions.
 - [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages.
 
 ## Getting Support
 
 - Use VQPy's [slack channel](https://join.slack.com/t/vqpy/shared_invite/zt-1mnq3uh9v-o2~uNUnRQRudNTrYCNHeUA) to ask questions and share ideas!
-- Create a github [issue](https://github.com/vqpy/vqpy/issues).
+- Create a GitHub [issue](https://github.com/vqpy/vqpy/issues).
 
 ## Acknowledgements
 
-We are grateful to the generous support from:
+We are grateful for the generous support from:
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/NSF.svg" height=100in weight=100in />| <img src="https://1000logos.net/wp-content/uploads/2016/11/Cisco-logo.png" height=100in weight=200in />
 
