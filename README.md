@@ -74,96 +74,117 @@ Below is an architecture graph which describes the VQPy framework.
   <img src="docs/resources/Architecture.png" width="800" title="architecture">
 </p>
 
-In the frontend, we provide interfaces for users to declare their query, i.e `VObj` and `Query`.
+VQPy's frontend is an object-oriented language that allows users to express their video queries in a natural way. VQPy extend Python's object-oriented programming with a set of video query specific constructs, including `VObj`, `Relation` and `Query`.
 
-In the backend, vqpy automatically select the best plan to execute the query, within user specified budget (e.g. accuracy, inference time, .etc).
+VQPy's backend framework is an extensible optimization framework, that allows users to easily register their own models and functions, and automatically selects the best plan to execute the query, within user specified budget (e.g. accuracy, inference time, .etc).
 
 VQPy also provides a library containing rich models and property functions that help save users' efforts to build queries.
 
-Note that users can also register their own models and functions to vqpy library, to enable reusability between different queries and customize their own end to end video query pipeline.
 
-## Quick Start
+## Usage
 
-### Basic usage
-
-In order to declare a video query with VQPy, users need to extend two classes defined in VQPy, namely `Query` and `VObj`. `VObj` defines the objects of interest (e.g., cars, humans, animals, etc.) in one or more video streams, and `Query` defines the video query.  
+### How to query on a video object?
+In order to declare a query on a video object with VQPy, users need to extend two classes defined in VQPy, namely `Query` and `VObj`. `VObj` defines the objects of interest (e.g., vehicle, person, animal, etc.), and `Query` defines the video query.
 
 #### Step 1. Define a `VObj`
 
-Users can define their own objects of interest, as well as the property in the objects they hope to query on, with a `VObj` class. 
+Users can define their own objects of interest, as well as the properties in the objects they hope to query on, with a `VObj` class. 
 
-To define a `VObj` class, users are required to inherit the `vqpy.VObjBase` class. User can also define properties in the `VObj` that can be used in query (like "license plate" of a "Vehicle"). To define a property, the definition should start either with a `@vqpy.property` decorator or a `@vqpy.cross_object_property` decorator, where `@vqpy.property` indicates that the calculation of the property only based on the attributes of **the VObj instance**, and `@vqpy.cross_vobj_property` indicates that the calculation of the property requires the arributes of **other Vobj instances** on the same frame.
+To define a `VObj` class, users are required to inherit the `VObjBase` class. To define a property of the `VObj`, users can decorate the property with a `@vqpy_property` decorator, with the dependencies of the property as the `inputs` argument. The `inputs` argument is a dictionary of property names and the history lengths of the properties. 
 
-For example,  if we are interested in the vehicle object in the video, and want to query the license plate. We can define a `Vehicle` class as below.
+Below example shows how to declare an object of interest `Vehicle` with a property `velocity` that is calculated based on the this and last frame's `tlbr` property of the `Vehicle` object, and a property `license_plate` that is calculated based on the current frame's `image` property of the `Vehicle` object.
 
 ```python
-class Vehicle(vqpy.VObjBase):
+from vqpy.frontend.vobj import VObjBase, vobj_property
 
-    @vqpy.property()
-    def license_plate(self):
+class Vehicle(VObjBase):
+
+    @vobj_property(inputs={"tlbr": 1})
+    def velocity(self, tlbr):
+        # calculate velocity based on tlbr
+        pass
+
+    @vobj_property(inputs={"image": 0})
+    def license_plate(self, image):
         # infer license plate with vqpy built-in openalpr model
         return self.infer('license_plate', {'license_plate': 'openalpr'})
 ```
 
-And if we want to query the owner of a baggage object where the baggage's owner is a person object who is closest to the baggage. We can define our interested `VObj`s as below. Note that the `owner` property of `Baggage` `VObj` should be decorcated with `@vqpy.cross_vobj_property`.
-
-```python
-class Person(vqpy.VObjBase):
-    pass
-
-class Baggage(vqpy.VObjBase):
-
-    @vqpy.cross_vobj_property(vobj_type=Person, vobj_num="ALL", vobj_input_fields=("track_id", "tlbr"))
-    def owner(self, person_id_tlbrs):
-        pass
-```
-
-To retrieve the attribute values in property calculation, you can use `self.getv("property_name", index={history_index})` or `self.infer`. For more information about how to retrieve attribute values in VObj, you can refer to document [here](docs/frontend.md#retrieve-property-value-in-vobj).
-
-You can find more details about `VObj` as well as the decorators in our [VObj API document](vqpy/obj/vobj/base.py) and [VObj decorator API document](vqpy/obj/vobj/wrappers.py) (Currently is the docstring in our source code).
-
 
 #### Step 2. Define a `Query`
 
-Users can express their queries through SQL-like constraints with `VObjConstraint`, which is a return value of the `setting` method in their `Query` class. In `VObjConstraint`, users can specify query constraints on the interested `VObj` with `filter_cons`, and `select_cons` gives the projection of the properties the query shall return.
+Users can define video query with a `Query` class that inherites the `QueryBase` class. VQPy introduces two methods for user to express the query logic, i.e. `frame_constraint` and `frame_output`, where users can define the constraints and outputs of the query on frame respectively.
 
-Note that the keys for both `filter_cons` and `select_cons` should be strings of property names, where the property name can either be a vqpy built-in property name or a user declared property name of the interested `VObj`. The value of `filter_cons` dictionary should be a boolean function, the `VObj` instances which satisfy all the boolean functions in `filter_cons` will be selected as query results. The value of `select_cons` dictionary is the postprocessing function applied on the property for query output. If you want to directly output the property value without any postprocessing functions, you can just set the value to `None.`
-
-The code below demonstrates a query that selects all the `Vehicle` objects whose velocity is greater than 0.1, and chooses the two properties of `track_id`  and `license_plate` as outputs.
+Below example shows how to declare a query that lists the license plates of vehicles that are moving faster than 60 km/h.
 
 ```python
-class ListMovingVehicle(vqpy.QueryBase):
+from vqpy.frontend.query import QueryBase
 
-    @staticmethod
-    def setting() -> vqpy.VObjConstraint:
-        filter_cons = {'__class__': lambda x: x == Vehicle,
-                       'velocity': lambda x: x >= 0.1}
-        select_cons = {'track_id': None,
-                       'license_plate': None}
-        return vqpy.VObjConstraint(filter_cons=filter_cons,
-                                   select_cons=select_cons)
+class SpeedTicketing(QueryBase):
+    def __init__(self):
+        self.speed_limit = 60
+        self.vehicle = Vehicle()
+
+    def frame_constraint(self):
+        return self.vehicle.velocity > self.speed_limit
+
+    def frame_output(self, frame):
+        return (self.vehicle.track_id,
+                self.vehicle.license_plate)
 ```
 
-We also provide boolean functions that can be used in query, like `vqpy.query.continuing`, which checks whether a condition function continues to be true for a certain duration. For the detailed usage, please refer to our [People Loitering](examples/loitering) example.
+#### Step 3. Initialize and run the query
 
-#### Step 3. Launch the task
-
-After declaring `VObj` and `Query`, users should call the `vqpy.launch` function to deploy the video query, below is an example of this interface. Users should specify the detection class they expect, and map the object detection result to the defined VObj types.
+After defining the `VObj` and `Query`, users can initialize the query executor with `vqpy.init`, and execute the query with the `vqpy.run` function.
 
 ```python
-vqpy.launch(cls_name=vqpy.COCO_CLASSES, # detection class
-            cls_type={"car": Vehicle, "truck": Vehicle}, # mappings from detection class to VObj
-            tasks=[ListMovingVehicle()], # a list of Queries to apply
-            video_path=args.path, # the path of the queried video
-            save_folder=args.save_folder # result of query will be saved as a json file in this folder
-            )
+import vqpy 
+
+# initialize the query executor
+query_executor = vqpy.init(
+    video_path="path/to/video.mp4",
+    query_obj=SpeedTicketing(),
+)
+
+# execute the query
+vqpy.run(query_executor)
 ```
 
-Under the hood, VQPy will automatically select an object detection model that outputs the specified `cls_name`, and decide the best predicates order to execute the query. Multiple video optimizations will be conducted transparently to improve the end-to-end video query performance.
+### How to write a video query with inheritance?
+VQPy supports both inheritance for `VObj` and `Query`. Users can define a `VObj` or `Query` by inheriting from an existing `VObj` or `Query` class, and easily reuse the properties and logic defined in the parent class.
 
-### Advanced Usage
+Below example shows how to define a `Car` `VObj` that inherits from the `Vehicle` `VObj` defined in the previous example, with a `make` property. And both the properties defined in the parent `Vehicle` class and the `make` property defined in the `Car` class can be used in queries on the `Car` `VObj`.
 
-We also support customizing components (e.g. detector) to build the end to end query pipeline. For more details on customization, please refer to the document [here](docs/customization.md).
+```python
+class Car(Vehicle):
+
+    @vobj_property(inputs={"image": 0})
+    def make(self, image):
+        pass
+```
+
+A specific `FindAmberAlertCar` query can be defined by inheriting a general `FindCar` query.
+
+```python
+
+class FindCar(QueryBase):
+    def __init__(self):
+        self.car = Car()
+
+    def frame_constraint(self):
+        return self.car
+
+
+class FindAmberAlertCar(FindCar):
+    def frame_constraint(self):
+        return super().frame_constraint() & \
+         self.car.make == "Toyota" & \
+         self.car.license_plate in amber_alert_list
+
+    def frame_output(self, frame):
+        return (self.car.track_id,
+                self.car.license_plate)
+```
 
 ## Examples
 
