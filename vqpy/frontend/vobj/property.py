@@ -60,6 +60,7 @@ class BuiltInProperty(Property):
     def __str__(self):
         return f"BuiltInProperty(name={self.name})"
 
+
 class Literal(Property):
     def __init__(self, value):
         self.value = value
