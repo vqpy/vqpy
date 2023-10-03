@@ -1,6 +1,4 @@
 from typing import Dict
-from vqpy.backend.executor import Executor
-from vqpy.backend.planner import Planner
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
 import os
