@@ -4,6 +4,7 @@ from vqpy.backend.plan_nodes.base import AbstractPlanNode
 from vqpy.frontend.query import QueryBase
 from vqpy.frontend.vobj.predicates import Predicate
 from vqpy.frontend.vobj.property import Property, BuiltInProperty
+from vqpy.backend.plan_nodes.vobj_filter import create_vobj_filter_node_pred
 
 
 class ProjectionField:
@@ -79,6 +80,86 @@ def create_pre_filter_projector(query_obj: QueryBase, input_node):
                 filter_index=0,
             )
             node = node.set_next(projector_node)
+        vobj_properties_map[vobj] = vobj_properties
+
+    return node, vobj_properties_map
+
+
+def split_predicate(predicate):
+    from vqpy.frontend.vobj.predicates import And
+    if isinstance(predicate, And):
+        return split_predicate(predicate.left_pred) + split_predicate(
+            predicate.right_pred
+        )
+    else:
+        return [predicate]
+
+
+def get_prop_pred_map(predicates):
+    # traverse the predicates and get the map from property to predicates
+    # if the predicate is a comparison predicate with one property,
+    # then return the map from the property to predicates that use the property
+    prop_pred_map = dict()
+    rest_predicates = []
+    for predicate in predicates:
+        if predicate.is_comparison():
+            prop_names = predicate.get_self_vobj_property_names()
+            if len(prop_names) == 1:
+                prop_name = list(prop_names)[0]
+                prop_pred_map[prop_name] = prop_pred_map.get(prop_name, []) + [
+                    predicate
+                ]
+            else:
+                rest_predicates.append(predicate)
+        else:
+            rest_predicates.append(predicate)
+    return prop_pred_map, rest_predicates
+
+
+def create_projector_adjacent_to_filter(query_obj: QueryBase, input_node):
+    frame_constraints = query_obj.frame_constraint()
+
+    node = input_node
+
+    vobj_properties_map = dict()
+
+    predicates = split_predicate(frame_constraints)
+    prop_pred_map, rest_predicates = get_prop_pred_map(predicates)
+
+    if isinstance(frame_constraints, Predicate):
+        vobjs = frame_constraints.get_vobjs()
+        assert len(vobjs) == 1, "Only support one vobj in the predicate"
+        vobj = list(vobjs)[0]
+        vobj_properties = frame_constraints.get_vobj_properties()
+        for p in vobj_properties:
+            projector_node = ProjectorNode(
+                class_name=vobj.class_name,
+                projection_field=ProjectionField(
+                    field_name=p.name,
+                    field_func=p,
+                    dependent_fields=p.inputs,
+                    is_stateful=p.stateful,
+                ),
+                filter_index=0,
+            )
+            node = node.set_next(projector_node)
+
+            # add filter node adjacent to the projector node
+            # if the property is used in a comparison predicate
+            if p.name in prop_pred_map:
+                for predicate in prop_pred_map[p.name]:
+                    filter_node = create_vobj_filter_node_pred(
+                        predicate, node
+                    )
+                    node = projector_node.set_next(filter_node)
+
+            # add filter node for the rest predicates
+        for predicate in rest_predicates:
+            filter_node = create_vobj_filter_node_pred(
+                predicate, node
+            )
+            node = node.set_next(filter_node)
+
         vobj_properties_map[vobj] = vobj_properties
 
     return node, vobj_properties_map

@@ -6,11 +6,12 @@ from vqpy.backend.plan_nodes.output_formatter import (
 from vqpy.backend.plan_nodes.tracker import create_tracker_node
 from vqpy.backend.plan_nodes.vobj_filter import (
     create_vobj_class_filter_node,
-    create_vobj_filter_node,
+    create_vobj_filter_node_query,
 )
 from vqpy.backend.plan_nodes.vobj_projector import (
     create_frame_output_projector,
     create_pre_filter_projector,
+    create_projector_adjacent_to_filter
 )
 from vqpy.backend.plan_nodes.base import AbstractPlanNode
 from vqpy.backend.plan_nodes.object_detector import create_object_detector_node
@@ -39,8 +40,12 @@ class Planner:
         output_node = create_object_detector_node(query_obj, input_node)
         output_node = create_tracker_node(query_obj, output_node)
         output_node = create_vobj_class_filter_node(query_obj, output_node)
-        output_node, map = create_pre_filter_projector(query_obj, output_node)
-        output_node = create_vobj_filter_node(query_obj, output_node)
+        # code for first all projectors then all filters
+        # output_node, map = create_pre_filter_projector(query_obj, output_node)
+        # output_node = create_vobj_filter_node_query(query_obj, output_node)
+        output_node, map = create_projector_adjacent_to_filter(
+            query_obj, output_node
+        )
         if not output_per_frame_results:
             # Todo: add bypass to output formatter when
             # output_per_frame_results is True.

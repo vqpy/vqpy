@@ -18,7 +18,6 @@ class VObjFilterNode(AbstractPlanNode):
             prev=self.prev.to_operator(lauch_args),
             condition_func=self.predicate.generate_condition_function(),
             filter_index=self.filter_index
-
         )
 
     def __str__(self):
@@ -40,9 +39,16 @@ def create_vobj_class_filter_node(query_obj: QueryBase, input_node):
     return node
 
 
-def create_vobj_filter_node(query_obj: QueryBase, input_node):
+def create_vobj_filter_node_pred(predicate: Predicate, input_node):
+    output_node = input_node
+    output_node = output_node.set_next(
+        VObjFilterNode(predicate=predicate, filter_index=0))
+    return output_node
+
+
+def create_vobj_filter_node_query(query_obj: QueryBase, input_node):
     predicate = query_obj.frame_constraint()
 
-    output_node = input_node.set_next(
-        VObjFilterNode(predicate=predicate, filter_index=0))
+    output_node = create_vobj_filter_node_pred(predicate, input_node)
+
     return output_node

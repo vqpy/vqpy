@@ -8,6 +8,8 @@ import fake_yolox  # noqa F401
 import numpy as np
 import math
 import vqpy
+import time
+
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 resource_dir = os.path.join(current_dir, "..", "..", "resources/")
@@ -43,6 +45,7 @@ class Person(VObjBase):
 
     @vobj_property(inputs={"velocity": 1})
     def acceleration(self, values):
+        time.sleep(0.005)
         fps = 24.0
         last_velocity, velocity = values["velocity"]
         if last_velocity is None or velocity is None:
@@ -68,8 +71,8 @@ class ListPerson(QueryBase):
         return (
             (self.person.score > 0.6)
             & (self.person.score < 0.7)
+            & (self.person.velocity < 1.0)
             & (self.person.acceleration > 0)
-            | (self.person.over_speed == True)  # noqa: E712
         )
 
     def frame_output(self):
@@ -136,6 +139,7 @@ def test_customize_video_reader():
 
 
 if __name__ == "__main__":
+    st = time.time()
     test_plan()
-    print("test_plan passed")
+    print(f"test_plan takes {time.time() - st:.2f} seconds")
     # result = test_customize_video_reader()

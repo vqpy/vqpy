@@ -19,6 +19,21 @@ class Predicate(ABC):
 
     @abstractmethod
     def get_vobj_properties(self):
+        # get vobj properties including the dependent properties
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_self_vobj_property_names(self) -> set:
+        # get the vobj property names included in the predicate itself
+        # (without dependent properties)
+        raise NotImplementedError
+
+    @abstractmethod
+    def is_comparison(self):
+        # whether the predicate is a comparison predicate or
+        # a logical predicate
+        # logical predicate: And, Or, Not
+        # comparison predicate: Equal, GreaterThan, Compare
         raise NotImplementedError
 
 
@@ -43,6 +58,13 @@ class BinaryPredicate(Predicate):
             if all([p.func != vp.func for vp in vobj_props]):
                 vobj_props.append(p)
         return vobj_props
+
+    def get_self_vobj_property_names(self):
+        return self.left_pred.get_self_vobj_property_names() \
+            | self.right_pred.get_self_vobj_property_names()
+
+    def is_comparison(self):
+        return False
 
 
 class And(BinaryPredicate):
@@ -75,6 +97,12 @@ class Not(Predicate):
         f = self.pred.generate_condition_function()
         return lambda vobj_data: not f(vobj_data)
 
+    def get_self_vobj_property_names(self):
+        return self.pred.get_self_vobj_property_names()
+
+    def is_comparison(self):
+        return False
+
 
 class IsInstance(Predicate):
     def __init__(self, vobj):
@@ -94,6 +122,12 @@ class IsInstance(Predicate):
 
     def generate_condition_function(self):
         return self.vobj.class_name
+
+    def get_self_vobj_property_names(self):
+        return set()
+
+    def is_comparison(self):
+        return True
 
 
 class LiteralPredicate(Predicate):
@@ -140,6 +174,17 @@ class LiteralPredicate(Predicate):
     @abstractmethod
     def generate_condition_function(self):
         raise NotImplementedError
+
+    def get_self_vobj_property_names(self) -> set:
+        vobj_property_names = set()
+        if self.left_prop.is_vobj_property():
+            vobj_property_names.add(self.left_prop.name)
+        if self.right_prop.is_vobj_property():
+            vobj_property_names.add(self.right_prop.name)
+        return vobj_property_names
+
+    def is_comparison(self):
+        return True
 
 
 class Equal(LiteralPredicate):
@@ -217,3 +262,12 @@ class Compare(Predicate):
             return self.compare_func(prop_value)
 
         return condition_function
+
+    def get_self_vobj_property_names(self) -> set:
+        vobj_property_names = set()
+        if self.prop.is_vobj_property():
+            vobj_property_names.add(self.prop.name)
+        return vobj_property_names
+
+    def is_comparison(self):
+        return True
