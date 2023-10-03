@@ -57,6 +57,9 @@ class BuiltInProperty(Property):
     def get_vobjs(self):
         return {self.vobj}
 
+    def __str__(self):
+        return f"BuiltInProperty(name={self.name})"
+
 
 class Literal(Property):
     def __init__(self, value):

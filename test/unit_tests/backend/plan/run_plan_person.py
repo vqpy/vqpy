@@ -1,6 +1,4 @@
 from typing import Dict
-from vqpy.backend.executor import Executor
-from vqpy.backend.planner import Planner
 from vqpy.frontend.vobj import VObjBase, vobj_property
 from vqpy.frontend.query import QueryBase
 import os
@@ -8,6 +6,8 @@ import fake_yolox  # noqa F401
 import numpy as np
 import math
 import vqpy
+import time
+
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 resource_dir = os.path.join(current_dir, "..", "..", "resources/")
@@ -43,6 +43,7 @@ class Person(VObjBase):
 
     @vobj_property(inputs={"velocity": 1})
     def acceleration(self, values):
+        time.sleep(0.005)
         fps = 24.0
         last_velocity, velocity = values["velocity"]
         if last_velocity is None or velocity is None:
@@ -68,8 +69,8 @@ class ListPerson(QueryBase):
         return (
             (self.person.score > 0.6)
             & (self.person.score < 0.7)
+            & (self.person.velocity < 1.0)
             & (self.person.acceleration > 0)
-            | (self.person.over_speed == True)  # noqa: E712
         )
 
     def frame_output(self):
@@ -82,16 +83,20 @@ class ListPerson(QueryBase):
 
 
 def test_plan():
-    planner = Planner()
-    launch_args = {
-        "video_path": video_path,
-    }
-    root_plan_node = planner.parse(ListPerson())
-    planner.print_plan(root_plan_node)
-    executor = Executor(root_plan_node, launch_args)
-    result = executor.execute()
-    for res in result:
-        print(res)
+    # planner = Planner()
+    # launch_args = {
+    #     "video_path": video_path,
+    # }
+    # root_plan_node = planner.parse(ListPerson())
+    # planner.print_plan(root_plan_node)
+    # executor = Executor(root_plan_node, launch_args)
+    # result = executor.execute()
+    # for res in result:
+    #     print(res)
+    query_executor = vqpy.init(video_path=video_path,
+                               query_obj=ListPerson(),
+                               output_per_frame_results=False)
+    vqpy.run(query_executor)
 
 
 def test_customize_video_reader():
@@ -136,6 +141,7 @@ def test_customize_video_reader():
 
 
 if __name__ == "__main__":
+    st = time.time()
     test_plan()
-    print("test_plan passed")
+    print(f"test_plan takes {time.time() - st:.2f} seconds")
     # result = test_customize_video_reader()
