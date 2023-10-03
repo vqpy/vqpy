@@ -85,16 +85,20 @@ class ListPerson(QueryBase):
 
 
 def test_plan():
-    planner = Planner()
-    launch_args = {
-        "video_path": video_path,
-    }
-    root_plan_node = planner.parse(ListPerson())
-    planner.print_plan(root_plan_node)
-    executor = Executor(root_plan_node, launch_args)
-    result = executor.execute()
-    for res in result:
-        print(res)
+    # planner = Planner()
+    # launch_args = {
+    #     "video_path": video_path,
+    # }
+    # root_plan_node = planner.parse(ListPerson())
+    # planner.print_plan(root_plan_node)
+    # executor = Executor(root_plan_node, launch_args)
+    # result = executor.execute()
+    # for res in result:
+    #     print(res)
+    query_executor = vqpy.init(video_path=video_path,
+                               query_obj=ListPerson(),
+                               output_per_frame_results=False)
+    vqpy.run(query_executor)
 
 
 def test_customize_video_reader():
