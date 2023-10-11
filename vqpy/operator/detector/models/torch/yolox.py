@@ -11,6 +11,7 @@ from loguru import logger
 from vqpy.operator.detector.base import DetectorBase
 from vqpy.class_names.coco import COCO_CLASSES
 
+
 class YOLOXDetector(DetectorBase):
     """The YOLOX detector for object detection"""
 
