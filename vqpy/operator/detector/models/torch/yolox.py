@@ -11,12 +11,6 @@ from loguru import logger
 from vqpy.operator.detector.base import DetectorBase
 from vqpy.class_names.coco import COCO_CLASSES
 
-from yolox.data.data_augment import ValTransform
-from yolox.exp.build import get_exp
-from yolox.utils import postprocess
-from yolox.utils.model_utils import get_model_info
-
-
 class YOLOXDetector(DetectorBase):
     """The YOLOX detector for object detection"""
 
@@ -25,6 +19,12 @@ class YOLOXDetector(DetectorBase):
 
     def __init__(self, model_path, device="gpu", fp16=True):
         # TODO: start a new process handling this
+
+        from yolox.data.data_augment import ValTransform
+        from yolox.exp.build import get_exp
+        from yolox.utils import postprocess
+        from yolox.utils.model_utils import get_model_info
+
         exp = get_exp(None, "yolox_x")
         exp.test_conf = 0.3
         exp.nmsthre = 0.3
