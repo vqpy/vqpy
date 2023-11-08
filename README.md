@@ -75,7 +75,7 @@ docker run -it --name vqpy_container vqpy_image /bin/bash
 ## Overview
 Below is an architecture graph that describes the VQPy framework.
 <p align="center">
-  <img src="docs/resources/Architecture.png" width="800" title="architecture">
+  <img src="docs/resources/architecture.png" width="800" title="architecture">
 </p>
 
 VQPy's frontend is an object-oriented language that allows users to express their video queries in a natural way. VQPy extends Python's object-oriented programming with a set of video query-specific constructs, including `VObj`, `Relation`, and `Query`.
