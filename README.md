@@ -1,6 +1,10 @@
+
 # VQPy: An Object-Oriented Approach to Modern Video Analytics
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-brightgreen.svg)](https://github.com/uclasystem/VQPy/blob/main/LICENSE)
+[![Paper](https://img.shields.io/badge/Paper-ArXiv-orange.svg)](https://arxiv.org/abs/2311.01623)
+
+
 
 VQPy is a Python-based video analytics library, designed to address two major issues in today's video analytics. 
 
