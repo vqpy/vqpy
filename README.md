@@ -17,6 +17,9 @@ Please check out our examples below for details.
 
 The development of VQPy was initiated by [Harry Xu](http://www.cs.ucla.edu/~harryxu)'s group at UCLA, and has evolved over time into a community effort, involving folks from both academia and industry. VQPy is now part of Cisco's [DeepVision platform](https://research.cisco.com/research-projects/deep-vision) which is deployed world-wide to support complex queries over customer videos.
 
+## Updates
+🌟 VQPy is accepted by [MLSys24](https://mlsys.org/virtual/2024/poster/2652)!
+
 ## Installation
 
 <details><summary>Show installation details</summary>
@@ -199,7 +202,20 @@ We have included several real-world video analytics examples for demonstrating V
 - [Fall Detection](examples/fall_detection): Recognize fallen people in a video.
 - [List red moving vehicle](examples/list_red_moving_vehicle): show the license plates of red moving vehicles.
 - [People Counting](examples/people_counting): count the number of people heading in different directions.
-- [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggages.
+- [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggage.
+
+## Cition
+If you've found VQPy useful for your project, please consider citing our paper as follows:
+```
+@misc{yu2023vqpy,
+      title={VQPy: An Object-Oriented Approach to Modern Video Analytics}, 
+      author={Shan Yu and Zhenting Zhu and Yu Chen and Hanchen Xu and Pengzhan Zhao and Yang Wang and Arthi Padmanabhan and Hugo Latapie and Harry Xu},
+      year={2023},
+      eprint={2311.01623},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
 
 ## Getting Support
 
