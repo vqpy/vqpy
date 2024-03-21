@@ -204,7 +204,7 @@ We have included several real-world video analytics examples for demonstrating V
 - [People Counting](examples/people_counting): count the number of people heading in different directions.
 - [Unattended Baggage Detection](examples/unattended_baggage): detect unattended baggage.
 
-## Cition
+## Citation
 If you've found VQPy useful for your project, please consider citing our paper as follows:
 ```
 @misc{yu2023vqpy,
