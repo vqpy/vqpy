@@ -8,3 +8,6 @@ ColorDetect==1.6.0
 opencv-python==4.7.0.72
 loguru==0.7.0
 pandas==2.0.2
+cython_bbox==0.1.3
+tqdm==4.66.1
+lap==0.4.0
