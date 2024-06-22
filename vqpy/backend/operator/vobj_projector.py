@@ -1,11 +1,8 @@
 from vqpy.backend.operator.base import Operator
 from vqpy.backend.frame import Frame
 from typing import Callable, Dict, Any
-import pandas as pd
-import numpy as np
 from vqpy.utils.images import crop_image
 from vqpy.common import InvalidProperty
-import time
 
 import warnings
 
@@ -32,7 +29,7 @@ class VObjData:
             frame_id = vobj_data.pop("frame_id")
 
             if self.property_name not in vobj_data:
-                assert this_vobj_index is not None, (   
+                assert this_vobj_index is not None, (
                     "this_vobj_index must be included when updating vobj "
                     "history data"
                 )
@@ -215,7 +212,6 @@ class VObjProjector(Operator):
     def _compute_property(self, non_hist_data, hist_data, frame):
         # Todo: allow user to fill property without enough history with a
         # default value. Currently fill with None
-        import time
         output_hist_data = hist_data.copy()
         for i, cur_dep in enumerate(non_hist_data):
             vobj_index = cur_dep["vobj_index"]
@@ -253,7 +249,6 @@ class VObjProjector(Operator):
 
                 dep_data_dict[dependency_name] = dep_data
 
-    
             for dependency_name in self._non_hist_dependencies:
                 assert (
                     dependency_name in cur_dep
@@ -299,7 +294,6 @@ class VObjProjector(Operator):
             )
             if self._dep_on_hist and hist_data:
                 self._update_hist_buffer(hist_deps=output_hist_data)
-            # print(f"vobj_projector for {self.property_name} takes: {time.time() - st}")
         return frame
 
 
