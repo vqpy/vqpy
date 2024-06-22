@@ -5,10 +5,71 @@ import pandas as pd
 import numpy as np
 from vqpy.utils.images import crop_image
 from vqpy.common import InvalidProperty
+import time
 
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
+
+
+class VObjData:
+    def __init__(self, property_name):
+        # vobj_hist_data is a dict of vobj history data, key is track_id,
+        # value is the history data of the vobj, including "first_frame_id",
+        # hist_dependencies, and "this_vobj_index"
+        self.vobj_hist_data = dict()
+        self.property_name = property_name
+
+    def update(self, vobj_data_list):
+        # vobj_data is a list of vobj data, each includes a dict of
+        # hist_dependency properties of a vobj, as well as "track_id"
+        # and "vobj_index"
+        for vobj_data in vobj_data_list:
+            assert "track_id" in vobj_data, "track_id must be included"
+
+            track_id = vobj_data.pop("track_id")
+            this_vobj_index = vobj_data.pop("vobj_index", None)
+            frame_id = vobj_data.pop("frame_id")
+
+            if self.property_name not in vobj_data:
+                assert this_vobj_index is not None, (   
+                    "this_vobj_index must be included when updating vobj "
+                    "history data"
+                )
+
+            if track_id not in self.vobj_hist_data:
+                # initialize vobj history data
+                data = {
+                    "first_frame_id": frame_id,
+                    "this_vobj_index": this_vobj_index
+                }
+                # map each value in vobj_data to a list of length 1
+                for k, v in vobj_data.items():
+                    data[k] = [v]
+                self.vobj_hist_data[track_id] = data
+
+            else:
+                # update vobj history data with new vobj data
+                if self.property_name not in vobj_data:
+                    self.vobj_hist_data[track_id]["this_vobj_index"] = \
+                        this_vobj_index
+                for k, v in vobj_data.items():
+                    # insert None for missing data
+                    insert_loc = frame_id - \
+                        self.vobj_hist_data[track_id]["first_frame_id"]
+                    while len(self.vobj_hist_data[track_id][k]) < insert_loc:
+                        self.vobj_hist_data[track_id][k].append(None)
+                    self.vobj_hist_data[track_id][k].append(v)
+
+    def get(self, track_id, dependency_name, hist_len):
+        if track_id not in self.vobj_hist_data:
+            return None, False
+
+        dependency_values = self.vobj_hist_data[track_id][dependency_name]
+        if len(dependency_values) < hist_len:
+            return None, False
+
+        return dependency_values[-hist_len:], True
 
 
 class VObjProjector(Operator):
@@ -62,10 +123,7 @@ class VObjProjector(Operator):
         self._self_dep = self.property_name in self._hist_dependencies
         self._dep_on_hist = len(self._hist_dependencies) > 0
         self._max_hist_len = max(dependencies.values())
-        columns = ["track_id", "frame_id", "vobj_index"] + list(
-            self._hist_dependencies.keys()
-        )
-        self._hist_buffer = pd.DataFrame(columns=columns)
+        self._hist_buffer = VObjData(property_name=self.property_name)
 
         super().__init__(prev)
 
@@ -141,54 +199,23 @@ class VObjProjector(Operator):
         return non_hist_deps, hist_deps
 
     def _update_hist_buffer(self, hist_deps):
-        # self._hist_buffer = self._hist_buffer.append(hist_deps)
-        self._hist_buffer = pd.concat(
-            [self._hist_buffer, pd.DataFrame.from_dict(hist_deps)]
-        )
+        self._hist_buffer.update(hist_deps)
 
-        # remove data that older than max history length
-        cur_frame_id = hist_deps[0]["frame_id"]
-        # frame_id starts from 0
-        oldest_frame_id = cur_frame_id + 1 - (self._max_hist_len + 1)
-        if oldest_frame_id >= 0:
-            self._hist_buffer = self._hist_buffer[
-                self._hist_buffer["frame_id"] >= oldest_frame_id
-            ]
+        # todo: remove data that older than max history length
 
     def _get_hist_dependency(
         self, dependency_name, track_id, frame_id, hist_len
     ):
         # todo: allow user to fill missing data with a default value
         # currently fill with None
-        hist_start = frame_id - hist_len
-        # return None if there isn't enough history
-        if hist_start < 0:
-            return None, False
-
-        hist_end = frame_id - 1
-        # get dependency data from hist buffer
-        row = (
-            (self._hist_buffer["track_id"] == track_id)
-            & (self._hist_buffer["frame_id"] >= hist_start)
-            & (self._hist_buffer["frame_id"] <= hist_end)
-        )
-        hist_df = (
-            self._hist_buffer.loc[row, ["frame_id", dependency_name]]
-            .set_index("frame_id")
-            .reindex(range(hist_start, hist_end + 1))
-        )
-        # fill missing frames with None
-        hist_df = hist_df.replace(np.nan, None)
-        hist_data = hist_df[dependency_name].tolist()
-
-        # hist_data contains history data
-        assert len(hist_data) == hist_len
-
-        return hist_data, True
+        results = self._hist_buffer.get(track_id, dependency_name, hist_len)
+        # print("get_hist_dependency results:", results)
+        return results
 
     def _compute_property(self, non_hist_data, hist_data, frame):
         # Todo: allow user to fill property without enough history with a
         # default value. Currently fill with None
+        import time
         output_hist_data = hist_data.copy()
         for i, cur_dep in enumerate(non_hist_data):
             vobj_index = cur_dep["vobj_index"]
@@ -226,6 +253,7 @@ class VObjProjector(Operator):
 
                 dep_data_dict[dependency_name] = dep_data
 
+    
             for dependency_name in self._non_hist_dependencies:
                 assert (
                     dependency_name in cur_dep
@@ -263,12 +291,15 @@ class VObjProjector(Operator):
     def next(self) -> Frame:
         if self.prev.has_next():
             frame = self.prev.next()
+            # import time
+            # st = time.time()
             non_hist_data, hist_data = self._get_cur_frame_dependencies(frame)
             frame, output_hist_data = self._compute_property(
                 non_hist_data, hist_data, frame=frame
             )
             if self._dep_on_hist and hist_data:
                 self._update_hist_buffer(hist_deps=output_hist_data)
+            # print(f"vobj_projector for {self.property_name} takes: {time.time() - st}")
         return frame
 
 
