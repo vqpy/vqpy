@@ -207,14 +207,18 @@ We have included several real-world video analytics examples for demonstrating V
 ## Citation
 If you've found VQPy useful for your project, please consider citing our paper as follows:
 ```
-@misc{yu2023vqpy,
-      title={VQPy: An Object-Oriented Approach to Modern Video Analytics}, 
-      author={Shan Yu and Zhenting Zhu and Yu Chen and Hanchen Xu and Pengzhan Zhao and Yang Wang and Arthi Padmanabhan and Hugo Latapie and Harry Xu},
-      year={2023},
-      eprint={2311.01623},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+@inproceedings{MLSYS2024_87eaaa86,
+ author = {Yu, Shan and Zhu, Zhenting and Chen, Yu and Xu, Hanchen and Zhao, Pengzhan and Wang, Yang and Padmanabhan, Arthi and Latapie, Hugo and Xu, Harry},
+ booktitle = {Proceedings of Machine Learning and Systems},
+ editor = {P. Gibbons and G. Pekhimenko and C. De Sa},
+ pages = {279--295},
+ title = {VQPy: An Object-Oriented Approach to Modern Video Analytics},
+ url = {https://proceedings.mlsys.org/paper_files/paper/2024/file/87eaaa8605a1a472d9a9756e7500517b-Paper-Conference.pdf},
+ volume = {6},
+ year = {2024}
 }
+
+
 ```
 
 ## Getting Support
