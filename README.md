@@ -1,5 +1,5 @@
 
-# VQPy: An Object-Oriented Approach to Modern Video Analytics
+# VQPy: An Object-Oriented Approach to Video Analytics Queries
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-brightgreen.svg)](https://github.com/uclasystem/VQPy/blob/main/LICENSE)
 [![Paper](https://img.shields.io/badge/Paper-ArXiv-orange.svg)](https://arxiv.org/abs/2311.01623)
